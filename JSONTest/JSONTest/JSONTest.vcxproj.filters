@@ -29,9 +29,15 @@
     <ClInclude Include="InputOption.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="CONSTANTSTRING.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="JSONForm.resx">
+      <Filter>リソース ファイル</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputOption.resx">
       <Filter>リソース ファイル</Filter>
     </EmbeddedResource>
   </ItemGroup>

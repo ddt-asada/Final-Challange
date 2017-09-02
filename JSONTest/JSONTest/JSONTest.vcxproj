@@ -137,6 +137,7 @@
     <ClCompile Include="JSONForm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CONSTANTSTRING.h" />
     <ClInclude Include="InputOption.h">
       <FileType>CppForm</FileType>
     </ClInclude>

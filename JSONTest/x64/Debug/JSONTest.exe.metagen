@@ -1,3 +1,4 @@
+  JSONTest.InputOption.resources - Embedded, ContainedInManifestFile, 
   JSONTest.JSONForm.resources - Embedded, ContainedInManifestFile, 
 ImageRuntimeVersion: v4.0.30319
 Assembly JSONTest, Version=0.0.*, Culture=ロケールに依存しない言語 (ロケールに依存しない国): 
@@ -17,6 +18,19 @@ Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c5619
 Class JSONTest.InputOption: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Properties:
+    System.String ResultJSON 'get set' : 
+    System.String SendQuery 'get set' : 
+    System.String FilePath 'get set' : 
+  Methods:
+    set_FilePath(String): PrivateScope, Public, HideBySig, SpecialName
+    get_FilePath(): PrivateScope, Public, HideBySig, SpecialName
+    set_SendQuery(String): PrivateScope, Public, HideBySig, SpecialName
+    get_SendQuery(): PrivateScope, Public, HideBySig, SpecialName
+    set_ResultJSON(String): PrivateScope, Public, HideBySig, SpecialName
+    get_ResultJSON(): PrivateScope, Public, HideBySig, SpecialName
 Class JSONTest.JSONForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    constantstring.CONSTANTSTRING CONST : Public
