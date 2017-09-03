@@ -144,6 +144,8 @@
     <ClInclude Include="JSONForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Processing.h" />
+    <ClInclude Include="StringProcess.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="InputOption.resx">

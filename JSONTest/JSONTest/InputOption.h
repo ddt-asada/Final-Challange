@@ -14,52 +14,6 @@ namespace JSONTest {
 	/// </summary>
 	public ref class InputOption : public System::Windows::Forms::Form
 	{
-	public:
-		InputOption(void)
-		{
-			InitializeComponent();
-			//
-			//TODO: ここにコンストラクター コードを追加します
-			//
-		}
-		//JSONファイルパスのプロパティ
-		//作成日：2017.9.2
-		//作成者：K.Asada
-		property String^ FilePath {
-			System::Void set(String^ Path) {
-				this->JFilePath = Path;
-			}
-
-			System::String^ get() {
-				return this->JFilePath;
-			}
-		}
-
-		//DBとの通信するクエリのプロパティ
-		//作成日：2017,9,2
-		//作成者：K.Asada
-		property String^ SendQuery{
-			System::Void set(String^ query) {
-				this->Query = query;
-			}
-
-			System::String^ get() {
-				return this->Query;
-			}
-		}
-
-		//DBとの通信結果のプロパティ
-		//作成日：2017,9,2
-		//作成者：K.Asada
-		property String^ ResultJSON {
-			System::Void set(String^ result) {
-				this->DbJson = result;
-			}
-
-			System::String^ get() {
-				return this->DbJson;
-			}
-		}
 
 	protected:
 		/// <summary>
@@ -87,9 +41,6 @@ namespace JSONTest {
 	protected:
 
 	private:
-		String^ JFilePath;		//入力されたJSONのファイルパスを格納するための文字列。
-		String^ Query;			//入力されたDBへ投げるクエリを格納する文字列。
-		String^ DbJson;			//DBとの通信結果を格納する文字列。
 		/// <summary>
 		/// 必要なデザイナー変数です。
 		/// </summary>
@@ -209,18 +160,70 @@ namespace JSONTest {
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
 			this->Name = L"InputOption";
 			this->Text = L"InputOption";
+			this->Load += gcnew System::EventHandler(this, &InputOption::InputOption_Load);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
+			public:
+				InputOption(void)
+				{
+					InitializeComponent();
+					//
+					//TODO: ここにコンストラクター コードを追加します
+					//
+				}
+				//JSONファイルパスのプロパティ
+				//作成日：2017.9.2
+				//作成者：K.Asada
+				property String^ FilePath {
+					System::Void set(String^ Path) {
+						this->JFilePath = Path;
+					}
+
+					System::String^ get() {
+						return this->JFilePath;
+					}
+				}
+
+				//DBとの通信するクエリのプロパティ
+				//作成日：2017,9,2
+				//作成者：K.Asada
+				property String^ SendQuery {
+					System::Void set(String^ query) {
+						this->Query = query;
+					}
+
+					System::String^ get() {
+						return this->Query;
+					}
+				}
+
+				//DBとの通信結果のプロパティ
+				//作成日：2017,9,2
+				//作成者：K.Asada
+				property String^ ResultJSON {
+					System::Void set(String^ result) {
+						this->DbJson = result;
+					}
+
+					System::String^ get() {
+						return this->DbJson;
+					}
+				}
+
+				private:
+					String^ JFilePath;		//入力されたJSONのファイルパスを格納するための文字列。
+					String^ Query;			//入力されたDBへ投げるクエリを格納する文字列。
+					String^ DbJson;			//DBとの通信結果を格納する文字列。
+
 	private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
 		this->textBox1->Text = this->openFileDialog1->FileName;
 	}
 	private: System::Void buttonLoadFileJSON_Click(System::Object^  sender, System::EventArgs^  e) {
 		
 		//ファイルフィルタ  
-		this->openFileDialog1->Filter = "画像ﾌｧｲﾙ(*.bmp,*.jpg,*.png,*.tif,*.ico)|*.bmp;*.jpg;*.png;*.tif;*.ico";
 		//ダイアログの表示 （Cancelボタンがクリックされた場合は何もしない）
 		if (this->openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) {
 			return;
@@ -243,6 +246,12 @@ private: System::Void buttonCancelOption_Click(System::Object^  sender, System::
 
 	//メイン画面へ戻る。
 	this->Close();
+}
+private: System::Void InputOption_Load(System::Object^  sender, System::EventArgs^  e) {
+	//テキストボックスの中身をメンバ変数の値で初期化。
+	this->textBox1->Text = this->JFilePath;
+	//テキストボックスの中身をメンバ変数の値で初期化。
+	this->textBoxDBquery->Text = this->Query;
 }
 };
 }

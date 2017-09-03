@@ -2,6 +2,7 @@
 
 #include "InputOption.h"
 #include "CONSTANTSTRING.h"
+#include "Processing.h"
 
 namespace JSONTest {
 
@@ -11,6 +12,7 @@ namespace JSONTest {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace process;
 
 	/// <summary>
 	/// JSONForm の概要
@@ -349,7 +351,7 @@ namespace JSONTest {
 	private: System::Void JSONForm_Load(System::Object^  sender, System::EventArgs^  e) {
 	}
 
-			 //設定ボタンをクリックしたときの処理
+	//設定ボタンをクリックしたときの処理
 private: System::Void buttonInputOption_Click(System::Object^  sender, System::EventArgs^  e) {
 	//設定ダイアログを開くために設定クラスをインスタンス化する。
 	InputOption^ iopt = gcnew InputOption();
@@ -378,29 +380,9 @@ private: System::Void JSONForm_FormClosing(System::Object^  sender, System::Wind
 
 //OKボタンが押されたときの処理
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
-	try {
-		
-		//testbutton->Name = "テスト";
-	//	testbutton->Text = "詳細";
-		//テキストボックスに入力された文字列を整数値に変換する関数を呼び出す
-		//タテを取得
-		this->row = this->IntToString(this->textBoxRow->Text);
-		//ヨコを取得
-		this->column = this->IntToString(this->textBoxColumn->Text);
-		//タテとヨコのテキストボックスに値が入っているかを判定する。
-		if (row >= 1 && column >= 1) {
-			//ヨコを分割
-		//	DataGridViewButtonRows^ = rowbutton = gcnew DataGridViewButtonColumn();
-			for (int i = 0; i < column; i++) {
-			//	DataGridViewButtonColumn^ testbutton = gcnew DataGridViewButtonColumn();
-			//	this->dataGridViewJSON->Columns->Add(testbutton);
-			}
-		}
-	}
-	catch (Exception^ ex) {
-		//受け取ったエラー内容を表示する。
-		MessageBox::Show(ex->ToString(), "警告", MessageBoxButtons::OK, MessageBoxIcon::Warning);
-	}
+	//表を生成するためのクラスをインスタンス化
+	Processing^ table = gcnew Processing(this->JSONFilePath, this->DBQuery);
+	table->run();
 }
 
 /*関数名：IntToString
@@ -439,6 +421,7 @@ private:System::Void initMainForm() {
 	this->textBoxColumn2->Text = CONST->ZERO_STRING;//ヨコが入力されたテキストボックスを初期化。
 	this->JSONFilePath = CONST->EMPTY_STRING;		//JSONの読み込み先のファイルパスを初期化。
 	this->DBQuery = CONST->EMPTY_STRING;			//DBクエリを初期化。
+	this->DBResult = CONST->EMPTY_STRING;			//DBとの通信結果を初期化する。
 }
 
 //キャンセルボタンが押されたときの処理

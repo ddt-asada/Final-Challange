@@ -17,5 +17,6 @@ namespace constantstring {
 		};
 		System::String^ EMPTY_STRING = "";
 		System::String^ ZERO_STRING = "0";
+		System::Int32^ ZERO = 0;
 	};
 }
