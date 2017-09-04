@@ -5,18 +5,27 @@
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
 #include <iostream>
+#include <cliext/map> 
+#include "CONSTANTSTRING.h"
 
 namespace process {
 	using namespace std;
 	using namespace System;
-
+	using namespace constantstring;
 	using namespace boost::property_tree;
+	using namespace cliext;
+	typedef map<String^, String^ > mymap;
 
 	//作成日：2017.9.2
 	//作成者：K.Asada
 	//文字列を処理する関数群クラス。
 	ref class StringProcess {
 	public:
+		//定数クラスをインスタンス化
+		CONSTANTSTRING^ CONST = gcnew CONSTANTSTRING();
+		int column;		//表の列数
+		int row;		//表の行数
+		map<string, string> table;
 
 		//デフォルトコンストラクタ
 		StringProcess() {
@@ -32,35 +41,69 @@ namespace process {
 			//受け取ったファイルパスよりJSONを取得する。
 			read_json(path, pt);
 
-			jsonchange(pt, "");
-/*			auto itr = pt.begin();
-			const ptree::value_type& child = pt.get_child(itr->first)) {
-				if (boost::optional<std::string> str = pt.get_optional<std::string>(child.first)) {
-					path = itr->first;
-				}
-			}
-			*/
-			//受け取った文字列をJSONに変換する。
-			write_json(cout, pt);
-			
+			//JSONから表の行数を割り出す関数を呼び出す。
+			CountRows(pt);
+
+			//JSONから表の出力に必要な文字列を呼び出す。
+			TableString(pt, "");
+
+			//タイトルの行数を考慮して列数を補正する。
+			this->column = (column - 1) / (row - 1);
+
 			return "";
 		}
 
-		Void jsonchange(ptree pt, string key) {
+		/*出力する表の行数を割り出すための関数
+		作成日：2017.9.4
+		作成者：K.Asada*/
+		Void CountRows(ptree pt) {
+			//イテレーターにより一番親のキー名を取り出す。
 			auto itr = pt.begin();
-			string json;
-			if (key == "") {
+			//1階層下がったところにある兄弟を数えて行数にする。
+			BOOST_FOREACH(const ptree::value_type& child, pt.get_child(itr->first)) {
+				//"class"は付加情報であるので行数から除外する。
+				if (child.first != "class") {
+					//行数をインクリメントする。
+					this->row++;
+				}
+			}
+		}
+
+		/*出力する表に必要な文字列および列数を割り出すための関数
+		作成日：2017.9.4
+		作成者：K.Asada
+		*/
+		Void TableString(ptree pt, string key) {
+			string childkey = "";		//再帰処理の時に必要な子のキー名を格納する文字列。
+			//表の要素を見つけたら。
+			if (key == "text") {
+				//列数をカウントする。
+				this->column++;
+			//キー名が空の時（初回ループ時）
+			}else if (key == "") {
+				//キー名を取得するためのイテレーターを宣言。
+				auto itr = pt.begin();
+				//キー名をイテレーターより取得。
 				key = itr->first;
 			}
+			//子に文字列があった場合
 			if (boost::optional<std::string> str = pt.get_optional<std::string>(key)) {
+			//文字列をキー名をペアにしてマップに格納する。
+
 			}
+			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
-			//	std::cout << "value : " << value.get() << std::endl;
+			//キー名をペアにしてマップに格納する
+				//	std::cout << "value : " << value.get() << std::endl;
 			}
+			//子がまだいる場合
 			if (pt.get_child_optional(key)) {
+				//子の兄弟を走査する
 				BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
-					json = child.first;
-					jsonchange(pt.get_child(key), json);
+					//再帰処理に必要な子のキー名を取得する
+					childkey = child.first;
+					//再帰処理を行う
+					TableString(pt.get_child(key), childkey);
 				}
 			}
 		}
