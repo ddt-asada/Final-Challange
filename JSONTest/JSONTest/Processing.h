@@ -11,7 +11,7 @@
 namespace process {
 	using namespace System;
 
-	ref class Processing {
+	ref class Processing : public StringProcess{
 	private:
 		//定数クラスをインスタンス化
 		constantstring::CONSTANTSTRING^ CONST = gcnew constantstring::CONSTANTSTRING();
@@ -43,10 +43,18 @@ namespace process {
 				StringProcess^ test = gcnew StringProcess();
 				test->ReadyString(this->LoadFilePath);
 				//JSONより取得した行数とメンバ変数の行数を比較する。
+				if (*this->Row > *this->row) {
+					//大きい方を採用する。
+					this->row = Row;
+				}
 				//JSONより取得した列数とメンバ変数の列数を比較する。
+				if (*this->Column > *this->column) {
+					//大きい方を採用する
+					this->column = Column;
+				}
 			}
-
 			//表を出力する関数を呼び出す。
+
 		}
 
 	};

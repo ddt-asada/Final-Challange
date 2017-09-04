@@ -5,7 +5,8 @@
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
 #include <iostream>
-#include <cliext/map> 
+#include <string>
+#include <vector> 
 #include "CONSTANTSTRING.h"
 
 namespace process {
@@ -13,8 +14,6 @@ namespace process {
 	using namespace System;
 	using namespace constantstring;
 	using namespace boost::property_tree;
-	using namespace cliext;
-	typedef map<String^, String^ > mymap;
 
 	//作成日：2017.9.2
 	//作成者：K.Asada
@@ -23,9 +22,9 @@ namespace process {
 	public:
 		//定数クラスをインスタンス化
 		CONSTANTSTRING^ CONST = gcnew CONSTANTSTRING();
-		int column;		//表の列数
-		int row;		//表の行数
-		map<string, string> table;
+		Int32^ column = CONST->ZERO;		//表の列数
+		Int32^ row = CONST->ZERO;		//表の行数
+		vector<pair<string, string>>* table = new vector<pair<string, string>>();
 
 		//デフォルトコンストラクタ
 		StringProcess() {
@@ -48,7 +47,7 @@ namespace process {
 			TableString(pt, "");
 
 			//タイトルの行数を考慮して列数を補正する。
-			this->column = (column - 1) / (row - 1);
+			this->column = (*this->column - 1) / (*this->row - 1);
 
 			return "";
 		}
@@ -64,7 +63,7 @@ namespace process {
 				//"class"は付加情報であるので行数から除外する。
 				if (child.first != "class") {
 					//行数をインクリメントする。
-					this->row++;
+					*this->row += 1;
 				}
 			}
 		}
@@ -78,7 +77,7 @@ namespace process {
 			//表の要素を見つけたら。
 			if (key == "text") {
 				//列数をカウントする。
-				this->column++;
+				*this->column += 1;
 			//キー名が空の時（初回ループ時）
 			}else if (key == "") {
 				//キー名を取得するためのイテレーターを宣言。
@@ -88,13 +87,13 @@ namespace process {
 			}
 			//子に文字列があった場合
 			if (boost::optional<std::string> str = pt.get_optional<std::string>(key)) {
-			//文字列をキー名をペアにしてマップに格納する。
-
+				//文字列をキー名をペアにしてマップに格納する。
+				this->table->push_back(pair<string, string>(key, str.get()));
 			}
 			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
-			//キー名をペアにしてマップに格納する
-				//	std::cout << "value : " << value.get() << std::endl;
+				//キー名をペアにしてマップに格納する
+				this->table->push_back(pair<string, string>(key, to_string(value.get())));
 			}
 			//子がまだいる場合
 			if (pt.get_child_optional(key)) {
