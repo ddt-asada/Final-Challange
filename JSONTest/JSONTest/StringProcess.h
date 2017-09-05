@@ -4,6 +4,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <Windows.h>
 #include <iostream>
 #include <string>
 #include <vector> 
@@ -21,9 +22,10 @@ namespace process {
 	ref class StringProcess {
 	public:
 		//定数クラスをインスタンス化
-		CONSTANTSTRING^ CONST = gcnew CONSTANTSTRING();
-		Int32^ column = CONST->ZERO;		//表の列数
-		Int32^ row = CONST->ZERO;		//表の行数
+		CONSTANTSTRING^ MyConst = gcnew CONSTANTSTRING();
+		Int32^ column = *MyConst->ZERO;		//表の列数
+		Int32^ row = *MyConst->ZERO;		//表の行数
+		Int32^ tmp = *MyConst->ZERO;
 		vector<pair<string, string>>* table = new vector<pair<string, string>>();
 
 		//デフォルトコンストラクタ
@@ -31,39 +33,69 @@ namespace process {
 		};
 
 		//ファイルパスより文字列を取得してその文字列から行数、列数、文字列を抜き出す。
-		String^ ReadyString(String^ JSONPath) {
+		vector<pair<string, string>>* ReadyString(String^ JSONPath) {
 			ptree pt;		//ファイルより取得したJSONを格納するツリー
+		//	String^ SJSON = "";
+			string JSON = "";
 			string path = "";
 			MarshalString(JSONPath, path);
-			//受け取ったファイルパスより文字列を取得する関数を呼び出す。
-			//JSON = LoadJSON(JSONPath);
-			//受け取ったファイルパスよりJSONを取得する。
-			read_json(path, pt);
+			//受け取ったファイルパスより文字列を呼び出す。
+			stringstream ss;
+			std::ifstream ifs(path, ios_base::binary);
+			ss << ifs.rdbuf();
 
-			//JSONから表の行数を割り出す関数を呼び出す。
-			CountRows(pt);
+			//取得した文字列よりJSONを取得する。
+			read_json(ss, pt);
 
 			//JSONから表の出力に必要な文字列を呼び出す。
 			TableString(pt, "");
+			//JSONから表の行数を割り出す関数を呼び出す。
+			CountRows();
+			this->tmp = *this->row;
+			//JSONから表の列数を割り出す関数を呼び出す。
+			CountColumn();
 
+			this->row = *this->row - *this->column;
 			//タイトルの行数を考慮して列数を補正する。
-			this->column = (*this->column - 1) / (*this->row - 1);
+			this->column = *this->tmp / *this->row;
 
-			return "";
+			return this->table;
+		}
+
+		/*出力する表の列数を割り出す関数
+		作成日：2017.9.5
+		作成者：K.Asada
+		*/
+		Void CountColumn() {
+			//イテレーターにより走査する。
+			for (auto itr = this->table->begin(); itr != this->table->end(); ++itr) {
+				Int32 tmp = 0;
+				//表の要素を見つけたら列数をカウント
+				if (itr->first == "text" || itr->first == "array" || itr->first == "html") {
+					*this->column += 1;
+				}
+				//結合を示すキー名があれば
+				else if (itr->first == "colspan") {
+					//結合の行数をプラスする
+					*this->column += stoi(itr->second) - 1;
+				}
+			}
 		}
 
 		/*出力する表の行数を割り出すための関数
 		作成日：2017.9.4
 		作成者：K.Asada*/
-		Void CountRows(ptree pt) {
-			//イテレーターにより一番親のキー名を取り出す。
-			auto itr = pt.begin();
-			//1階層下がったところにある兄弟を数えて行数にする。
-			BOOST_FOREACH(const ptree::value_type& child, pt.get_child(itr->first)) {
-				//"class"は付加情報であるので行数から除外する。
-				if (child.first != "class") {
-					//行数をインクリメントする。
+		Void CountRows() {
+			//イテレーターにより走査する。
+			for (auto itr = this->table->begin(); itr != this->table->end(); ++itr) {
+				//親のノードまたは子が配列の時に列数をカウント
+				if ((itr->second == "" && (itr + 1)->first != "array") || itr->first == "array" || itr->first == "html") {
+					//列数をインクリメント
 					*this->row += 1;
+				}
+				else if (itr->first == "colspan") {
+					//結合の行数をプラスする
+					*this->row += stoi(itr->second) - 1;
 				}
 			}
 		}
@@ -74,12 +106,8 @@ namespace process {
 		*/
 		Void TableString(ptree pt, string key) {
 			string childkey = "";		//再帰処理の時に必要な子のキー名を格納する文字列。
-			//表の要素を見つけたら。
-			if (key == "text") {
-				//列数をカウントする。
-				*this->column += 1;
 			//キー名が空の時（初回ループ時）
-			}else if (key == "") {
+			if (key == "") {
 				//キー名を取得するためのイテレーターを宣言。
 				auto itr = pt.begin();
 				//キー名をイテレーターより取得。
@@ -88,21 +116,35 @@ namespace process {
 			//子に文字列があった場合
 			if (boost::optional<std::string> str = pt.get_optional<std::string>(key)) {
 				//文字列をキー名をペアにしてマップに格納する。
-				this->table->push_back(pair<string, string>(key, str.get()));
+				this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
 			}
 			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
 				//キー名をペアにしてマップに格納する
-				this->table->push_back(pair<string, string>(key, to_string(value.get())));
+				this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
 			}
 			//子がまだいる場合
 			if (pt.get_child_optional(key)) {
 				//子の兄弟を走査する
 				BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
-					//再帰処理に必要な子のキー名を取得する
+					//判定を行うためにsecondを取得
+					const ptree& info = child.second;
+					//子のキー名を取得する
 					childkey = child.first;
-					//再帰処理を行う
-					TableString(pt.get_child(key), childkey);
+					//子要素が配列かつ整数であれば
+					if (boost::optional<int> value = info.get_optional<int>(childkey)) {
+						//キー名をペアにしてマップに格納する
+						this->table->push_back(pair<string, string>(UTF8toSjis(childkey), UTF8toSjis(to_string(value.get()))));
+					//子要素が配列かつ文字列であれば
+					}
+					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
+						this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
+						//文字列をキー名をペアにしてマップに格納する。					
+					}
+					else {
+						//再帰処理を行う
+						TableString(pt.get_child(key), childkey);
+					}
 				}
 			}
 		}
@@ -126,12 +168,78 @@ namespace process {
 			return retString;
 		}
 
+		/*String^型をstring型へ変換する関数
+		作成日：2017.9.5
+		作成者：K.Asada
+		*/
 		void MarshalString(String^ sys_string, string& std_string) {
 			using namespace Runtime::InteropServices;
 			const char* chars =
 				(const char*)(Marshal::StringToHGlobalAnsi(sys_string)).ToPointer();
 			std_string = chars;
 			Marshal::FreeHGlobal(IntPtr((void*)chars));
+		}
+
+		/*文字コードの変換を行う関数
+		作成日：2017.9.5
+		作成者：K.Asada
+		*/
+		std::string UTF8toSjis(std::string srcUTF8) {
+			//Unicodeへ変換後の文字列長を得る
+			int lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, NULL, 0);
+
+			//必要な分だけUnicode文字列のバッファを確保
+			wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
+
+			//UTF8からUnicodeへ変換
+			MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
+
+			//ShiftJISへ変換後の文字列長を得る
+			int lengthSJis = WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+
+			//必要な分だけShiftJIS文字列のバッファを確保
+			char* bufShiftJis = new char[lengthSJis];
+
+			//UnicodeからShiftJISへ変換
+			WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
+
+			std::string strSJis(bufShiftJis);
+
+			delete bufUnicode;
+			delete bufShiftJis;
+
+			return strSJis;
+		}
+
+		/*文字コードの変換を行う関数
+		作成日：2017.9.5
+		作成者：K.Asada*/
+		std::string SjistoUTF8(std::string srcSjis) {
+			//Unicodeへ変換後の文字列長を得る
+			int lenghtUnicode = MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, NULL, 0);
+
+			//必要な分だけUnicode文字列のバッファを確保
+			wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
+
+			//ShiftJISからUnicodeへ変換
+			MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, bufUnicode, lenghtUnicode);
+
+
+			//UTF8へ変換後の文字列長を得る
+			int lengthUTF8 = WideCharToMultiByte(CP_UTF8, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+
+			//必要な分だけUTF8文字列のバッファを確保
+			char* bufUTF8 = new char[lengthUTF8];
+
+			//UnicodeからUTF8へ変換
+			WideCharToMultiByte(CP_UTF8, 0, bufUnicode, lenghtUnicode + 1, bufUTF8, lengthUTF8, NULL, NULL);
+
+			std::string strUTF8(bufUTF8);
+
+			delete bufUnicode;
+			delete bufUTF8;
+
+			return strUTF8;
 		}
 	};
 }

@@ -147,6 +147,7 @@
     </ClInclude>
     <ClInclude Include="Processing.h" />
     <ClInclude Include="StringProcess.h" />
+    <ClInclude Include="TableProcessing.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="InputOption.resx">

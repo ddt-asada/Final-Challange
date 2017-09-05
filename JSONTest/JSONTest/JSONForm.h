@@ -27,7 +27,10 @@ namespace JSONTest {
 			//TODO: ここにコンストラクター コードを追加します
 			//
 		}
-		constantstring::CONSTANTSTRING^ CONST = gcnew constantstring::CONSTANTSTRING();
+	private: System::Windows::Forms::DataGridView^  dataGridView1;
+
+	public:
+		constantstring::CONSTANTSTRING^ MyConst = gcnew constantstring::CONSTANTSTRING();
 
 	protected:
 		/// <summary>
@@ -71,9 +74,9 @@ namespace JSONTest {
 
 
 	private:
-		String^ JSONFilePath = CONST->EMPTY_STRING;		//入力されたJSONのファイルパスを格納するための文字列。
-		String^ DBQuery = CONST->EMPTY_STRING;			//入力されたDBへ投げるクエリを格納する文字列。
-		String^ DBResult = CONST->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
+		String^ JSONFilePath = MyConst->EMPTY_STRING;		//入力されたJSONのファイルパスを格納するための文字列。
+		String^ DBQuery = MyConst->EMPTY_STRING;			//入力されたDBへ投げるクエリを格納する文字列。
+		String^ DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
 		/// <summary>
 		/// 必要なデザイナー変数です。
 		/// </summary>
@@ -95,6 +98,7 @@ namespace JSONTest {
 			this->buttonCancel = (gcnew System::Windows::Forms::Button());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
+			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
 			this->buttonConversion = (gcnew System::Windows::Forms::Button());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
 			this->buttonConversion2 = (gcnew System::Windows::Forms::Button());
@@ -107,6 +111,7 @@ namespace JSONTest {
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->BeginInit();
 			this->tabPage2->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -184,14 +189,15 @@ namespace JSONTest {
 			// 
 			this->tabControl1->Controls->Add(this->tabPage1);
 			this->tabControl1->Controls->Add(this->tabPage2);
-			this->tabControl1->Location = System::Drawing::Point(12, 12);
+			this->tabControl1->Location = System::Drawing::Point(23, 12);
 			this->tabControl1->Name = L"tabControl1";
 			this->tabControl1->SelectedIndex = 0;
-			this->tabControl1->Size = System::Drawing::Size(1431, 636);
+			this->tabControl1->Size = System::Drawing::Size(1431, 874);
 			this->tabControl1->TabIndex = 9;
 			// 
 			// tabPage1
 			// 
+			this->tabPage1->Controls->Add(this->dataGridView1);
 			this->tabPage1->Controls->Add(this->buttonConversion);
 			this->tabPage1->Controls->Add(this->buttonCancel);
 			this->tabPage1->Controls->Add(this->labelRow);
@@ -203,17 +209,26 @@ namespace JSONTest {
 			this->tabPage1->Location = System::Drawing::Point(8, 39);
 			this->tabPage1->Name = L"tabPage1";
 			this->tabPage1->Padding = System::Windows::Forms::Padding(3);
-			this->tabPage1->Size = System::Drawing::Size(1415, 589);
+			this->tabPage1->Size = System::Drawing::Size(1415, 827);
 			this->tabPage1->TabIndex = 0;
 			this->tabPage1->Text = L"tabPage1";
 			this->tabPage1->UseVisualStyleBackColor = true;
 			this->tabPage1->Click += gcnew System::EventHandler(this, &JSONForm::tabPage1_Click);
 			// 
+			// dataGridView1
+			// 
+			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dataGridView1->Location = System::Drawing::Point(8, 160);
+			this->dataGridView1->Name = L"dataGridView1";
+			this->dataGridView1->RowTemplate->Height = 33;
+			this->dataGridView1->Size = System::Drawing::Size(1209, 660);
+			this->dataGridView1->TabIndex = 16;
+			// 
 			// buttonConversion
 			// 
 			this->buttonConversion->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->buttonConversion->Location = System::Drawing::Point(1240, 482);
+			this->buttonConversion->Location = System::Drawing::Point(1240, 720);
 			this->buttonConversion->Name = L"buttonConversion";
 			this->buttonConversion->Size = System::Drawing::Size(169, 101);
 			this->buttonConversion->TabIndex = 15;
@@ -234,7 +249,7 @@ namespace JSONTest {
 			this->tabPage2->Location = System::Drawing::Point(8, 39);
 			this->tabPage2->Name = L"tabPage2";
 			this->tabPage2->Padding = System::Windows::Forms::Padding(3);
-			this->tabPage2->Size = System::Drawing::Size(1415, 589);
+			this->tabPage2->Size = System::Drawing::Size(1415, 827);
 			this->tabPage2->TabIndex = 1;
 			this->tabPage2->Text = L"tabPage2";
 			this->tabPage2->UseVisualStyleBackColor = true;
@@ -327,7 +342,7 @@ namespace JSONTest {
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->AutoSize = true;
-			this->ClientSize = System::Drawing::Size(1455, 660);
+			this->ClientSize = System::Drawing::Size(1466, 898);
 			this->Controls->Add(this->tabControl1);
 			this->DoubleBuffered = true;
 			this->Name = L"JSONForm";
@@ -337,6 +352,7 @@ namespace JSONTest {
 			this->tabControl1->ResumeLayout(false);
 			this->tabPage1->ResumeLayout(false);
 			this->tabPage1->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->EndInit();
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
 			this->ResumeLayout(false);
@@ -382,7 +398,43 @@ private: System::Void JSONForm_FormClosing(System::Object^  sender, System::Wind
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	//表を生成するためのクラスをインスタンス化
 	Processing^ table = gcnew Processing(this->JSONFilePath, this->DBQuery);
+	table->Row = Convert::ToInt32(this->textBoxRow->Text);
+	table->Column = Convert::ToInt32(this->textBoxColumn->Text);
+
 	table->run();
+
+	Int32^ col = table->Column;
+	//表を生成。
+	//タイトルを設定。
+	auto itr = table->rettable->begin();
+	String^ str;
+	for (; itr != table->rettable->end(); ++itr) {
+		if (itr->first == "text") {
+			str = gcnew String((itr->second).c_str());
+			itr++;
+			break;
+		}
+	}
+	this->dataGridView1->ColumnCount = *col;
+	this->dataGridView1->RowCount = *table->Row;
+
+	this->dataGridView1->Rows[0]->Cells[0]->Value = str;
+
+	for (int i = 1; i < *table->Row; i++) {
+		for (int j = 0; j < *table->Column; j++) {
+			for (; itr != table->rettable->end(); ++itr) {
+				if (itr->first == "text" || itr->first == "array" || itr->first == "html") {
+					str = gcnew String((itr->second).c_str());
+					itr++;
+					break;
+				}
+				else if (itr->first == "colspan") {
+					j += stoi(itr->second) - 1;
+				}
+			}
+			this->dataGridView1->Rows[i]->Cells[j]->Value = str;
+		}
+	}
 }
 
 /*関数名：IntToString
@@ -415,13 +467,13 @@ private:System::Int32 IntToString(String^ con) {
 private:System::Void initMainForm() {
 	this->row = 0;//取得したタテを初期化。
 	this->column = 0;//取得したヨコを初期化。
-	this->textBoxRow->Text = CONST->ZERO_STRING;//タテが入力されたテキストボックスを初期化。
-	this->textBoxColumn->Text = CONST->ZERO_STRING;//ヨコが入力されたテキストボックスを初期化。
-	this->textBoxRow2->Text = CONST->ZERO_STRING;//タテが入力されたテキストボックスを初期化。
-	this->textBoxColumn2->Text = CONST->ZERO_STRING;//ヨコが入力されたテキストボックスを初期化。
-	this->JSONFilePath = CONST->EMPTY_STRING;		//JSONの読み込み先のファイルパスを初期化。
-	this->DBQuery = CONST->EMPTY_STRING;			//DBクエリを初期化。
-	this->DBResult = CONST->EMPTY_STRING;			//DBとの通信結果を初期化する。
+	this->textBoxRow->Text = MyConst->ZERO_STRING;//タテが入力されたテキストボックスを初期化。
+	this->textBoxColumn->Text = MyConst->ZERO_STRING;//ヨコが入力されたテキストボックスを初期化。
+	this->textBoxRow2->Text = MyConst->ZERO_STRING;//タテが入力されたテキストボックスを初期化。
+	this->textBoxColumn2->Text = MyConst->ZERO_STRING;//ヨコが入力されたテキストボックスを初期化。
+	this->JSONFilePath = MyConst->EMPTY_STRING;		//JSONの読み込み先のファイルパスを初期化。
+	this->DBQuery = MyConst->EMPTY_STRING;			//DBクエリを初期化。
+	this->DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を初期化する。
 }
 
 //キャンセルボタンが押されたときの処理
