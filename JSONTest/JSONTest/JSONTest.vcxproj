@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClCompile Include="InputOption.cpp" />
     <ClCompile Include="JSONForm.cpp" />
+    <ClCompile Include="TableInformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CONSTANTSTRING.h" />
@@ -147,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="Processing.h" />
     <ClInclude Include="StringProcess.h" />
+    <ClInclude Include="TableInformation.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="TableProcessing.h" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +159,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="JSONForm.resx">
       <DependentUpon>JSONForm.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TableInformation.resx">
+      <DependentUpon>TableInformation.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

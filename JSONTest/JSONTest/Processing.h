@@ -22,7 +22,7 @@ namespace process {
 		String^ DbJson = MyConst->EMPTY_STRING;		//DBより取得した文字列を格納する文字列。
 		Int32^ Row = *MyConst->ZERO;					//表の行数を格納する変数
 		Int32^ Column = *MyConst->ZERO;				//表の列数を格納する変数
-		vector<pair<string, string>>* rettable = new vector<pair<string, string>>();
+		vector<pair<string, string>> *rettable = new vector<pair<string, string>>();
 
 	public:
 		//デフォルトコンストラクタ
@@ -58,5 +58,15 @@ namespace process {
 			}
 			//表を出力する関数を呼び出す。
 		}
+		/*
+		Void ConversionTable(vector<pair<string, string>> tmptable) {
+			auto itr = tmptable.begin();
+			for (auto itr = tmptable.begin(); itr != tmptable.end(); itr++) {
+				string test = itr->first;
+				string test2 = itr->second;
+				this->rettable->push_back(pair<String^, String^>(gcnew String (test.c_str()), gcnew String(test2.c_str())));
+			}
+		}*/
+		
 	};
 }

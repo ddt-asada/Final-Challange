@@ -1,5 +1,6 @@
   JSONTest.InputOption.resources - Embedded, ContainedInManifestFile, 
   JSONTest.JSONForm.resources - Embedded, ContainedInManifestFile, 
+  JSONTest.TableInformation.resources - Embedded, ContainedInManifestFile, 
 ImageRuntimeVersion: v4.0.30319
 Assembly JSONTest, Version=0.0.*, Culture=ロケールに依存しない言語 (ロケールに依存しない国): 
 	hash=SHA1, flags=PublicKey
@@ -29,6 +30,9 @@ Class JSONTest.InputOption: AutoLayout, AnsiClass, Class, Public, BeforeFieldIni
     get_SendQuery(): PrivateScope, Public, HideBySig, SpecialName
     set_ResultJSON(String): PrivateScope, Public, HideBySig, SpecialName
     get_ResultJSON(): PrivateScope, Public, HideBySig, SpecialName
+Class JSONTest.TableInformation: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
 Class JSONTest.JSONForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName

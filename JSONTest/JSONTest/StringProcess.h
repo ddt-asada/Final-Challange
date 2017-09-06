@@ -27,7 +27,6 @@ namespace process {
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
 		vector<pair<string, string>>* table = new vector<pair<string, string>>();
-
 		//デフォルトコンストラクタ
 		StringProcess() {
 		};
