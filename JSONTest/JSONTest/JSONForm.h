@@ -266,6 +266,7 @@ namespace JSONTest {
 			this->dataGridView1->RowTemplate->Height = 33;
 			this->dataGridView1->Size = System::Drawing::Size(597, 660);
 			this->dataGridView1->TabIndex = 16;
+			this->dataGridView1->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &JSONForm::dataGridView1_CellEndEdit);
 			this->dataGridView1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::dataGridView1_MouseDown);
 			// 
 			// buttonConversion
@@ -572,5 +573,29 @@ private: System::Void dataGridView1_MouseDown(System::Object^  sender, System::W
 			}
 		}
 }
+
+private: System::Void dataGridView1_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
+	int x = this->dataGridView1->CurrentCell->ColumnIndex;
+	int y = this->dataGridView1->CurrentCell->RowIndex;
+	string tmp;
+	for (auto itr = this->infotable->begin(); itr != this->infotable->end(); itr++) {
+		if (itr->second == ('x' + to_string(x) + to_string(y)) && itr->first.first == "text") {
+			 MarshalString(this->dataGridView1->CurrentCell->Value->ToString(), tmp);
+			 itr->first.second = tmp;
+		}
+	}
+}
+
+		 /*String^Œ^‚ğstringŒ^‚Ö•ÏŠ·‚·‚éŠÖ”
+		 ì¬“úF2017.9.5
+		 ì¬ÒFK.Asada
+		 */
+private: System::Void MarshalString(String^ sys_string, string& std_string) {
+			 using namespace Runtime::InteropServices;
+			 const char* chars =
+				 (const char*)(Marshal::StringToHGlobalAnsi(sys_string)).ToPointer();
+			 std_string = chars;
+			 Marshal::FreeHGlobal(IntPtr((void*)chars));
+		 }
 };
 }
