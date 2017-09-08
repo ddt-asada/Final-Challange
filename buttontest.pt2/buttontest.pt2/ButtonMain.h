@@ -45,6 +45,8 @@ namespace buttontestpt2 {
 			 int Columnindex = 0;		//クリックした列を保持する
 			 int row = 3;				//描画する表の行
 			 int column = 3;			//描画する表の列
+			 int rctwidth = 100;		//描画する図形一つ当たりの幅
+			 int rctheight = 100;		//描画する図形一つ当たりの高さ
 			//array<String^, 2>^ ary = gcnew array<String^, 2>(3, 3);//
 			 array<String^, 2>^ str = gcnew array<String^, 2>(this->row, this->column);//表の中身
 			 array<String^>^ join = gcnew array<String^>(this->row);				//結合箇所を保持する
@@ -95,10 +97,9 @@ namespace buttontestpt2 {
 			// 
 			// pictureBox1
 			// 
-			this->pictureBox1->BackColor = System::Drawing::SystemColors::ControlLightLight;
 			this->pictureBox1->Location = System::Drawing::Point(12, 102);
 			this->pictureBox1->Name = L"pictureBox1";
-			this->pictureBox1->Size = System::Drawing::Size(289, 184);
+			this->pictureBox1->Size = System::Drawing::Size(1000, 1000);
 			this->pictureBox1->SizeMode = System::Windows::Forms::PictureBoxSizeMode::AutoSize;
 			this->pictureBox1->TabIndex = 2;
 			this->pictureBox1->TabStop = false;
@@ -131,8 +132,6 @@ namespace buttontestpt2 {
 			//結合判定用の文字列配列を初期化
 			this->join[i] = "";
 			for (int j = 0; j < this->column; j++) {
-				//配列1～9の文字列を順に格納
-			//	this->ary[i, j] = Convert::ToString(count++);
 				//Valueの初期値として「無」を格納
 				this->str[i, j] = "無";
 			}
@@ -143,39 +142,62 @@ namespace buttontestpt2 {
 	private: System::Void init() {
 		//ビットマップの中に描画する数字
 		int count = 1;
-		//描画する図形一つ当たりの幅
-		int rctwidth = 100;
-		//描画する図形一つ当たりの高さ
-		int rctheight = 100;
-		// ビットマップクラス(イメージ画像)の生成
-		Bitmap^ img = gcnew Bitmap(rctwidth * this->column + 1, rctheight * this->row + 1);
+		Bitmap^ img = gcnew Bitmap(this->rctwidth * this->column + 1, this->rctheight * this->row + 1);
 		//描画を行うグラフィックスクラスを生成
 		Graphics^ gr = Graphics::FromImage(img);
 		for (int i = 0; i < this->row; i++) {
 			//結合状態であれば
 			if (this->join[i] != "") {
-				count = Convert::ToInt32(this->join[i]) + (i * this->row) + 1;
 				// 画像領域に線を描画
-				gr->DrawRectangle(Pens::Black, 0, rctheight * i, rctwidth * this->row, rctheight);
+				gr->DrawRectangle(Pens::Black, 0, this->rctheight * i, this->rctwidth * this->row, this->rctheight);
 				// 画像領域に文字列を書き込む
 				System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 				//行の中心にインデックスを付ける
-				gr->DrawString(Convert::ToString(count++), myFont, Brushes::Black, rctwidth *this-> row / 2, rctheight * i);
+				gr->DrawString(Convert::ToString(count++), myFont, Brushes::Black, this->rctwidth *this-> row / 2, this->rctheight * i);
 			}
 			else {
 				for (int j = 0; j < this->column; j++) {
 					// 画像領域に線を描画
-					gr->DrawRectangle(Pens::Black, rctwidth * j, rctheight * i, rctwidth, rctheight);
+					gr->DrawRectangle(Pens::Black, this->rctwidth * j, this->rctheight * i, this->rctwidth, this->rctheight);
 					// 画像領域に文字列を書き込む
 					System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 					//表にインデックスを付ける
-					gr->DrawString(Convert::ToString(count++), myFont, Brushes::Black, rctwidth * j, rctheight * i);
+					gr->DrawString(Convert::ToString(count++), myFont, Brushes::Black, this->rctwidth * j, this->rctheight * i);
 				}
 			}
 		}
 		//pictureBoxに作成した画像（表）を反映
 		this->pictureBox1->Image = img;
 	}
+
+			 private: System::Void pict() {
+			//半透明の塗りつぶし用のブラシを作成
+			Brush^ br = gcnew SolidBrush(Color::FromArgb(50, Color::Yellow));
+			//描画を行うグラフィックスクラスを生成
+			Graphics^ gr = this->pictureBox1->CreateGraphics();
+			//結合状態であれば
+			if (this->join[this->Rowindex] != "") {
+				// 画像領域に線を描画
+				gr->FillRectangle(br, 0, this->rctheight * this->Rowindex, this->rctwidth * this->column, this->rctheight);
+			}
+			else {
+				gr->FillRectangle(br, this->rctwidth * this->Columnindex, this->rctheight * this->Rowindex, this->rctwidth, this->rctheight);
+			}
+			gr->Dispose();
+		}
+
+			 private: System::Void repict() {
+			//結合状態であれば
+			if (this->join[this->Rowindex] != "") {
+				//色付けした部分を再描画
+				this->pictureBox1->Invalidate(Drawing::Rectangle(0, this->rctheight * this->Rowindex, this->rctwidth * this->column, this->rctheight));
+			}
+			else {
+				//色付けした部分を再描画
+				this->pictureBox1->Invalidate(Drawing::Rectangle(this->rctwidth * this->Columnindex, this->rctheight * this->Rowindex, this->rctwidth, this->rctheight));
+			}
+		}
+
 
 	//Value変更画面を表示する関数
 	private: System::Void ValueDisplay() {
@@ -189,6 +211,8 @@ namespace buttontestpt2 {
 		this->str[this->Rowindex, this->Columnindex] = rewrite->textBox1->Text;
 		//メイン画面の表の初期化関数を呼び出す。
 		this->init();
+		//選択範囲の色付けを行う。
+		this->pict();
 	}
 
 
@@ -201,6 +225,7 @@ private: System::Void pictureBox1_MouseDoubleClick(System::Object^  sender, Syst
 	this->ValueDisplay();
 }
 private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	this->repict();
 	//表の行の座標を取得する
 	this->Rowindex = (e->Location.Y / (this->pictureBox1->Height / this->row));
 	//表の列の座標を取得する
@@ -212,6 +237,7 @@ private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Wi
 		//表の行の座標を取得する
 		this->Columnindex = (e->Location.X / (this->pictureBox1->Width / this->column));
 	}
+	this->pict();
 }
 private: System::Void buttonRetouch_Click(System::Object^  sender, System::EventArgs^  e) {
 	//Value変更画面を表示する関数を呼び出す
