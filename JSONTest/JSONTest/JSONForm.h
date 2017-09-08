@@ -103,6 +103,8 @@ namespace JSONTest {
 		String^ DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
 		Int32^ column = MyConst->ZERO;						//表の列数
 		Int32^ row = MyConst->ZERO;							//表の行数
+	//	string* xindex = &string("");
+	//	string* yindex = &string("");
 		vector<pair<pair<string, string>, string>>* infotable = new vector<pair<pair<string, string>, string>>();
 		/// <summary>
 		/// 必要なデザイナー変数です。
@@ -125,7 +127,6 @@ namespace JSONTest {
 			this->buttonCancel = (gcnew System::Windows::Forms::Button());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
-			this->dataGridView2 = (gcnew System::Windows::Forms::DataGridView());
 			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
 			this->buttonConversion = (gcnew System::Windows::Forms::Button());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
@@ -137,12 +138,13 @@ namespace JSONTest {
 			this->buttonInputOption2 = (gcnew System::Windows::Forms::Button());
 			this->textBoxRow2 = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
+			this->dataGridView2 = (gcnew System::Windows::Forms::DataGridView());
 			this->dataSet1 = (gcnew System::Data::DataSet());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->BeginInit();
 			this->tabPage2->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataSet1))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -230,7 +232,6 @@ namespace JSONTest {
 			// tabPage1
 			// 
 			this->tabPage1->AutoScroll = true;
-			this->tabPage1->Controls->Add(this->dataGridView2);
 			this->tabPage1->Controls->Add(this->dataGridView1);
 			this->tabPage1->Controls->Add(this->buttonConversion);
 			this->tabPage1->Controls->Add(this->buttonCancel);
@@ -249,24 +250,16 @@ namespace JSONTest {
 			this->tabPage1->UseVisualStyleBackColor = true;
 			this->tabPage1->Click += gcnew System::EventHandler(this, &JSONForm::tabPage1_Click);
 			// 
-			// dataGridView2
-			// 
-			this->dataGridView2->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->dataGridView2->Location = System::Drawing::Point(662, 185);
-			this->dataGridView2->Name = L"dataGridView2";
-			this->dataGridView2->RowTemplate->Height = 33;
-			this->dataGridView2->Size = System::Drawing::Size(559, 612);
-			this->dataGridView2->TabIndex = 17;
-			// 
 			// dataGridView1
 			// 
 			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->dataGridView1->Location = System::Drawing::Point(6, 185);
 			this->dataGridView1->Name = L"dataGridView1";
 			this->dataGridView1->RowTemplate->Height = 33;
-			this->dataGridView1->Size = System::Drawing::Size(597, 660);
+			this->dataGridView1->Size = System::Drawing::Size(1263, 660);
 			this->dataGridView1->TabIndex = 16;
 			this->dataGridView1->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &JSONForm::dataGridView1_CellEndEdit);
+			this->dataGridView1->CellMouseDoubleClick += gcnew System::Windows::Forms::DataGridViewCellMouseEventHandler(this, &JSONForm::dataGridView1_CellMouseDoubleClick);
 			this->dataGridView1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::dataGridView1_MouseDown);
 			// 
 			// buttonConversion
@@ -381,6 +374,17 @@ namespace JSONTest {
 			this->textBoxColumn2->TabIndex = 10;
 			this->textBoxColumn2->Text = L"0";
 			// 
+			// dataGridView2
+			// 
+			this->dataGridView2->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dataGridView2->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->dataGridView2->Location = System::Drawing::Point(3, 3);
+			this->dataGridView2->Name = L"dataGridView2";
+			this->dataGridView2->RowTemplate->Height = 33;
+			this->dataGridView2->Size = System::Drawing::Size(1444, 845);
+			this->dataGridView2->TabIndex = 17;
+			this->dataGridView2->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &JSONForm::dataGridView2_CellEndEdit);
+			// 
 			// dataSet1
 			// 
 			this->dataSet1->DataSetName = L"NewDataSet";
@@ -401,10 +405,10 @@ namespace JSONTest {
 			this->tabControl1->ResumeLayout(false);
 			this->tabPage1->ResumeLayout(false);
 			this->tabPage1->PerformLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->EndInit();
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataSet1))->EndInit();
 			this->ResumeLayout(false);
 
@@ -558,6 +562,7 @@ private: System::Void buttonConversion_Click(System::Object^  sender, System::Ev
 }
 
 private: System::Void dataGridView1_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+/*	TableInformation^ datatable = gcnew TableInformation();
 		DataGridView::HitTestInfo^ hit = ((DataGridView^)sender)->HitTest(e->X, e->Y);
 		string xindex = 'x' + to_string(hit->ColumnIndex) + to_string(hit->RowIndex);
 		string yindex = 'y' + to_string(hit->RowIndex);
@@ -572,6 +577,28 @@ private: System::Void dataGridView1_MouseDown(System::Object^  sender, System::W
 				this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
 			}
 		}
+
+		itr = this->infotable->begin();
+		datatable->Controls->Add(this->dataGridView2);
+		datatable->ShowDialog();
+
+		string tmp;
+		int i = 0;
+			for (; itr != this->infotable->end(); itr++) {
+				int j = 0;
+				if (itr->second == "title") {
+					MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
+					itr->first.first = tmp;
+					MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
+					itr->first.second = tmp;
+				}
+				else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
+					MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
+					itr->first.first = tmp;
+					MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
+					itr->first.second = tmp;
+				}
+			}*/
 }
 
 private: System::Void dataGridView1_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
@@ -597,5 +624,46 @@ private: System::Void MarshalString(String^ sys_string, string& std_string) {
 			 std_string = chars;
 			 Marshal::FreeHGlobal(IntPtr((void*)chars));
 		 }
+private: System::Void dataGridView2_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
+}
+private: System::Void dataGridView1_CellMouseDoubleClick(System::Object^  sender, System::Windows::Forms::DataGridViewCellMouseEventArgs^  e) {
+	TableInformation^ datatable = gcnew TableInformation();
+//	DataGridView::HitTestInfo^ hit = ((DataGridView^)sender)->HitTest(e->X, e->Y);
+	string xindex = 'x' + to_string(this->dataGridView1->CurrentCell->ColumnIndex) + to_string(this->dataGridView1->CurrentCell->RowIndex);
+	string yindex = 'y' + to_string(this->dataGridView1->CurrentCell->RowIndex);
+	auto itr = this->infotable->begin();
+	this->dataGridView2->RowCount = 1;
+	this->dataGridView2->ColumnCount = 2;
+	for (; itr != this->infotable->end(); itr++) {
+		if (itr->second == "title") {
+			this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
+		}
+		else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
+			this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
+		}
+	}
+
+	itr = this->infotable->begin();
+	datatable->Controls->Add(this->dataGridView2);
+	datatable->ShowDialog();
+
+	string tmp;
+	int i = 0;
+	for (; itr != this->infotable->end(); itr++) {
+		int j = 0;
+		if (itr->second == "title") {
+			MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
+			itr->first.first = tmp;
+			MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
+			itr->first.second = tmp;
+		}
+		else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
+			MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
+			itr->first.first = tmp;
+			MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
+			itr->first.second = tmp;
+		}
+	}
+}
 };
 }

@@ -34,7 +34,7 @@ namespace JSONTest {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::TextBox^  textBox1;
+
 	protected:
 
 	private:
@@ -50,26 +50,16 @@ namespace JSONTest {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->SuspendLayout();
-			// 
-			// textBox1
-			// 
-			this->textBox1->Location = System::Drawing::Point(146, 135);
-			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(442, 31);
-			this->textBox1->TabIndex = 0;
 			// 
 			// TableInformation
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(780, 360);
-			this->Controls->Add(this->textBox1);
 			this->Name = L"TableInformation";
 			this->Text = L"TableInformation";
 			this->ResumeLayout(false);
-			this->PerformLayout();
 
 		}
 #pragma endregion

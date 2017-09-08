@@ -23,6 +23,7 @@ namespace process {
 		Int32^ Row = *MyConst->ZERO;					//表の行数を格納する変数
 		Int32^ Column = *MyConst->ZERO;				//表の列数を格納する変数
 		vector<pair<string, string>> *rettable = new vector<pair<string, string>>();
+		vector<pair<pair<string, string>, string>>* jsontable = new vector<pair<pair<string, string>, string>>();
 
 	public:
 		//デフォルトコンストラクタ
@@ -58,6 +59,16 @@ namespace process {
 			}
 			//表を出力する関数を呼び出す。
 		}
+
+		/*受け取った情報よりJSONを出力するための処理
+		作成日：2017.9.7
+		作成者：K.Asada
+		*/
+		Void change() {
+			//受け取ったテーブルよりJSONに変換する関数を呼び出す。
+		}
+
+
 		/*
 		Void ConversionTable(vector<pair<string, string>> tmptable) {
 			auto itr = tmptable.begin();
