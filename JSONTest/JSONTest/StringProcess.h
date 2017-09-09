@@ -4,6 +4,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <cliext/utility>
 #include <Windows.h>
 #include <iostream>
 #include <string>
@@ -14,6 +15,7 @@ namespace process {
 	using namespace std;
 	using namespace System;
 	using namespace constantstring;
+	using namespace  System::Collections::Generic;
 	using namespace boost::property_tree;
 
 	//作成日：2017.9.2
@@ -27,6 +29,7 @@ namespace process {
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
 		vector<pair<string, string>>* table = new vector<pair<string, string>>();
+		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
 		//デフォルトコンストラクタ
 		StringProcess() {
 		};
@@ -116,11 +119,13 @@ namespace process {
 			if (boost::optional<std::string> str = pt.get_optional<std::string>(key)) {
 				//文字列をキー名をペアにしてマップに格納する。
 				this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
+				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 			}
 			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
 				//キー名をペアにしてマップに格納する
 				this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
+				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String((UTF8toSjis(to_string(value.get()))).c_str())));
 			}
 			//子がまだいる場合
 			if (pt.get_child_optional(key)) {
@@ -134,10 +139,12 @@ namespace process {
 					if (boost::optional<int> value = info.get_optional<int>(childkey)) {
 						//キー名をペアにしてマップに格納する
 						this->table->push_back(pair<string, string>(UTF8toSjis(childkey), UTF8toSjis(to_string(value.get()))));
+						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(to_string(value.get())).c_str())));
 					//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
 						this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
+						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis("array").c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 						//文字列をキー名をペアにしてマップに格納する。					
 					}
 					else {
