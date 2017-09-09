@@ -70,7 +70,7 @@ namespace process {
 		*/
 		Void CountColumn() {
 			//イテレーターにより走査する。
-			for (auto itr = this->table->begin(); itr != this->table->end(); ++itr) {
+			for (auto itr = this->dic->begin(); itr != this->dic->end(); ++itr) {
 				Int32 tmp = 0;
 				//表の要素を見つけたら列数をカウント
 				if (itr->first == "text" || itr->first == "array" || itr->first == "html") {
@@ -118,13 +118,13 @@ namespace process {
 			//子に文字列があった場合
 			if (boost::optional<std::string> str = pt.get_optional<std::string>(key)) {
 				//文字列をキー名をペアにしてマップに格納する。
-				this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
+				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
 				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 			}
 			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
 				//キー名をペアにしてマップに格納する
-				this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
+				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
 				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String((UTF8toSjis(to_string(value.get()))).c_str())));
 			}
 			//子がまだいる場合
@@ -138,12 +138,12 @@ namespace process {
 					//子要素が配列かつ整数であれば
 					if (boost::optional<int> value = info.get_optional<int>(childkey)) {
 						//キー名をペアにしてマップに格納する
-						this->table->push_back(pair<string, string>(UTF8toSjis(childkey), UTF8toSjis(to_string(value.get()))));
+				//		this->table->push_back(pair<string, string>(UTF8toSjis(childkey), UTF8toSjis(to_string(value.get()))));
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(to_string(value.get())).c_str())));
 					//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
-						this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
+					//	this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis("array").c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 						//文字列をキー名をペアにしてマップに格納する。					
 					}

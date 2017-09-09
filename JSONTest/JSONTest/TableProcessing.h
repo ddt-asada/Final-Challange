@@ -15,6 +15,7 @@ namespace process {
 	using namespace System;
 	using namespace System::Drawing;
 	using namespace System::Collections::Generic;
+	using namespace System::Windows::Forms;
 	using namespace constantstring;
 	using namespace boost::property_tree;
 
@@ -23,8 +24,7 @@ namespace process {
 	作成者；K.Asada*/
 	ref class TableProcessing {
 	private:
-		TableProcessing() {
-		};
+
 
 	public:
 
@@ -34,10 +34,15 @@ namespace process {
 		Int32 ColumnIndex = 0;	//クリックされたセルの列座標
 		Int32 RctWidth = 0;		//セル一つ当たりの幅
 		Int32 RctHeight = 0;	//セル一つ当たりの高さ
-		cli::array<String^>^ join = gcnew cli::array<String^>(this->Row);
+		cli::array<String^>^ join = gcnew cli::array<String^>(5);
 		List<cliext::pair<String^, String^>^>^ TableOut = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 
+		TableProcessing() {
+			for (int i = 0; i < 5; i++) {
+				this->join[i] = "";
+			}
+		};
 		//コンストラクタ
 		TableProcessing(Int32 row, Int32 column, Int32 rowindex, Int32 columnindex, List<cliext::pair<String^, String^>^>^ strout, List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ tblinfo): Row(0), Column(0), RowIndex(0),ColumnIndex(0) {
 			this->TableOut = strout;
@@ -75,6 +80,30 @@ namespace process {
 			return img;
 		}
 		/*選択箇所をハイライトする関数*/
+
+		/*選択箇所をハイライトするための画像を生成する関数*/
+		PictureBox^ pict(PictureBox^ PictSelect) {
+		//半透明の塗りつぶし用のブラシを作成
+		Brush^ br = gcnew SolidBrush(Color::FromArgb(50, Color::Yellow));
+		//ビットマップを生成
+		Bitmap^ img = gcnew Bitmap(this->RctWidth * this->Column + 1, this->RctHeight * this->Row + 1);
+		//描画を行うグラフィックスクラスを生成
+		Graphics^ gr = Graphics::FromImage(img);
+		//結合状態であれば
+		if (this->join[this->RowIndex] != "") {
+			// 画像領域に線を描画
+			PictSelect->Location = System::Drawing::Point(0, this->RctHeight * this->RowIndex);
+			PictSelect->Size = System::Drawing::Size(this->RctWidth * this->Column, this->RctHeight);
+			gr->FillRectangle(br, 0, 0, this->RctWidth * this->Column, this->RctHeight);
+		}
+		else {
+			PictSelect->Location = System::Drawing::Point(this->RctWidth * this->ColumnIndex, this->RctHeight * this->RowIndex);
+			PictSelect->Size = System::Drawing::Size(this->RctWidth, this->RctHeight);
+			gr->FillRectangle(br, 0, 0, this->RctWidth - 1, this->RctHeight - 1);
+		}
+		PictSelect->Image = img;
+		return PictSelect;
+	}
 
 		/*値の変更画面を表示する関数*/
 
