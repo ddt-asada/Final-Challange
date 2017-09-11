@@ -2,7 +2,6 @@
 
 #include "CONSTANTSTRING.h"//定数クラスを扱うためのインクルード
 #include "StringProcess.h"//文字列処理クラスのインクルード
-#include "TableProcessing.h"
 #include "JSONForm.h"
 
 /*作成日：2017.9.2
@@ -23,6 +22,7 @@ namespace process {
 		String^ DbJson = MyConst->EMPTY_STRING;		//DBより取得した文字列を格納する文字列。
 		Int32^ Row = *MyConst->ZERO;					//表の行数を格納する変数
 		Int32^ Column = *MyConst->ZERO;				//表の列数を格納する変数
+		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 	public:
 		//デフォルトコンストラクタ
 		Processing() {
@@ -54,6 +54,7 @@ namespace process {
 					//大きい方を採用する
 					this->Column = test->column;
 				}
+				this->retTable = test->retPointTable;
 			}
 		}
 

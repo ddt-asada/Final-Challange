@@ -111,11 +111,11 @@ namespace JSONTest {
 		Int32^ column = MyConst->ZERO;						//表の列数
 		Int32^ row = MyConst->ZERO;							//表の行数
 		Int32 Row = 3;			//表の行数
-		Int32 Column = 3;		//表の列数
-		Int32 RowIndex = 0;		//クリックされたセルの行座標
-		Int32 ColumnIndex = 0;	//クリックされたセルの列座標
-		Int32 RctWidth = 100;		//セル一つ当たりの幅
-		Int32 RctHeight = 100;	//セル一つ当たりの高さ
+		Int32^ Column = 3;		//表の列数
+		Int32^ RowIndex = 0;		//クリックされたセルの行座標
+		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
+		Int32^ RctWidth = 100;		//セル一つ当たりの幅
+		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
 		cli::array<String^>^ join = gcnew cli::array<String^>(5);
 	//	string* xindex = &string("");
 	//	string* yindex = &string("");
@@ -492,21 +492,23 @@ private: System::Void JSONForm_FormClosing(System::Object^  sender, System::Wind
 //OKボタンが押されたときの処理
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
 	
-	//表を生成するためのクラスをインスタンス化
-	Processing^ table = gcnew Processing(this->JSONFilePath, this->DBQuery);
-	table->Row = Convert::ToInt32(this->textBoxRow->Text);
-	table->Column = Convert::ToInt32(this->textBoxColumn->Text);
+	//文字列から表に必要な情報を取得するためのクラスをインスタンス化
+	Processing^ proc = gcnew Processing(this->JSONFilePath, this->DBQuery);
+	//メイン画面の「タテ」テキストボックスの中身を処理のメンバへ格納
+	proc->Row = Convert::ToInt32(this->textBoxRow->Text);
+	//メイン画面の「ヨコ」テキストボックスの中身を処理のメンバへ格納
+	proc->Column = Convert::ToInt32(this->textBoxColumn->Text);
 
-	table->run();
-
-	this->column = table->Column;
-	this->row = table->Row;
-
-	//表を生成。
-	//タイトルを設定。
-	auto itr = table->rettable->begin();
-	String^ str;
-
+	//JSON文字列の処理を実行
+	proc->run();
+	
+	//取得した表の行数をメンバへ格納
+	this->Column = *proc->Column;
+	//取得した表の列数をメンバへ格納
+	this->Row = *proc->Row;
+	//取得した表に出力する文字列をメンバへ格納
+	this->TableInfo = proc->retTable;
+	//文字列処理クラスへ移行
 	/*
 	this->infotable->push_back(pair<pair<string, string>, string>(make_pair("親キー", itr->first), "title"));
 	itr++;
@@ -551,11 +553,11 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 			}
 		}
 	}*/
-	TableProcessing^ tbl = gcnew TableProcessing();
+/*	TableProcessing^ tbl = gcnew TableProcessing();
 	tbl->Row = this->Row;
 	tbl->Column = this->Column;
 	tbl->RctWidth = this->RctWidth;
-	tbl->RctHeight = this->RctHeight;
+	tbl->RctHeight = this->RctHeight;*/
 //	this->pictureBox1->Image = tbl->TableGenerate();
 }
 
@@ -715,7 +717,7 @@ private: System::Void dataGridView1_CellMouseDoubleClick(System::Object^  sender
 
 //選択箇所を取得する
 private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	//表の行の座標を取得する
+	/*//表の行の座標を取得する
 	this->RowIndex = (e->Location.Y / (this->pictureBox1->Height / this->Row));
 	//表の列の座標を取得する
 	if (this->join[this->RowIndex] != "") {
@@ -725,7 +727,8 @@ private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Wi
 	else {
 		//表の行の座標を取得する
 		this->ColumnIndex = (e->Location.X / (this->pictureBox1->Width / this->Column));
-	}
+	}*/
+	/*
 	//選択箇所をハイライトする関数をインスタンス化
 	TableProcessing^ tbl = gcnew TableProcessing();
 	tbl->RowIndex = this->RowIndex;
@@ -735,7 +738,7 @@ private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Wi
 	tbl->join = this->join;
 	tbl->Column = this->Column;
 	tbl->Row = this->Row;
-	tbl->pict(this->pictureBox2);
+	tbl->pict(this->pictureBox2);*/
 }
 };
 }

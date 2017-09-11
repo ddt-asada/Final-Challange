@@ -29,7 +29,7 @@ namespace process {
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
-		List<cliext::pair<cliext::pair<String^, String^>, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>, String^>^>();
+		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 
 			//デフォルトコンストラクタ
 		StringProcess() {
@@ -160,20 +160,20 @@ namespace process {
 		作成者：K.Asada*/
 		Void SetTablePoint() {
 			int itr = 0;		//リストを走査する際のインデックス
-			this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("title")));
+			this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String^>(%cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("title")));
 			itr++;
 			if (dic[itr]->first == "class") {
-				this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("title")));
+				this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("title")));
 				itr++;
 			}
 
 			for (int i = 0; i < *this->row; i++) {
 				if (dic[itr]->second == "" && ((dic[itr + 1])->first != "text" && (dic[itr + 1])->first != "array" && (dic[itr + 1])->first != "html")) {
-					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("y") + Convert::ToString(i)));
+					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String^>(%cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("y") + Convert::ToString(i)));
 					itr++;
 				}
 				if (dic[itr]->first == "class") {
-					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("y") + Convert::ToString(i)));
+					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("y") + Convert::ToString(i)));
 					itr++;
 				}
 
@@ -181,19 +181,19 @@ namespace process {
 					for (; itr < this->dic->Count; ++itr) {
 						if (dic[itr]->first == "text" || dic[itr]->first == "array" || dic[itr]->first == "html") {
 //							str = gcnew String((dic[itr]->second).c_);
-							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^>(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							itr++;
 							break;
 						}
 						else if (dic[itr]->first == "colspan") {
-							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^ >(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^ >(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							j += Convert::ToInt32(dic[itr]->second) - 1;
 						}
 						else if (dic[itr]->second == "") {
-							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^ >(cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^ >(%cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 						}
 						else {
-							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^ >(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^ >(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 						}
 					}
 					//初回処理時はタイトルを取得したとしてループを抜ける
