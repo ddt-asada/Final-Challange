@@ -42,19 +42,6 @@ namespace JSONTest {
 	protected:
 
 	public:
-		String^ JSONFilePath = MyConst->EMPTY_STRING;		//入力されたJSONのファイルパスを格納するための文字列。
-		String^ DBQuery = MyConst->EMPTY_STRING;			//入力されたDBへ投げるクエリを格納する文字列。
-		String^ DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
-		Int32^ TextIndex = 0;				//フォーカス中の文字列判定用の変数
-		Int32^ column = MyConst->ZERO;						//表の列数
-		Int32^ row = MyConst->ZERO;							//表の行数
-		Int32^ Row = 3;			//表の行数
-		Int32^ Column = 3;		//表の列数
-		Int32^ RowIndex = 0;		//クリックされたセルの行座標
-		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
-		Int32^ RctWidth = 200;		//セル一つ当たりの幅
-		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
-		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 	private: System::Windows::Forms::PictureBox^  pictureBoxDetail;
 	private: System::Windows::Forms::TextBox^  textBox1;
 	private: System::Windows::Forms::PictureBox^  pictureBoxSelect;

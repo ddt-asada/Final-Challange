@@ -1,9 +1,9 @@
 #pragma once
 
-#include "InputOption.h"
-#include "TableInformation.h"
-#include "TableProcessing.h"
 #include "CONSTANTSTRING.h"
+#include "TableInformation.h"
+#include "InputOption.h"
+#include "TableProcessing.h"
 #include "Processing.h"
 
 namespace JSONTest {
@@ -19,7 +19,7 @@ namespace JSONTest {
 	/// <summary>
 	/// JSONForm の概要
 	/// </summary>
-	public ref class JSONForm : public System::Windows::Forms::Form
+	public ref class JSONForm : public TableProcessing
 	{
 	public:
 		JSONForm(void)
@@ -111,15 +111,15 @@ namespace JSONTest {
 		Int32^ TextIndex = 0;				//フォーカス中の文字列判定用の変数
 		Int32^ column = MyConst->ZERO;						//表の列数
 		Int32^ row = MyConst->ZERO;							//表の行数
-		Int32^ Row = 3;			//表の行数
-		Int32^ Column = 3;		//表の列数
-		Int32^ RowIndex = 0;		//クリックされたセルの行座標
-		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
-		Int32^ RctWidth = 200;		//セル一つ当たりの幅
-		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
-		List<String^>^ join = gcnew List<String^>;
-	//	string* xindex = &string("");
-	//	string* yindex = &string("");
+//		Int32^ Row = 3;			//表の行数
+//		Int32^ Column = 3;		//表の列数
+//		Int32^ RowIndex = 0;		//クリックされたセルの行座標
+//		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
+//		Int32^ RctWidth = 200;		//セル一つ当たりの幅
+//		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
+//		List<String^>^ join = gcnew List<String^>;
+//		string* xindex = &string("");
+//		string* yindex = &string("");
 		vector<pair<pair<string, string>, string>>* infotable = new vector<pair<pair<string, string>, string>>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 		/// <summary>

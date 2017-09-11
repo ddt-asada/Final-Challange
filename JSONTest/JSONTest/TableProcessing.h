@@ -8,12 +8,10 @@
 #include <cliext/utility>
 #include <string>
 #include <vector> 
-#include "JSONForm.h"
 #include "CONSTANTSTRING.h"
-#include "TableInformation.h"
 
-namespace process {
-	using namespace JSONTest;
+namespace JSONTest {
+//	using namespace JSONTest;
 	using namespace std;
 	using namespace System;
 	using namespace System::Drawing;
@@ -25,10 +23,7 @@ namespace process {
 	/*表画像を生成するクラス
 	作成日：2017.9.9
 	作成者；K.Asada*/
-	ref class TableProcessing{
-	private:
-
-
+	public ref class TableProcessing : public System::Windows::Forms::Form{
 	public:
 
 		Int32^ Row = 0;			//表の行数
@@ -125,7 +120,7 @@ namespace process {
 
 		/*値の変更画面を表示する関数*/
 		Void ValueChange() {
-			String^ Xindex = "x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex);
+		/*	String^ Xindex = "x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex);
 			String^ Yindex = "y" + Convert::ToString(this->RowIndex);
 			//値変更画面のフォームをインスタンス化
 			TableInformation^ tble = gcnew TableInformation();
@@ -156,7 +151,7 @@ namespace process {
 			cellpict->Image = img;
 			tble->TableInfo = this->TableInfo;
 			tble->Controls->Add(cellpict);
-			tble->ShowDialog();
+			tble->ShowDialog();*/
 		}
 
 		/*選択箇所を結合/解除する関数*/
