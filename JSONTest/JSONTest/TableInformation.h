@@ -14,12 +14,21 @@ namespace JSONTest {
 	/// <summary>
 	/// TableInformation の概要
 	/// </summary>
-	public ref class TableInformation : public System::Windows::Forms::Form
+	public ref class TableInformation : public TableProcessing
 	{
 	public:
 		TableInformation(void)
 		{
 			InitializeComponent();
+			//
+			//TODO: ここにコンストラクター コードを追加します
+			//
+		}
+
+		TableInformation(Bitmap^ tblpict)
+		{
+			InitializeComponent();
+			this->pictureBoxDetail->Image = tblpict;
 			//
 			//TODO: ここにコンストラクター コードを追加します
 			//
@@ -112,6 +121,10 @@ namespace JSONTest {
 		}
 #pragma endregion
 	private: System::Void pictureBoxDetail_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+		//クリックした座標を取得する
+		this->CalPoint(e);
+		//選択箇所をハイライトする
+		this->pict(this->pictureBoxSelect);
 	}
 };
 }

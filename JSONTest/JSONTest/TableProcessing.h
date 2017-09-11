@@ -118,16 +118,10 @@ namespace JSONTest {
 		return PictSelect;
 	}
 
-		/*値の変更画面を表示する関数*/
-		Void ValueChange() {
-		/*	String^ Xindex = "x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex);
+		/*値の変更画面に表示する画像を生成する関数*/
+		Bitmap^ ValueChange() {
+			String^ Xindex = "x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex);
 			String^ Yindex = "y" + Convert::ToString(this->RowIndex);
-			//値変更画面のフォームをインスタンス化
-			TableInformation^ tble = gcnew TableInformation();
-			//値変更画面へ出力するためのピクチャボックスをインスタンス化
-			PictureBox^ cellpict = gcnew PictureBox();
-			cellpict->AutoSize = true;
-			cellpict->Location = System::Drawing::Point(0, 0);
 			//ビットマップを生成
 			Bitmap^ img = gcnew Bitmap(1000, 1000);
 			//描画を行うグラフィッククラスを生成
@@ -148,10 +142,7 @@ namespace JSONTest {
 					gr->DrawString(this->TableInfo[i]->first->second, myFont, Brushes::Black, *this->RctWidth, *this->RctHeight * count++);
 				}
 			}
-			cellpict->Image = img;
-			tble->TableInfo = this->TableInfo;
-			tble->Controls->Add(cellpict);
-			tble->ShowDialog();*/
+			return img;
 		}
 
 		/*選択箇所を結合/解除する関数*/
@@ -186,5 +177,7 @@ namespace JSONTest {
 				this->ColumnIndex = (e->Location.X / *this->RctWidth);
 			}
 		}
+
+		
 	};
 }

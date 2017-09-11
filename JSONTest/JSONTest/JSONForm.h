@@ -31,8 +31,6 @@ namespace JSONTest {
 			//
 		}
 
-
-
 	private: System::Windows::Forms::PictureBox^  pictureBox1;
 	private: System::Windows::Forms::PictureBox^  pictureBox2;
 	private: System::Windows::Forms::Button^  buttonJoin;
@@ -535,6 +533,8 @@ private: System::Void buttonJoin_Click(System::Object^  sender, System::EventArg
 	this->JoinRelease();
 
 	//表を再描画する
+	this->TableGenerate(this->pictureBox1);
+	//選択箇所をハイライトする
 	this->pict(this->pictureBox2);
 }
 private: System::Void pictureBox2_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
@@ -565,7 +565,20 @@ private: System::Void textBoxCell_KeyDown(System::Object^  sender, System::Windo
 	}
 }
 private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	this->ValueChange();
+	//値変更画面へ出力するためのピクチャボックスをインスタンス化
+	PictureBox^ cellpict = gcnew PictureBox();
+	//オートサイズにする
+	cellpict->AutoSize = true;
+	//座標をフォームの左上に設定
+	cellpict->Location = System::Drawing::Point(0, 0);
+	//受け渡す表画像を生成し、ピクチャボックスに設定
+	cellpict->Image = this->ValueChange();
+	//表示先の画面に作成したピクチャボックスを載せる
+//	tble->picture->Add(cellpict);
+	//値変更画面をインスタンス化
+	TableInformation^ tble = gcnew TableInformation(this->ValueChange());
+	//画面を表示
+	tble->ShowDialog();
 }
 };
 }

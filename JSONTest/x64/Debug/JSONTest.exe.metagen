@@ -53,7 +53,8 @@ Class JSONTest.TableProcessing: AutoLayout, AnsiClass, Class, Public, BeforeFiel
     JoinRelease(): PrivateScope, Public, HideBySig
     CalPoint(MouseEventArgs): PrivateScope, Public, HideBySig
 Class JSONTest.TableInformation: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
-  :System.Windows.Forms.Form
+  :JSONTest.TableProcessing
+    Void .ctor(System.Drawing.Bitmap): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
     System.ComponentModel.Container components : Public
