@@ -26,19 +26,17 @@ namespace JSONTest {
 		{
 			InitializeComponent();
 			this->pictureBox2->Parent = this->pictureBox1;
-			for (int i = 0; i < 5; i++) {
-				this->join[i] = "";
-			}
 			//
 			//TODO: ここにコンストラクター コードを追加します
 			//
 		}
-	private: System::Windows::Forms::DataGridView^  dataGridView1;
+
 
 	private: System::Data::DataSet^  dataSet1;
 	private: System::Windows::Forms::DataGridView^  dataGridView2;
 	private: System::Windows::Forms::PictureBox^  pictureBox1;
 	private: System::Windows::Forms::PictureBox^  pictureBox2;
+	private: System::Windows::Forms::Button^  buttonJoin;
 
 
 
@@ -110,13 +108,13 @@ namespace JSONTest {
 		String^ DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
 		Int32^ column = MyConst->ZERO;						//表の列数
 		Int32^ row = MyConst->ZERO;							//表の行数
-		Int32 Row = 3;			//表の行数
+		Int32^ Row = 3;			//表の行数
 		Int32^ Column = 3;		//表の列数
 		Int32^ RowIndex = 0;		//クリックされたセルの行座標
 		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
-		Int32^ RctWidth = 100;		//セル一つ当たりの幅
+		Int32^ RctWidth = 200;		//セル一つ当たりの幅
 		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
-		cli::array<String^>^ join = gcnew cli::array<String^>(5);
+		List<String^>^ join = gcnew List<String^>;
 	//	string* xindex = &string("");
 	//	string* yindex = &string("");
 		vector<pair<pair<string, string>, string>>* infotable = new vector<pair<pair<string, string>, string>>();
@@ -144,7 +142,6 @@ namespace JSONTest {
 			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
 			this->pictureBox2 = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
-			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
 			this->buttonConversion = (gcnew System::Windows::Forms::Button());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
 			this->buttonConversion2 = (gcnew System::Windows::Forms::Button());
@@ -157,11 +154,11 @@ namespace JSONTest {
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
 			this->dataGridView2 = (gcnew System::Windows::Forms::DataGridView());
 			this->dataSet1 = (gcnew System::Data::DataSet());
+			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->BeginInit();
 			this->tabPage2->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataSet1))->BeginInit();
@@ -251,9 +248,9 @@ namespace JSONTest {
 			// tabPage1
 			// 
 			this->tabPage1->AutoScroll = true;
+			this->tabPage1->Controls->Add(this->buttonJoin);
 			this->tabPage1->Controls->Add(this->pictureBox2);
 			this->tabPage1->Controls->Add(this->pictureBox1);
-			this->tabPage1->Controls->Add(this->dataGridView1);
 			this->tabPage1->Controls->Add(this->buttonConversion);
 			this->tabPage1->Controls->Add(this->buttonCancel);
 			this->tabPage1->Controls->Add(this->labelRow);
@@ -273,6 +270,8 @@ namespace JSONTest {
 			// 
 			// pictureBox2
 			// 
+			this->pictureBox2->BackColor = System::Drawing::Color::Transparent;
+			this->pictureBox2->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
 			this->pictureBox2->Location = System::Drawing::Point(911, 44);
 			this->pictureBox2->Name = L"pictureBox2";
 			this->pictureBox2->Size = System::Drawing::Size(78, 83);
@@ -289,18 +288,6 @@ namespace JSONTest {
 			this->pictureBox1->TabIndex = 17;
 			this->pictureBox1->TabStop = false;
 			this->pictureBox1->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::pictureBox1_MouseClick);
-			// 
-			// dataGridView1
-			// 
-			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->dataGridView1->Location = System::Drawing::Point(679, 203);
-			this->dataGridView1->Name = L"dataGridView1";
-			this->dataGridView1->RowTemplate->Height = 33;
-			this->dataGridView1->Size = System::Drawing::Size(562, 514);
-			this->dataGridView1->TabIndex = 16;
-			this->dataGridView1->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &JSONForm::dataGridView1_CellEndEdit);
-			this->dataGridView1->CellMouseDoubleClick += gcnew System::Windows::Forms::DataGridViewCellMouseEventHandler(this, &JSONForm::dataGridView1_CellMouseDoubleClick);
-			this->dataGridView1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::dataGridView1_MouseDown);
 			// 
 			// buttonConversion
 			// 
@@ -429,6 +416,16 @@ namespace JSONTest {
 			// 
 			this->dataSet1->DataSetName = L"NewDataSet";
 			// 
+			// buttonJoin
+			// 
+			this->buttonJoin->Location = System::Drawing::Point(424, 13);
+			this->buttonJoin->Name = L"buttonJoin";
+			this->buttonJoin->Size = System::Drawing::Size(182, 99);
+			this->buttonJoin->TabIndex = 19;
+			this->buttonJoin->Text = L"結合/解除";
+			this->buttonJoin->UseVisualStyleBackColor = true;
+			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONForm::buttonJoin_Click);
+			// 
 			// JSONForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -447,7 +444,6 @@ namespace JSONTest {
 			this->tabPage1->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->EndInit();
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->EndInit();
@@ -508,57 +504,19 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	this->Row = *proc->Row;
 	//取得した表に出力する文字列をメンバへ格納
 	this->TableInfo = proc->retTable;
-	//文字列処理クラスへ移行
-	/*
-	this->infotable->push_back(pair<pair<string, string>, string>(make_pair("親キー", itr->first), "title"));
-	itr++;
-	if (itr->first == "class") {
-		this->infotable->push_back(pair<pair<string, string>, string>(make_pair(itr->first, itr->second), "title"));
-		itr++;
+
+	//結合状態判定用の文字列を初期化する。
+	for (int i = 0; i < this->Row; i++) {
+		this->join->Add("");
 	}
-
-	for (int i = 0; i < *this->row; i++) {
-		if (itr->second == "" && ((itr + 1)->first != "text" && (itr + 1)->first != "array" && (itr + 1)->first != "html")) {
-			this->infotable->push_back(pair<pair<string, string>, string>(make_pair("親キー", itr->first), 'y' + to_string(i)));
-			itr++;
-		}
-		if (itr->first == "class") {
-			this->infotable->push_back(pair<pair<string, string>, string>(make_pair(itr->first, itr->second), 'y'+ to_string(i)));
-			itr++;
-		}
-
-		for (int j = 0; j < *this->column; j++) {
-			for (; itr != table->rettable->end(); ++itr) {
-				if (itr->first == "text" || itr->first == "array" || itr->first == "html") {
-					str = gcnew String((itr->second).c_str());
-					this->infotable->push_back(pair<pair<string, string>, string>(make_pair(itr->first, itr->second), 'x' + to_string(j) + to_string(i)));
-					itr++;
-					this->dataGridView1->Rows[i]->Cells[j]->Value = str;
-					break;
-				}
-				else if (itr->first == "colspan") {
-					this->infotable->push_back(pair<pair<string, string>, string>(make_pair(itr->first, itr->second), 'x' + to_string(j) + to_string(i)));
-					j += stoi(itr->second) - 1;
-				}
-				else if (itr->second == "") {
-					this->infotable->push_back(pair<pair<string, string>, string>(make_pair("親キー", itr->first), 'x' + to_string(j) + to_string(i)));
-				}
-				else {
-					this->infotable->push_back(pair<pair<string, string>, string>(make_pair(itr->first, itr->second), 'x' + to_string(j) + to_string(i)));
-				}
-			}
-			//初回処理時はタイトルを取得したとしてループを抜ける
-			if (i == 0 && j == 0) {
-				break;
-			}
-		}
-	}*/
-/*	TableProcessing^ tbl = gcnew TableProcessing();
+	TableProcessing^ tbl = gcnew TableProcessing();
 	tbl->Row = this->Row;
 	tbl->Column = this->Column;
 	tbl->RctWidth = this->RctWidth;
-	tbl->RctHeight = this->RctHeight;*/
-//	this->pictureBox1->Image = tbl->TableGenerate();
+	tbl->RctHeight = this->RctHeight;
+	tbl->TableInfo = this->TableInfo;
+	tbl->join = this->join;
+	tbl->TableGenerate(this->pictureBox1);
 }
 
 /*関数名：IntToString
@@ -651,14 +609,14 @@ private: System::Void dataGridView1_MouseDown(System::Object^  sender, System::W
 }
 
 private: System::Void dataGridView1_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
-	int x = this->dataGridView1->CurrentCell->ColumnIndex;
-	int y = this->dataGridView1->CurrentCell->RowIndex;
+	//int x = this->dataGridView1->CurrentCell->ColumnIndex;
+//	int y = this->dataGridView1->CurrentCell->RowIndex;
 	string tmp;
 	for (auto itr = this->infotable->begin(); itr != this->infotable->end(); itr++) {
-		if (itr->second == ('x' + to_string(x) + to_string(y)) && itr->first.first == "text") {
-			 MarshalString(this->dataGridView1->CurrentCell->Value->ToString(), tmp);
+		//if (itr->second == ('x' + to_string(x) + to_string(y)) && itr->first.first == "text") {
+	//		 MarshalString(this->dataGridView1->CurrentCell->Value->ToString(), tmp);
 			 itr->first.second = tmp;
-		}
+		//}
 	}
 }
 
@@ -678,8 +636,8 @@ private: System::Void dataGridView2_CellEndEdit(System::Object^  sender, System:
 private: System::Void dataGridView1_CellMouseDoubleClick(System::Object^  sender, System::Windows::Forms::DataGridViewCellMouseEventArgs^  e) {
 	TableInformation^ datatable = gcnew TableInformation();
 //	DataGridView::HitTestInfo^ hit = ((DataGridView^)sender)->HitTest(e->X, e->Y);
-	string xindex = 'x' + to_string(this->dataGridView1->CurrentCell->ColumnIndex) + to_string(this->dataGridView1->CurrentCell->RowIndex);
-	string yindex = 'y' + to_string(this->dataGridView1->CurrentCell->RowIndex);
+	//string xindex = 'x' + to_string(this->dataGridView1->CurrentCell->ColumnIndex) + to_string(this->dataGridView1->CurrentCell->RowIndex);
+	//string yindex = 'y' + to_string(this->dataGridView1->CurrentCell->RowIndex);
 	auto itr = this->infotable->begin();
 	this->dataGridView2->RowCount = 1;
 	this->dataGridView2->ColumnCount = 2;
@@ -687,12 +645,12 @@ private: System::Void dataGridView1_CellMouseDoubleClick(System::Object^  sender
 		if (itr->second == "title") {
 			this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
 		}
-		else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
+//		else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
 			this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
-		}
+	//	}
 	}
 
-	itr = this->infotable->begin();
+/*	itr = this->infotable->begin();
 	datatable->Controls->Add(this->dataGridView2);
 	datatable->ShowDialog();
 
@@ -706,39 +664,41 @@ private: System::Void dataGridView1_CellMouseDoubleClick(System::Object^  sender
 			MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
 			itr->first.second = tmp;
 		}
-		else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
+	//	else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
 			MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
 			itr->first.first = tmp;
 			MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
 			itr->first.second = tmp;
-		}
-	}
+		//}
+	}*/
 }
 
 //選択箇所を取得する
 private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	/*//表の行の座標を取得する
-	this->RowIndex = (e->Location.Y / (this->pictureBox1->Height / this->Row));
+	//表の行の座標を取得する
+	this->RowIndex = (e->Location.Y / (this->pictureBox1->Height / *this->Row));
 	//表の列の座標を取得する
-	if (this->join[this->RowIndex] != "") {
+	if (this->join[*this->RowIndex] != "") {
 		//結合の座標を取得。
-		this->ColumnIndex = Convert::ToInt32(this->join[this->RowIndex]);
+		this->ColumnIndex = Convert::ToInt32(this->join[*this->RowIndex]);
 	}
 	else {
 		//表の行の座標を取得する
-		this->ColumnIndex = (e->Location.X / (this->pictureBox1->Width / this->Column));
-	}*/
-	/*
+		this->ColumnIndex = (e->Location.X / (this->pictureBox1->Width / *this->Column));
+	}
+	
 	//選択箇所をハイライトする関数をインスタンス化
 	TableProcessing^ tbl = gcnew TableProcessing();
-	tbl->RowIndex = this->RowIndex;
-	tbl->ColumnIndex = this->ColumnIndex;
-	tbl->RctHeight = this->RctHeight;
-	tbl->RctWidth = this->RctWidth;
+	tbl->RowIndex = *this->RowIndex;
+	tbl->ColumnIndex = *this->ColumnIndex;
+	tbl->RctHeight = *this->RctHeight;
+	tbl->RctWidth = *this->RctWidth;
 	tbl->join = this->join;
-	tbl->Column = this->Column;
-	tbl->Row = this->Row;
-	tbl->pict(this->pictureBox2);*/
+	tbl->Column = *this->Column;
+	tbl->Row = *this->Row;
+	tbl->pict(this->pictureBox2);
+}
+private: System::Void buttonJoin_Click(System::Object^  sender, System::EventArgs^  e) {
 }
 };
 }

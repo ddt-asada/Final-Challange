@@ -29,20 +29,17 @@ namespace process {
 
 	public:
 
-		Int32 Row = 0;			//表の行数
-		Int32 Column = 0;		//表の列数
-		Int32 RowIndex = 0;		//クリックされたセルの行座標
-		Int32 ColumnIndex = 0;	//クリックされたセルの列座標
-		Int32 RctWidth = 0;		//セル一つ当たりの幅
-		Int32 RctHeight = 0;	//セル一つ当たりの高さ
-		cli::array<String^>^ join = gcnew cli::array<String^>(5);
+		Int32^ Row = 0;			//表の行数
+		Int32^ Column = 0;		//表の列数
+		Int32^ RowIndex = 0;		//クリックされたセルの行座標
+		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
+		Int32^ RctWidth = 0;		//セル一つ当たりの幅
+		Int32^ RctHeight = 0;	//セル一つ当たりの高さ
+		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ TableOut = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 
 		TableProcessing() {
-			for (int i = 0; i < 5; i++) {
-				this->join[i] = "";
-			}
 		};
 		//コンストラクタ
 		TableProcessing(Int32 row, Int32 column, Int32 rowindex, Int32 columnindex, List<cliext::pair<String^, String^>^>^ strout, List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ tblinfo): Row(0), Column(0), RowIndex(0),ColumnIndex(0) {
@@ -53,14 +50,14 @@ namespace process {
 		/*表を生成する関数
 		*/
 		PictureBox^ TableGenerate(PictureBox^ PictBox) {
-			Bitmap^ img = gcnew Bitmap(this->RctWidth * this->Column + 1, this->RctHeight * this->Row + 1);
+			Bitmap^ img = gcnew Bitmap(*this->RctWidth * *this->Column + 1, *this->RctHeight * *this->Row + 1);
 			//描画を行うグラフィックスクラスを生成
 			Graphics^ gr = Graphics::FromImage(img);
 			for (int i = 0; i < this->Row; i++) {
 				//結合状態であれば
 				if (this->join[i] != "") {
 					// 画像領域に線を描画
-					gr->DrawRectangle(Pens::Black, 0, this->RctHeight * i, this->RctWidth * this->Row, this->RctHeight);
+					gr->DrawRectangle(Pens::Black, 0, *this->RctHeight * i, *this->RctWidth * *this->Column, *this->RctHeight);
 					// 画像領域に文字列を書き込む
 					System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 					//行の中心にインデックスを付ける
@@ -69,11 +66,23 @@ namespace process {
 				else {
 					for (int j = 0; j < this->Column; j++) {
 						// 画像領域に線を描画
-						gr->DrawRectangle(Pens::Black, this->RctWidth * j, this->RctHeight * i, this->RctWidth, this->RctHeight);
-						// 画像領域に文字列を書き込む
-						System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
-						//表にインデックスを付ける
-						//gr->DrawString(Convert::ToString(count++), myFont, Brushes::Black, this->rctwidth * j, this->rctheight * i);
+						for (int k = 0; k < this->TableInfo->Count; k++) {
+						/*	if (i == 0 && j == 0 && this->TableInfo[k]->first->first == "text") {
+								gr->DrawRectangle(Pens::Black, 0, *this->RctHeight * i, *this->RctWidth * *this->Column, *this->RctHeight);
+								System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+								//表にインデックスを付ける
+								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * j, *this->RctHeight * i);
+								break;
+							}*/
+							if ((this->TableInfo[k]->first->first == "text" || this->TableInfo[k]->first->first == "array") && this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
+								gr->DrawRectangle(Pens::Black, *this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
+								// 画像領域に文字列を書き込む
+								System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+								//表にインデックスを付ける
+								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * j, *this->RctHeight * i);
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -87,22 +96,22 @@ namespace process {
 		/*選択箇所をハイライトするための画像を生成する関数*/
 		PictureBox^ pict(PictureBox^ PictSelect) {
 		//半透明の塗りつぶし用のブラシを作成
-		Brush^ br = gcnew SolidBrush(Color::FromArgb(50, Color::Yellow));
+		Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Yellow));
 		//ビットマップを生成
-		Bitmap^ img = gcnew Bitmap(this->RctWidth * this->Column + 1, this->RctHeight * this->Row + 1);
+		Bitmap^ img = gcnew Bitmap(*this->RctWidth * *this->Column + 1, *this->RctHeight * *this->Row + 1);
 		//描画を行うグラフィックスクラスを生成
 		Graphics^ gr = Graphics::FromImage(img);
 		//結合状態であれば
-		if (this->join[this->RowIndex] != "") {
+		if (this->join[*this->RowIndex] != "") {
 			// 画像領域に線を描画
-			PictSelect->Location = System::Drawing::Point(0, this->RctHeight * this->RowIndex);
-			PictSelect->Size = System::Drawing::Size(this->RctWidth * this->Column, this->RctHeight);
-			gr->FillRectangle(br, 0, 0, this->RctWidth * this->Column, this->RctHeight);
+			PictSelect->Location = System::Drawing::Point(0, *this->RctHeight * *this->RowIndex);
+			PictSelect->Size = System::Drawing::Size(*this->RctWidth * *this->Column, *this->RctHeight);
+			gr->FillRectangle(br, 0, 0, *this->RctWidth * *this->Column - 1, *this->RctHeight - 1);
 		}
 		else {
-			PictSelect->Location = System::Drawing::Point(this->RctWidth * this->ColumnIndex, this->RctHeight * this->RowIndex);
-			PictSelect->Size = System::Drawing::Size(this->RctWidth, this->RctHeight);
-			gr->FillRectangle(br, 0, 0, this->RctWidth - 1, this->RctHeight - 1);
+			PictSelect->Location = System::Drawing::Point(*this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
+			PictSelect->Size = System::Drawing::Size(*this->RctWidth, *this->RctHeight);
+			gr->FillRectangle(br, 0, 0, *this->RctWidth - 1, *this->RctHeight - 1);
 		}
 		PictSelect->Image = img;
 		return PictSelect;
