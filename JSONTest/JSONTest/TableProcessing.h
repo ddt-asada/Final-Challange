@@ -10,8 +10,10 @@
 #include <vector> 
 #include "JSONForm.h"
 #include "CONSTANTSTRING.h"
+#include "TableInformation.h"
 
 namespace process {
+	using namespace JSONTest;
 	using namespace std;
 	using namespace System;
 	using namespace System::Drawing;
@@ -56,12 +58,16 @@ namespace process {
 			for (int i = 0; i < this->Row; i++) {
 				//結合状態であれば
 				if (this->join[i] != "") {
-					// 画像領域に線を描画
-					gr->DrawRectangle(Pens::Black, 0, *this->RctHeight * i, *this->RctWidth * *this->Column, *this->RctHeight);
-					// 画像領域に文字列を書き込む
-					System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
-					//行の中心にインデックスを付ける
-					//gr->DrawString(Convert::ToString(count++), myFont, Brushes::Black, this->rctwidth *this-> row / 2, this->rctheight * i);
+					for(int k = 0; k < this->TableInfo->Count; k++){
+						if ((this->TableInfo[k]->first->first == "text" || this->TableInfo[k]->first->first == "array") && this->TableInfo[k]->second == ("x" + "0" + Convert::ToString(i))) {
+							gr->DrawRectangle(Pens::Black, 0, *this->RctHeight * i, *this->RctWidth * *this->Column, *this->RctHeight);
+							// 画像領域に文字列を書き込む
+							System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+							//表にインデックスを付ける
+							gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * *this->Row / 2, *this->RctHeight * i);
+							break;
+						}
+					}
 				}
 				else {
 					for (int j = 0; j < this->Column; j++) {
@@ -118,6 +124,40 @@ namespace process {
 	}
 
 		/*値の変更画面を表示する関数*/
+		Void ValueChange() {
+			String^ Xindex = "x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex);
+			String^ Yindex = "y" + Convert::ToString(this->RowIndex);
+			//値変更画面のフォームをインスタンス化
+			TableInformation^ tble = gcnew TableInformation();
+			//値変更画面へ出力するためのピクチャボックスをインスタンス化
+			PictureBox^ cellpict = gcnew PictureBox();
+			cellpict->AutoSize = true;
+			cellpict->Location = System::Drawing::Point(0, 0);
+			//ビットマップを生成
+			Bitmap^ img = gcnew Bitmap(1000, 1000);
+			//描画を行うグラフィッククラスを生成
+			Graphics^ gr = Graphics::FromImage(img);
+			int count = 0;
+			//クリックされたセルに対応した情報を取得し、描画
+			for (int i = 0; i < this->TableInfo->Count; i++) {
+				//クリックされたセルに対応した情報を見つけたら
+				if (this->TableInfo[i]->second == Xindex || this->TableInfo[i]->second == Yindex || this->TableInfo[i]->second == "title") {
+					gr->DrawRectangle(Pens::Black, 0, *this->RctHeight * count, *this->RctWidth, *this->RctHeight);
+					// 画像領域に文字列を書き込む
+					System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+					//表にインデックスを付ける
+					gr->DrawString(this->TableInfo[i]->first->first, myFont, Brushes::Black, 0, *this->RctHeight * count);
+					gr->DrawRectangle(Pens::Black, *this->RctWidth, *this->RctHeight * count, *this->RctWidth, *this->RctHeight);
+					// 画像領域に文字列を書き込む
+					//表にインデックスを付ける
+					gr->DrawString(this->TableInfo[i]->first->second, myFont, Brushes::Black, *this->RctWidth, *this->RctHeight * count++);
+				}
+			}
+			cellpict->Image = img;
+			tble->TableInfo = this->TableInfo;
+			tble->Controls->Add(cellpict);
+			tble->ShowDialog();
+		}
 
 		/*選択箇所を結合/解除する関数*/
 

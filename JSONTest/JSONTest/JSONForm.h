@@ -32,11 +32,13 @@ namespace JSONTest {
 		}
 
 
-	private: System::Data::DataSet^  dataSet1;
+
 	private: System::Windows::Forms::DataGridView^  dataGridView2;
 	private: System::Windows::Forms::PictureBox^  pictureBox1;
 	private: System::Windows::Forms::PictureBox^  pictureBox2;
 	private: System::Windows::Forms::Button^  buttonJoin;
+	private: System::Windows::Forms::TextBox^  textBoxCell;
+
 
 
 
@@ -106,6 +108,7 @@ namespace JSONTest {
 		String^ JSONFilePath = MyConst->EMPTY_STRING;		//入力されたJSONのファイルパスを格納するための文字列。
 		String^ DBQuery = MyConst->EMPTY_STRING;			//入力されたDBへ投げるクエリを格納する文字列。
 		String^ DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
+		Int32^ TextIndex = 0;				//フォーカス中の文字列判定用の変数
 		Int32^ column = MyConst->ZERO;						//表の列数
 		Int32^ row = MyConst->ZERO;							//表の行数
 		Int32^ Row = 3;			//表の行数
@@ -140,6 +143,8 @@ namespace JSONTest {
 			this->buttonCancel = (gcnew System::Windows::Forms::Button());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
+			this->textBoxCell = (gcnew System::Windows::Forms::TextBox());
+			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->pictureBox2 = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
 			this->buttonConversion = (gcnew System::Windows::Forms::Button());
@@ -153,15 +158,12 @@ namespace JSONTest {
 			this->textBoxRow2 = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
 			this->dataGridView2 = (gcnew System::Windows::Forms::DataGridView());
-			this->dataSet1 = (gcnew System::Data::DataSet());
-			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			this->tabPage2->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataSet1))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// labelRow
@@ -248,6 +250,7 @@ namespace JSONTest {
 			// tabPage1
 			// 
 			this->tabPage1->AutoScroll = true;
+			this->tabPage1->Controls->Add(this->textBoxCell);
 			this->tabPage1->Controls->Add(this->buttonJoin);
 			this->tabPage1->Controls->Add(this->pictureBox2);
 			this->tabPage1->Controls->Add(this->pictureBox1);
@@ -268,6 +271,30 @@ namespace JSONTest {
 			this->tabPage1->UseVisualStyleBackColor = true;
 			this->tabPage1->Click += gcnew System::EventHandler(this, &JSONForm::tabPage1_Click);
 			// 
+			// textBoxCell
+			// 
+			this->textBoxCell->BackColor = System::Drawing::Color::White;
+			this->textBoxCell->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->textBoxCell->Font = (gcnew System::Drawing::Font(L"MS UI Gothic", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->textBoxCell->Location = System::Drawing::Point(1089, 32);
+			this->textBoxCell->Multiline = true;
+			this->textBoxCell->Name = L"textBoxCell";
+			this->textBoxCell->Size = System::Drawing::Size(221, 79);
+			this->textBoxCell->TabIndex = 20;
+			this->textBoxCell->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &JSONForm::textBoxCell_KeyDown);
+			this->textBoxCell->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::textBoxCell_MouseDoubleClick);
+			// 
+			// buttonJoin
+			// 
+			this->buttonJoin->Location = System::Drawing::Point(424, 13);
+			this->buttonJoin->Name = L"buttonJoin";
+			this->buttonJoin->Size = System::Drawing::Size(182, 99);
+			this->buttonJoin->TabIndex = 19;
+			this->buttonJoin->Text = L"結合/解除";
+			this->buttonJoin->UseVisualStyleBackColor = true;
+			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONForm::buttonJoin_Click);
+			// 
 			// pictureBox2
 			// 
 			this->pictureBox2->BackColor = System::Drawing::Color::Transparent;
@@ -277,6 +304,7 @@ namespace JSONTest {
 			this->pictureBox2->Size = System::Drawing::Size(78, 83);
 			this->pictureBox2->TabIndex = 18;
 			this->pictureBox2->TabStop = false;
+			this->pictureBox2->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::pictureBox2_MouseClick);
 			// 
 			// pictureBox1
 			// 
@@ -412,20 +440,6 @@ namespace JSONTest {
 			this->dataGridView2->TabIndex = 17;
 			this->dataGridView2->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &JSONForm::dataGridView2_CellEndEdit);
 			// 
-			// dataSet1
-			// 
-			this->dataSet1->DataSetName = L"NewDataSet";
-			// 
-			// buttonJoin
-			// 
-			this->buttonJoin->Location = System::Drawing::Point(424, 13);
-			this->buttonJoin->Name = L"buttonJoin";
-			this->buttonJoin->Size = System::Drawing::Size(182, 99);
-			this->buttonJoin->TabIndex = 19;
-			this->buttonJoin->Text = L"結合/解除";
-			this->buttonJoin->UseVisualStyleBackColor = true;
-			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONForm::buttonJoin_Click);
-			// 
 			// JSONForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -447,7 +461,6 @@ namespace JSONTest {
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataSet1))->EndInit();
 			this->ResumeLayout(false);
 
 		}
@@ -686,7 +699,7 @@ private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Wi
 		//表の行の座標を取得する
 		this->ColumnIndex = (e->Location.X / (this->pictureBox1->Width / *this->Column));
 	}
-	
+
 	//選択箇所をハイライトする関数をインスタンス化
 	TableProcessing^ tbl = gcnew TableProcessing();
 	tbl->RowIndex = *this->RowIndex;
@@ -699,6 +712,66 @@ private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Wi
 	tbl->pict(this->pictureBox2);
 }
 private: System::Void buttonJoin_Click(System::Object^  sender, System::EventArgs^  e) {
+	//すでに結合状態であれば
+	if (join[*this->RowIndex] != "") {
+		//結合状態に解除する。
+		this->join[*this->RowIndex] = "";
+	}
+	else {
+		//結合状態にする。
+		this->join[*this->RowIndex] = Convert::ToString(this->ColumnIndex);
+	}
+	//表を再描画する
+	TableProcessing^ tbl = gcnew TableProcessing();
+	tbl->RowIndex = this->RowIndex;
+	tbl->ColumnIndex = this->ColumnIndex;
+	tbl->RctHeight = this->RctHeight;
+	tbl->RctWidth = this->RctWidth;
+	tbl->join = this->join;
+	tbl->Column = this->Column;
+	tbl->TableInfo = this->TableInfo;
+	tbl->Row = this->Row;
+	tbl->TableGenerate(this->pictureBox1);
+	tbl->pict(this->pictureBox2);
+}
+private: System::Void pictureBox2_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//コントロールにテキストボックスを追加する
+	this->pictureBox1->Controls->Add(this->textBoxCell);
+	//テキストボックスを対象のセルの大きさと同じにする
+	this->textBoxCell->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
+	//テキストボックスの配置を対象のセルと同じ位置にする
+	this->textBoxCell->Location = System::Drawing::Point(0 + *this->RctWidth * *this->ColumnIndex, 0 + *this->RctHeight * *this->RowIndex);
+	//テキストボックスを前面に配置する
+	this->textBoxCell->BringToFront();
+	//テキストボックスへ文字列を配置するためのループ
+	for (int i = 0; i < this->TableInfo->Count; i++) {
+		if ((this->TableInfo[i]->first->first == "text" || this->TableInfo[i]->first->first == "array") && this->TableInfo[i]->second == ("x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex))) {
+			this->textBoxCell->Text = this->TableInfo[i]->first->second;
+			this->TextIndex = i;
+			break;
+		}
+	}
+}
+private: System::Void textBoxCell_KeyDown(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
+	//エンターキーが押されたときのイベント
+	if (e->KeyCode == Keys::Enter) {
+		//テキストボックスに入力された文字列を対象のセルの文字列として格納する
+		this->TableInfo[*this->TextIndex]->first->second = this->textBoxCell->Text;
+		//コントロールからテキストボックスを削除する
+		this->pictureBox1->Controls->Remove(this->textBoxCell);
+	}
+}
+private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	TableProcessing^ tbl = gcnew TableProcessing();
+	tbl->RowIndex = *this->RowIndex;
+	tbl->ColumnIndex = *this->ColumnIndex;
+	tbl->RctHeight = *this->RctHeight;
+	tbl->RctWidth = *this->RctWidth;
+	tbl->join = this->join;
+	tbl->Column = *this->Column;
+	tbl->Row = *this->Row;
+	tbl->TableInfo = this->TableInfo;
+	tbl->ValueChange();
 }
 };
 }
