@@ -8,6 +8,7 @@
 #include <cliext/utility>
 #include <string>
 #include <vector> 
+#include "JSONForm.h"
 #include "CONSTANTSTRING.h"
 
 namespace process {
@@ -22,7 +23,7 @@ namespace process {
 	/*表画像を生成するクラス
 	作成日：2017.9.9
 	作成者；K.Asada*/
-	ref class TableProcessing {
+	ref class TableProcessing{
 	private:
 
 
@@ -51,7 +52,7 @@ namespace process {
 
 		/*表を生成する関数
 		*/
-		Bitmap^ TableGenerate() {
+		PictureBox^ TableGenerate(PictureBox^ PictBox) {
 			Bitmap^ img = gcnew Bitmap(this->RctWidth * this->Column + 1, this->RctHeight * this->Row + 1);
 			//描画を行うグラフィックスクラスを生成
 			Graphics^ gr = Graphics::FromImage(img);
@@ -77,7 +78,9 @@ namespace process {
 				}
 			}
 			//作成した表画像を反映
-			return img;
+			PictBox->Image = img;
+			//ピクチャーボックスを返却
+			return PictBox;
 		}
 		/*選択箇所をハイライトする関数*/
 

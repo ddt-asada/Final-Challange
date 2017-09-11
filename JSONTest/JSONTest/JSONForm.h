@@ -2,6 +2,7 @@
 
 #include "InputOption.h"
 #include "TableInformation.h"
+#include "TableProcessing.h"
 #include "CONSTANTSTRING.h"
 #include "Processing.h"
 
@@ -119,6 +120,7 @@ namespace JSONTest {
 	//	string* xindex = &string("");
 	//	string* yindex = &string("");
 		vector<pair<pair<string, string>, string>>* infotable = new vector<pair<pair<string, string>, string>>();
+		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 		/// <summary>
 		/// 必要なデザイナー変数です。
 		/// </summary>
@@ -489,7 +491,7 @@ private: System::Void JSONForm_FormClosing(System::Object^  sender, System::Wind
 
 //OKボタンが押されたときの処理
 private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^  e) {
-	/*
+	
 	//表を生成するためのクラスをインスタンス化
 	Processing^ table = gcnew Processing(this->JSONFilePath, this->DBQuery);
 	table->Row = Convert::ToInt32(this->textBoxRow->Text);
@@ -500,14 +502,12 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	this->column = table->Column;
 	this->row = table->Row;
 
-	this->dataGridView1->ColumnCount = *this->column;
-	this->dataGridView1->RowCount = *this->row;
-
 	//表を生成。
 	//タイトルを設定。
 	auto itr = table->rettable->begin();
 	String^ str;
 
+	/*
 	this->infotable->push_back(pair<pair<string, string>, string>(make_pair("親キー", itr->first), "title"));
 	itr++;
 	if (itr->first == "class") {
@@ -556,7 +556,7 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	tbl->Column = this->Column;
 	tbl->RctWidth = this->RctWidth;
 	tbl->RctHeight = this->RctHeight;
-	this->pictureBox1->Image = tbl->TableGenerate();
+//	this->pictureBox1->Image = tbl->TableGenerate();
 }
 
 /*関数名：IntToString

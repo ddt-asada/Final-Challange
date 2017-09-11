@@ -28,14 +28,15 @@ namespace process {
 		Int32^ column = *MyConst->ZERO;		//表の列数
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
-		vector<pair<string, string>>* table = new vector<pair<string, string>>();
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
-		//デフォルトコンストラクタ
+		List<cliext::pair<cliext::pair<String^, String^>, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>, String^>^>();
+
+			//デフォルトコンストラクタ
 		StringProcess() {
 		};
 
 		//ファイルパスより文字列を取得してその文字列から行数、列数、文字列を抜き出す。
-		vector<pair<string, string>>* ReadyString(String^ JSONPath) {
+		Void ReadyString(String^ JSONPath) {
 			ptree pt;		//ファイルより取得したJSONを格納するツリー
 		//	String^ SJSON = "";
 			string JSON = "";
@@ -61,7 +62,7 @@ namespace process {
 			//タイトルの行数を考慮して列数を補正する。
 			this->column = *this->tmp / *this->row;
 
-			return this->table;
+			SetTablePoint();
 		}
 
 		/*出力する表の列数を割り出す関数
@@ -70,16 +71,15 @@ namespace process {
 		*/
 		Void CountColumn() {
 			//イテレーターにより走査する。
-			for (auto itr = this->dic->begin(); itr != this->dic->end(); ++itr) {
-				Int32 tmp = 0;
+			for (int i = 0; i < this->dic->Count; i++) {
 				//表の要素を見つけたら列数をカウント
-				if (itr->first == "text" || itr->first == "array" || itr->first == "html") {
+				if (this->dic[i]->first == "text" || this->dic[i]->first == "array" || this->dic[i]->first == "html") {
 					*this->column += 1;
 				}
 				//結合を示すキー名があれば
-				else if (itr->first == "colspan") {
+				else if (this->dic[i]->first == "colspan") {
 					//結合の行数をプラスする
-					*this->column += stoi(itr->second) - 1;
+					*this->column += Convert::ToInt32(this->dic[i]->second) - 1;
 				}
 			}
 		}
@@ -89,15 +89,15 @@ namespace process {
 		作成者：K.Asada*/
 		Void CountRows() {
 			//イテレーターにより走査する。
-			for (auto itr = this->table->begin(); itr != this->table->end(); ++itr) {
+			for (int i = 0; i < this->dic->Count; i++) {
 				//親のノードまたは子が配列の時に列数をカウント
-				if ((itr->second == "" && (itr + 1)->first != "array") || itr->first == "array" || itr->first == "html") {
+				if ((this->dic[i]->second == "" && (this->dic[i + 1])->first != "array") || this->dic[i]->first == "array" || this->dic[i]->first == "html") {
 					//列数をインクリメント
 					*this->row += 1;
 				}
-				else if (itr->first == "colspan") {
+				else if (this->dic[i]->first == "colspan") {
 					//結合の行数をプラスする
-					*this->row += stoi(itr->second) - 1;
+					*this->row += Convert::ToInt32(this->dic[i]->second) - 1;
 				}
 			}
 		}
@@ -150,6 +150,55 @@ namespace process {
 					else {
 						//再帰処理を行う
 						TableString(pt.get_child(key), childkey);
+					}
+				}
+			}
+		}
+
+		/*文字列リストに座標を紐づける関数
+		作成日：2017.9.11
+		作成者：K.Asada*/
+		Void SetTablePoint() {
+			int itr = 0;		//リストを走査する際のインデックス
+			this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("title")));
+			itr++;
+			if (dic[itr]->first == "class") {
+				this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("title")));
+				itr++;
+			}
+
+			for (int i = 0; i < *this->row; i++) {
+				if (dic[itr]->second == "" && ((dic[itr + 1])->first != "text" && (dic[itr + 1])->first != "array" && (dic[itr + 1])->first != "html")) {
+					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("y") + Convert::ToString(i)));
+					itr++;
+				}
+				if (dic[itr]->first == "class") {
+					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String^>(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("y") + Convert::ToString(i)));
+					itr++;
+				}
+
+				for (int j = 0; j < *this->column; j++) {
+					for (; itr < this->dic->Count; ++itr) {
+						if (dic[itr]->first == "text" || dic[itr]->first == "array" || dic[itr]->first == "html") {
+//							str = gcnew String((dic[itr]->second).c_);
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^>(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							itr++;
+							break;
+						}
+						else if (dic[itr]->first == "colspan") {
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^ >(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							j += Convert::ToInt32(dic[itr]->second) - 1;
+						}
+						else if (dic[itr]->second == "") {
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^ >(cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+						}
+						else {
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>, String ^ >(cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+						}
+					}
+					//初回処理時はタイトルを取得したとしてループを抜ける
+					if (i == 0 && j == 0) {
+						break;
 					}
 				}
 			}

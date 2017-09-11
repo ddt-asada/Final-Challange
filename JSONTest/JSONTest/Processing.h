@@ -23,9 +23,6 @@ namespace process {
 		String^ DbJson = MyConst->EMPTY_STRING;		//DBより取得した文字列を格納する文字列。
 		Int32^ Row = *MyConst->ZERO;					//表の行数を格納する変数
 		Int32^ Column = *MyConst->ZERO;				//表の列数を格納する変数
-		vector<pair<string, string>> *rettable = new vector<pair<string, string>>();
-		vector<pair<pair<string, string>, string>>* jsontable = new vector<pair<pair<string, string>, string>>();
-
 	public:
 		//デフォルトコンストラクタ
 		Processing() {
@@ -46,7 +43,7 @@ namespace process {
 			if (this->LoadFilePath != MyConst->EMPTY_STRING) {
 				//JSONより表を出力するために必要な情報を抜き出す関数を呼び出す
 				StringProcess^ test = gcnew StringProcess();
-				this->rettable = test->ReadyString(this->LoadFilePath);
+				test->ReadyString(this->LoadFilePath);
 				//JSONより取得した行数とメンバ変数の行数を比較する。
 				if (*this->Row < *test->row) {
 					//大きい方を採用する。
@@ -58,7 +55,6 @@ namespace process {
 					this->Column = test->column;
 				}
 			}
-			//表を出力する関数を呼び出す。
 		}
 
 		/*受け取った情報よりJSONを出力するための処理
