@@ -33,32 +33,10 @@ namespace JSONTest {
 
 
 
-	private: System::Windows::Forms::DataGridView^  dataGridView2;
 	private: System::Windows::Forms::PictureBox^  pictureBox1;
 	private: System::Windows::Forms::PictureBox^  pictureBox2;
 	private: System::Windows::Forms::Button^  buttonJoin;
 	private: System::Windows::Forms::TextBox^  textBoxCell;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	public:
 		constantstring::CONSTANTSTRING^ MyConst = gcnew constantstring::CONSTANTSTRING();
@@ -109,19 +87,6 @@ namespace JSONTest {
 		String^ DBQuery = MyConst->EMPTY_STRING;			//入力されたDBへ投げるクエリを格納する文字列。
 		String^ DBResult = MyConst->EMPTY_STRING;			//DBとの通信結果を格納する文字列。
 		Int32^ TextIndex = 0;				//フォーカス中の文字列判定用の変数
-		Int32^ column = MyConst->ZERO;						//表の列数
-		Int32^ row = MyConst->ZERO;							//表の行数
-//		Int32^ Row = 3;			//表の行数
-//		Int32^ Column = 3;		//表の列数
-//		Int32^ RowIndex = 0;		//クリックされたセルの行座標
-//		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
-//		Int32^ RctWidth = 200;		//セル一つ当たりの幅
-//		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
-//		List<String^>^ join = gcnew List<String^>;
-//		string* xindex = &string("");
-//		string* yindex = &string("");
-		vector<pair<pair<string, string>, string>>* infotable = new vector<pair<pair<string, string>, string>>();
-		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 		/// <summary>
 		/// 必要なデザイナー変数です。
 		/// </summary>
@@ -157,13 +122,11 @@ namespace JSONTest {
 			this->buttonInputOption2 = (gcnew System::Windows::Forms::Button());
 			this->textBoxRow2 = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
-			this->dataGridView2 = (gcnew System::Windows::Forms::DataGridView());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			this->tabPage2->SuspendLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// labelRow
@@ -429,17 +392,6 @@ namespace JSONTest {
 			this->textBoxColumn2->TabIndex = 10;
 			this->textBoxColumn2->Text = L"0";
 			// 
-			// dataGridView2
-			// 
-			this->dataGridView2->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->dataGridView2->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->dataGridView2->Location = System::Drawing::Point(3, 3);
-			this->dataGridView2->Name = L"dataGridView2";
-			this->dataGridView2->RowTemplate->Height = 33;
-			this->dataGridView2->Size = System::Drawing::Size(1444, 845);
-			this->dataGridView2->TabIndex = 17;
-			this->dataGridView2->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &JSONForm::dataGridView2_CellEndEdit);
-			// 
 			// JSONForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -460,7 +412,6 @@ namespace JSONTest {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView2))->EndInit();
 			this->ResumeLayout(false);
 
 		}
@@ -522,14 +473,7 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	for (int i = 0; i < this->Row; i++) {
 		this->join->Add("");
 	}
-	TableProcessing^ tbl = gcnew TableProcessing();
-	tbl->Row = this->Row;
-	tbl->Column = this->Column;
-	tbl->RctWidth = this->RctWidth;
-	tbl->RctHeight = this->RctHeight;
-	tbl->TableInfo = this->TableInfo;
-	tbl->join = this->join;
-	tbl->TableGenerate(this->pictureBox1);
+	this->TableGenerate(this->pictureBox1);
 }
 
 /*関数名：IntToString
@@ -560,8 +504,6 @@ private:System::Int32 IntToString(String^ con) {
   作成者：K.Asada
   */
 private:System::Void initMainForm() {
-	this->row = 0;//取得したタテを初期化。
-	this->column = 0;//取得したヨコを初期化。
 	this->textBoxRow->Text = MyConst->ZERO_STRING;//タテが入力されたテキストボックスを初期化。
 	this->textBoxColumn->Text = MyConst->ZERO_STRING;//ヨコが入力されたテキストボックスを初期化。
 	this->textBoxRow2->Text = MyConst->ZERO_STRING;//タテが入力されたテキストボックスを初期化。
@@ -580,159 +522,20 @@ private: System::Void tabPage1_Click(System::Object^  sender, System::EventArgs^
 }
 private: System::Void buttonConversion_Click(System::Object^  sender, System::EventArgs^  e) {
 }
-
-private: System::Void dataGridView1_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-/*	TableInformation^ datatable = gcnew TableInformation();
-		DataGridView::HitTestInfo^ hit = ((DataGridView^)sender)->HitTest(e->X, e->Y);
-		string xindex = 'x' + to_string(hit->ColumnIndex) + to_string(hit->RowIndex);
-		string yindex = 'y' + to_string(hit->RowIndex);
-		auto itr = this->infotable->begin();
-		this->dataGridView2->RowCount = 1;
-		this->dataGridView2->ColumnCount = 2;
-		for (; itr != this->infotable->end(); itr++) {
-			if (itr->second == "title") {
-				this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
-			}
-			else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
-				this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
-			}
-		}
-
-		itr = this->infotable->begin();
-		datatable->Controls->Add(this->dataGridView2);
-		datatable->ShowDialog();
-
-		string tmp;
-		int i = 0;
-			for (; itr != this->infotable->end(); itr++) {
-				int j = 0;
-				if (itr->second == "title") {
-					MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
-					itr->first.first = tmp;
-					MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
-					itr->first.second = tmp;
-				}
-				else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
-					MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
-					itr->first.first = tmp;
-					MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
-					itr->first.second = tmp;
-				}
-			}*/
-}
-
-private: System::Void dataGridView1_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
-	//int x = this->dataGridView1->CurrentCell->ColumnIndex;
-//	int y = this->dataGridView1->CurrentCell->RowIndex;
-	string tmp;
-	for (auto itr = this->infotable->begin(); itr != this->infotable->end(); itr++) {
-		//if (itr->second == ('x' + to_string(x) + to_string(y)) && itr->first.first == "text") {
-	//		 MarshalString(this->dataGridView1->CurrentCell->Value->ToString(), tmp);
-			 itr->first.second = tmp;
-		//}
-	}
-}
-
-		 /*String^型をstring型へ変換する関数
-		 作成日：2017.9.5
-		 作成者：K.Asada
-		 */
-private: System::Void MarshalString(String^ sys_string, string& std_string) {
-			 using namespace Runtime::InteropServices;
-			 const char* chars =
-				 (const char*)(Marshal::StringToHGlobalAnsi(sys_string)).ToPointer();
-			 std_string = chars;
-			 Marshal::FreeHGlobal(IntPtr((void*)chars));
-		 }
-private: System::Void dataGridView2_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
-}
-private: System::Void dataGridView1_CellMouseDoubleClick(System::Object^  sender, System::Windows::Forms::DataGridViewCellMouseEventArgs^  e) {
-	TableInformation^ datatable = gcnew TableInformation();
-//	DataGridView::HitTestInfo^ hit = ((DataGridView^)sender)->HitTest(e->X, e->Y);
-	//string xindex = 'x' + to_string(this->dataGridView1->CurrentCell->ColumnIndex) + to_string(this->dataGridView1->CurrentCell->RowIndex);
-	//string yindex = 'y' + to_string(this->dataGridView1->CurrentCell->RowIndex);
-	auto itr = this->infotable->begin();
-	this->dataGridView2->RowCount = 1;
-	this->dataGridView2->ColumnCount = 2;
-	for (; itr != this->infotable->end(); itr++) {
-		if (itr->second == "title") {
-			this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
-		}
-//		else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
-			this->dataGridView2->Rows->Add(gcnew String((itr->first.first).c_str()), gcnew String((itr->first.second).c_str()));
-	//	}
-	}
-
-/*	itr = this->infotable->begin();
-	datatable->Controls->Add(this->dataGridView2);
-	datatable->ShowDialog();
-
-	string tmp;
-	int i = 0;
-	for (; itr != this->infotable->end(); itr++) {
-		int j = 0;
-		if (itr->second == "title") {
-			MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
-			itr->first.first = tmp;
-			MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
-			itr->first.second = tmp;
-		}
-	//	else if (itr->second == "y0" || itr->second == yindex || itr->second == xindex) {
-			MarshalString(this->dataGridView2->Rows[i]->Cells[j++]->Value->ToString(), tmp);
-			itr->first.first = tmp;
-			MarshalString(this->dataGridView2->Rows[i++]->Cells[j++]->Value->ToString(), tmp);
-			itr->first.second = tmp;
-		//}
-	}*/
-}
-
 //選択箇所を取得する
 private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	//表の行の座標を取得する
-	this->RowIndex = (e->Location.Y / (this->pictureBox1->Height / *this->Row));
-	//表の列の座標を取得する
-	if (this->join[*this->RowIndex] != "") {
-		//結合の座標を取得。
-		this->ColumnIndex = Convert::ToInt32(this->join[*this->RowIndex]);
-	}
-	else {
-		//表の行の座標を取得する
-		this->ColumnIndex = (e->Location.X / (this->pictureBox1->Width / *this->Column));
-	}
+	//クリックしたセルの座標を取得する関数を呼び出す
+	this->CalPoint(e);
 
-	//選択箇所をハイライトする関数をインスタンス化
-	TableProcessing^ tbl = gcnew TableProcessing();
-	tbl->RowIndex = *this->RowIndex;
-	tbl->ColumnIndex = *this->ColumnIndex;
-	tbl->RctHeight = *this->RctHeight;
-	tbl->RctWidth = *this->RctWidth;
-	tbl->join = this->join;
-	tbl->Column = *this->Column;
-	tbl->Row = *this->Row;
-	tbl->pict(this->pictureBox2);
+	//選択箇所をハイライトする関数を呼び出す
+	this->pict(this->pictureBox2);
 }
 private: System::Void buttonJoin_Click(System::Object^  sender, System::EventArgs^  e) {
-	//すでに結合状態であれば
-	if (join[*this->RowIndex] != "") {
-		//結合状態に解除する。
-		this->join[*this->RowIndex] = "";
-	}
-	else {
-		//結合状態にする。
-		this->join[*this->RowIndex] = Convert::ToString(this->ColumnIndex);
-	}
+	//選択箇所を結合状態にする関数を呼び出す
+	this->JoinRelease();
+
 	//表を再描画する
-	TableProcessing^ tbl = gcnew TableProcessing();
-	tbl->RowIndex = this->RowIndex;
-	tbl->ColumnIndex = this->ColumnIndex;
-	tbl->RctHeight = this->RctHeight;
-	tbl->RctWidth = this->RctWidth;
-	tbl->join = this->join;
-	tbl->Column = this->Column;
-	tbl->TableInfo = this->TableInfo;
-	tbl->Row = this->Row;
-	tbl->TableGenerate(this->pictureBox1);
-	tbl->pict(this->pictureBox2);
+	this->pict(this->pictureBox2);
 }
 private: System::Void pictureBox2_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 	//コントロールにテキストボックスを追加する
@@ -762,16 +565,7 @@ private: System::Void textBoxCell_KeyDown(System::Object^  sender, System::Windo
 	}
 }
 private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	TableProcessing^ tbl = gcnew TableProcessing();
-	tbl->RowIndex = *this->RowIndex;
-	tbl->ColumnIndex = *this->ColumnIndex;
-	tbl->RctHeight = *this->RctHeight;
-	tbl->RctWidth = *this->RctWidth;
-	tbl->join = this->join;
-	tbl->Column = *this->Column;
-	tbl->Row = *this->Row;
-	tbl->TableInfo = this->TableInfo;
-	tbl->ValueChange();
+	this->ValueChange();
 }
 };
 }

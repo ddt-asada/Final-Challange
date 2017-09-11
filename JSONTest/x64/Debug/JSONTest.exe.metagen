@@ -50,6 +50,8 @@ Class JSONTest.TableProcessing: AutoLayout, AnsiClass, Class, Public, BeforeFiel
     TableGenerate(PictureBox): PrivateScope, Public, HideBySig
     pict(PictureBox): PrivateScope, Public, HideBySig
     ValueChange(): PrivateScope, Public, HideBySig
+    JoinRelease(): PrivateScope, Public, HideBySig
+    CalPoint(MouseEventArgs): PrivateScope, Public, HideBySig
 Class JSONTest.TableInformation: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName

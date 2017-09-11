@@ -30,8 +30,8 @@ namespace JSONTest {
 		Int32^ Column = 0;		//表の列数
 		Int32^ RowIndex = 0;		//クリックされたセルの行座標
 		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
-		Int32^ RctWidth = 0;		//セル一つ当たりの幅
-		Int32^ RctHeight = 0;	//セル一つ当たりの高さ
+		Int32^ RctWidth = 200;		//セル一つ当たりの幅
+		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
 		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ TableOut = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
@@ -155,7 +155,36 @@ namespace JSONTest {
 		}
 
 		/*選択箇所を結合/解除する関数*/
+		Void JoinRelease() {
+			//すでに結合状態であれば
+			if (join[*this->RowIndex] != "") {
+				//結合状態に解除する。
+				this->join[*this->RowIndex] = "";
+			}
+			else {
+				//結合状態にする。
+				this->join[*this->RowIndex] = Convert::ToString(this->ColumnIndex);
+			}
+		}
 
 		/*表を再描画する関数*/
+
+		/*クリックされたセルを取得する関数
+		作成日：2017.9.11
+		作成者：K.Asada
+		*/
+		Void CalPoint(System::Windows::Forms::MouseEventArgs^  e) {
+			//表の行の座標を取得する
+			this->RowIndex = (e->Location.Y / *this->RctHeight);
+			//表の列の座標を取得する
+			if (this->join[*this->RowIndex] != "") {
+				//結合の座標を取得。
+				this->ColumnIndex = Convert::ToInt32(this->join[*this->RowIndex]);
+			}
+			else {
+				//表の行の座標を取得する
+				this->ColumnIndex = (e->Location.X / *this->RctWidth);
+			}
+		}
 	};
 }
