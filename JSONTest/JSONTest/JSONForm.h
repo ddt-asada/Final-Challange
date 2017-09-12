@@ -19,13 +19,16 @@ namespace JSONTest {
 	/// <summary>
 	/// JSONForm の概要
 	/// </summary>
-	public ref class JSONForm : public TableProcessing
+	public ref class JSONForm 
+		//: public System::Windows::Forms::Form
+		: public TableProcessing
 	{
 	public:
 		JSONForm(void)
 		{
 			InitializeComponent();
 			this->pictureBox2->Parent = this->pictureBox1;
+			this->pictureBox4->Parent = this->pictureBox3;
 			//
 			//TODO: ここにコンストラクター コードを追加します
 			//
@@ -35,6 +38,10 @@ namespace JSONTest {
 	private: System::Windows::Forms::PictureBox^  pictureBox2;
 	private: System::Windows::Forms::Button^  buttonJoin;
 	private: System::Windows::Forms::TextBox^  textBoxCell;
+	private: System::Windows::Forms::PictureBox^  pictureBox3;
+	private: System::Windows::Forms::TextBox^  textBoxList;
+
+	private: System::Windows::Forms::PictureBox^  pictureBox4;
 
 	public:
 		constantstring::CONSTANTSTRING^ MyConst = gcnew constantstring::CONSTANTSTRING();
@@ -112,6 +119,9 @@ namespace JSONTest {
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
 			this->buttonConversion = (gcnew System::Windows::Forms::Button());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
+			this->textBoxList = (gcnew System::Windows::Forms::TextBox());
+			this->pictureBox4 = (gcnew System::Windows::Forms::PictureBox());
+			this->pictureBox3 = (gcnew System::Windows::Forms::PictureBox());
 			this->buttonConversion2 = (gcnew System::Windows::Forms::Button());
 			this->buttonCancel2 = (gcnew System::Windows::Forms::Button());
 			this->label1 = (gcnew System::Windows::Forms::Label());
@@ -125,6 +135,8 @@ namespace JSONTest {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			this->tabPage2->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// labelRow
@@ -280,6 +292,7 @@ namespace JSONTest {
 			// 
 			// buttonConversion
 			// 
+			this->buttonConversion->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 			this->buttonConversion->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
 			this->buttonConversion->Location = System::Drawing::Point(1275, 744);
@@ -292,6 +305,10 @@ namespace JSONTest {
 			// 
 			// tabPage2
 			// 
+			this->tabPage2->AutoScroll = true;
+			this->tabPage2->Controls->Add(this->textBoxList);
+			this->tabPage2->Controls->Add(this->pictureBox4);
+			this->tabPage2->Controls->Add(this->pictureBox3);
 			this->tabPage2->Controls->Add(this->buttonConversion2);
 			this->tabPage2->Controls->Add(this->buttonCancel2);
 			this->tabPage2->Controls->Add(this->label1);
@@ -308,11 +325,43 @@ namespace JSONTest {
 			this->tabPage2->Text = L"tabPage2";
 			this->tabPage2->UseVisualStyleBackColor = true;
 			// 
+			// textBoxList
+			// 
+			this->textBoxList->Location = System::Drawing::Point(1192, 204);
+			this->textBoxList->Multiline = true;
+			this->textBoxList->Name = L"textBoxList";
+			this->textBoxList->Size = System::Drawing::Size(199, 84);
+			this->textBoxList->TabIndex = 17;
+			this->textBoxList->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &JSONForm::textBoxList_KeyDown);
+			this->textBoxList->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::textBoxList_MouseDoubleClick);
+			// 
+			// pictureBox4
+			// 
+			this->pictureBox4->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
+			this->pictureBox4->Location = System::Drawing::Point(1192, 39);
+			this->pictureBox4->Name = L"pictureBox4";
+			this->pictureBox4->Size = System::Drawing::Size(159, 143);
+			this->pictureBox4->TabIndex = 16;
+			this->pictureBox4->TabStop = false;
+			this->pictureBox4->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::pictureBox4_MouseClick);
+			// 
+			// pictureBox3
+			// 
+			this->pictureBox3->BackColor = System::Drawing::Color::White;
+			this->pictureBox3->Location = System::Drawing::Point(4, 123);
+			this->pictureBox3->Name = L"pictureBox3";
+			this->pictureBox3->Size = System::Drawing::Size(305, 216);
+			this->pictureBox3->SizeMode = System::Windows::Forms::PictureBoxSizeMode::AutoSize;
+			this->pictureBox3->TabIndex = 15;
+			this->pictureBox3->TabStop = false;
+			this->pictureBox3->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::pictureBox3_MouseClick);
+			// 
 			// buttonConversion2
 			// 
+			this->buttonConversion2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 			this->buttonConversion2->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->buttonConversion2->Location = System::Drawing::Point(1246, 482);
+			this->buttonConversion2->Location = System::Drawing::Point(1275, 744);
 			this->buttonConversion2->Name = L"buttonConversion2";
 			this->buttonConversion2->Size = System::Drawing::Size(169, 101);
 			this->buttonConversion2->TabIndex = 14;
@@ -349,7 +398,7 @@ namespace JSONTest {
 			this->buttonOK2->TabIndex = 12;
 			this->buttonOK2->Text = L"OK";
 			this->buttonOK2->UseVisualStyleBackColor = true;
-			this->buttonOK2->Click += gcnew System::EventHandler(this, &JSONForm::buttonOK_Click);
+			this->buttonOK2->Click += gcnew System::EventHandler(this, &JSONForm::buttonOK2_Click);
 			// 
 			// label2
 			// 
@@ -410,6 +459,8 @@ namespace JSONTest {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
 			this->tabPage2->ResumeLayout(false);
 			this->tabPage2->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->EndInit();
 			this->ResumeLayout(false);
 
 		}
@@ -581,6 +632,79 @@ private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, Syst
 	tble->ColumnIndex = this->ColumnIndex;
 	//画面を表示
 	tble->ShowDialog();
+}
+private: System::Void buttonOK2_Click(System::Object^  sender, System::EventArgs^  e) {
+	//文字列から表に必要な情報を取得するためのクラスをインスタンス化
+	Processing^ proc = gcnew Processing(this->JSONFilePath, this->DBQuery);
+	//メイン画面の「タテ」テキストボックスの中身を処理のメンバへ格納
+	proc->Row = Convert::ToInt32(this->textBoxRow->Text);
+	//メイン画面の「ヨコ」テキストボックスの中身を処理のメンバへ格納
+	proc->Column = Convert::ToInt32(this->textBoxColumn->Text);
+
+	//JSON文字列の処理を実行
+	proc->Listrun();
+
+	//取得した表の行数をメンバへ格納
+	this->Column = *proc->Column;
+	//取得した表の列数をメンバへ格納
+	this->Row = *proc->Row;
+	//取得した表に出力する文字列をメンバへ格納
+	this->TableInfo = proc->retTable;
+	//列用にセル一つ値の長さを伸ばす
+	this->RctWidth = 1000;
+
+	//結合状態判定用の文字列を初期化する。
+	for (int i = 0; i < this->Row; i++) {
+		this->join->Add("");
+	}
+	this->TableGenerate(this->pictureBox3);
+}
+private: System::Void pictureBox4_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//コントロールにテキストボックスを追加する
+	this->pictureBox1->Controls->Add(this->textBoxList);
+	//テキストボックスを対象のセルの大きさと同じにする
+	this->textBoxList->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
+	//テキストボックスの配置を対象のセルと同じ位置にする
+	this->textBoxList->Location = System::Drawing::Point(0 + *this->RctWidth * *this->ColumnIndex, 0 + *this->RctHeight * *this->RowIndex);
+	//テキストボックスを前面に配置する
+	this->textBoxList->BringToFront();
+	//テキストボックスへ文字列を配置するためのループ
+	for (int i = 0; i < this->TableInfo->Count; i++) {
+		if ((this->TableInfo[i]->first->first == "text" || this->TableInfo[i]->first->first == "array") && this->TableInfo[i]->second == ("x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex))) {
+			this->textBoxList->Text = this->TableInfo[i]->first->second;
+			this->Index->Add(i);
+			break;
+		}
+	}
+}
+private: System::Void textBoxList_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//値変更画面をインスタンス化
+	TableInformation^ tble = gcnew TableInformation(this->TableInfo);
+	tble->RowIndex = this->RowIndex;
+	tble->ColumnIndex = this->ColumnIndex;
+	//画面を表示
+	tble->ShowDialog();
+}
+private: System::Void pictureBox3_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//クリックしたセルの座標を取得する関数を呼び出す
+	this->CalPoint(e);
+	//テキストボックスを削除する
+	this->pictureBox3->Controls->Remove(this->textBoxList);
+	//選択箇所をハイライトする関数を呼び出す
+	this->pict(this->pictureBox4);
+}
+private: System::Void textBoxList_KeyDown(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
+	//エンターキーが押されたときのイベント
+	if (e->KeyCode == Keys::Enter) {
+		//テキストボックスに入力された文字列を対象のセルの文字列として格納する
+		this->TableInfo[this->Index[0]]->first->second = this->textBoxList->Text;
+		//コントロールからテキストボックスを削除する
+		this->pictureBox3->Controls->Remove(this->textBoxList);
+		//書き換えた部分だけ再描画する
+		this->ReTable(this->pictureBox3, 0);
+		//インデックスを削除する
+		this->Index->Clear();
+	}
 }
 };
 }

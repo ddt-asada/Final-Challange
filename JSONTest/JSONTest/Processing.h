@@ -58,6 +58,29 @@ namespace process {
 			}
 		}
 
+		/*箇条書き上のJSONを処理するための関数
+		作成日：2017.9.12
+		作成者：K.Asada*/
+		Void Listrun() {
+			//ファイルパスを取得していれば
+			if (this->LoadFilePath != MyConst->EMPTY_STRING) {
+				//JSONより表を出力するために必要な情報を抜き出す関数を呼び出す
+				StringProcess^ test = gcnew StringProcess();
+				test->ReadyListString(this->LoadFilePath);
+				//JSONより取得した行数とメンバ変数の行数を比較する。
+				if (*this->Row < *test->row) {
+					//大きい方を採用する。
+					this->Row = test->row;
+				}
+				//JSONより取得した列数とメンバ変数の列数を比較する。
+				if (*this->Column < *test->column) {
+					//大きい方を採用する
+					this->Column = test->column;
+				}
+				this->retTable = test->retPointTable;
+			}
+		}
+
 		/*受け取った情報よりJSONを出力するための処理
 		作成日：2017.9.12
 		作成者：K.Asada

@@ -71,16 +71,19 @@ namespace JSONTest {
 								break;
 							}*/
 							if ((this->TableInfo[k]->first->first == "text" || this->TableInfo[k]->first->first == "array") && this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
-								gr->DrawRectangle(Pens::Black, *this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
+						//		gr->DrawRectangle(Pens::Black, *this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
+								System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
+								gr->DrawRectangle(Pens::Black, *rct);
 								// 画像領域に文字列を書き込む
 								System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 								//表にインデックスを付ける
-								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * j, *this->RctHeight * i);
+								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *rct);
 								break;
 							}
 						}
 					}
 				}
+
 			}
 			//作成した表画像を反映
 			PictBox->Image = img;

@@ -66,6 +66,39 @@ namespace process {
 			SetTablePoint();
 		}
 
+		/*箇条書きのJSONを読み込むための関数
+		作成日：2017.9.12
+		作成者：K.Asada */
+		//ファイルパスより文字列を取得してその文字列から行数、列数、文字列を抜き出す。
+		Void ReadyListString(String^ JSONPath) {
+			ptree pt;		//ファイルより取得したJSONを格納するツリー
+							//	String^ SJSON = "";
+			string JSON = "";
+			string path = "";
+			MarshalString(JSONPath, path);
+			//受け取ったファイルパスより文字列を呼び出す。
+			stringstream ss;
+			std::ifstream ifs(path, ios_base::binary);
+			ss << ifs.rdbuf();
+
+			//取得した文字列よりJSONを取得する。
+			read_json(ss, pt);
+
+			//JSONから表の出力に必要な文字列を呼び出す。
+			TableString(pt, "");
+			//JSONから表の行数を割り出す関数を呼び出す。
+			CountRows();
+			this->tmp = *this->row;
+			//JSONから表の列数を割り出す関数を呼び出す。
+			CountColumn();
+
+			this->row = *this->column;
+			//タイトルの行数を考慮して列数を補正する。
+			this->column = 1;
+
+			SetTablePoint();
+		}
+
 		/*出力する表の列数を割り出す関数
 		作成日：2017.9.5
 		作成者：K.Asada
@@ -212,6 +245,7 @@ namespace process {
 			ptree parent;
 			ptree child;
 			string tmp = "courseGuide";
+			string arrtmp = "";
 			//String^型の文字列リストをstring型へ変換する関数を呼び出す
 			Stos();
 			for (int i = 0; i < this->row; i++) {
@@ -231,9 +265,25 @@ namespace process {
 					for (auto  itr = this->jsontable->begin(); itr != this->jsontable->end(); itr++){
 						if (itr->second == "x" + to_string(j) + to_string(i)) {
 							if (itr->first.first == "text") {
-								child.put(((itr - 1)->first.second + "." + itr->first.first), itr->first.second);
-							}else if (itr->first.first != "親キー") {
+								child.put((arrtmp + "." + itr->first.first), itr->first.second);
+							}
+							else if (itr->first.first == "array") {
+								arrtmp = (itr - 1)->first.second;
+								ptree tmp;
+								ptree arr;
+								for (; itr->first.first == "array"; itr++) {
+									arr.push_back(std::make_pair("", (tmp.put("", itr->first.second))));
+									write_json(std::cout, arr);
+								}
+								child.put_child(arrtmp, arr);
+								j += *this->column;
+								break;
+							}
+							else if (itr->first.first != "親キー") {
 								child.put(itr->first.first, itr->first.second);
+							}
+							else if (itr->first.first == "親キー") {
+								arrtmp = itr->first.second;
 							}
 						}
 					}
