@@ -59,11 +59,12 @@ namespace process {
 		}
 
 		/*受け取った情報よりJSONを出力するための処理
-		作成日：2017.9.7
+		作成日：2017.9.12
 		作成者：K.Asada
 		*/
-		Void change() {
-			//受け取ったテーブルよりJSONに変換する関数を呼び出す。
+		Void JSONrun() {
+			//受け取った文字列リストをもとにJSONに変換する関数を呼び出す
+			this->ConversionJSON();
 		}
 
 

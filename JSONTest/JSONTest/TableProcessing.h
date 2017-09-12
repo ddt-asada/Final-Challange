@@ -155,7 +155,29 @@ namespace JSONTest {
 			}
 		}
 
-		/*表を再描画する関数*/
+		/*表を再描画する関数
+		作成日：2017.9.12
+		作成者：K.Asada*/
+		PictureBox^ ReTable(PictureBox^ pct,int dex) {
+			//再描画のためのグラフィッククラスをインスタンス化
+			Graphics^ gr = Graphics::FromImage(pct->Image);
+			//塗りつぶし用のブラシを生成
+			Brush^ br = gcnew SolidBrush(Color::FromArgb(255, Color::White));
+			//結合状態であれば
+			if (this->join[*this->RowIndex] != "") {
+				// 画像領域に線を描画
+//				gr->DrawingRectangle(br, 0, 0, *this->RctWidth * *this->Column - 1, *this->RctHeight - 1);
+			}
+			else {
+				gr->FillRectangle(br, *this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex, *this->RctWidth, *this->RctHeight);
+				gr->DrawRectangle(Pens::Black, *this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex, *this->RctWidth, *this->RctHeight);
+				// 画像領域に文字列を書き込
+				System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+				//表にインデックスを付ける
+				gr->DrawString(this->TableInfo[this->Index[dex]]->first->second, myFont, Brushes::Black, *this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
+			}
+			return pct;
+		}
 
 		/*クリックされたセルを取得する関数
 		作成日：2017.9.11

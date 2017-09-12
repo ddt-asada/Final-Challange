@@ -133,6 +133,8 @@ namespace JSONTest {
 	private: System::Void pictureBoxDetail_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 		//クリックした座標を取得する
 		this->CalPoint(e);
+		//コントロールからテキストボックスを削除する
+		this->pictureBoxDetail->Controls->Remove(this->textBox1);
 		//選択箇所をハイライトする
 		this->pict(this->pictureBoxSelect);
 	}
@@ -169,12 +171,16 @@ private: System::Void textBox1_KeyDown(System::Object^  sender, System::Windows:
 		if (this->ColumnIndex == 0) {
 			//テキストボックスに入力された文字列を対象のセルの文字列として格納する
 			this->TableInfo[this->Index[*this->RowIndex]]->first->first = this->textBox1->Text;
+			//セルを再描画する関数を呼び出す
+			this->ReTable(this->pictureBoxDetail, *this->RowIndex);
 			//コントロールからテキストボックスを削除する
 			this->pictureBoxDetail->Controls->Remove(this->textBox1);
 		}
 		else {
 			//テキストボックスに入力された文字列を対象のセルの文字列として格納する
 			this->TableInfo[this->Index[*this->RowIndex]]->first->second = this->textBox1->Text;
+			//セルを再描画する関数を呼び出す
+			this->ReTable(this->pictureBoxDetail, *this->RowIndex);
 			//コントロールからテキストボックスを削除する
 			this->pictureBoxDetail->Controls->Remove(this->textBox1);
 		}

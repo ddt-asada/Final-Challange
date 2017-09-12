@@ -30,6 +30,7 @@ namespace process {
 		Int32^ tmp = *MyConst->ZERO;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
+		vector<pair<pair<string, string>, string>>* jsontable = new vector<pair<pair<string, string>, string>>();
 
 			//デフォルトコンストラクタ
 		StringProcess() {
@@ -121,7 +122,7 @@ namespace process {
 				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
 				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 			}
-			//子に整数があった場合
+//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
 				//キー名をペアにしてマップに格納する
 				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
@@ -140,10 +141,10 @@ namespace process {
 						//キー名をペアにしてマップに格納する
 				//		this->table->push_back(pair<string, string>(UTF8toSjis(childkey), UTF8toSjis(to_string(value.get()))));
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(to_string(value.get())).c_str())));
-					//子要素が配列かつ文字列であれば
+						//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
-					//	this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
+						//	this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis("array").c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 						//文字列をキー名をペアにしてマップに格納する。					
 					}
@@ -180,7 +181,7 @@ namespace process {
 				for (int j = 0; j < *this->column; j++) {
 					for (; itr < this->dic->Count; ++itr) {
 						if (dic[itr]->first == "text" || dic[itr]->first == "array" || dic[itr]->first == "html") {
-//							str = gcnew String((dic[itr]->second).c_);
+							//							str = gcnew String((dic[itr]->second).c_);
 							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							itr++;
 							break;
@@ -202,6 +203,44 @@ namespace process {
 					}
 				}
 			}
+		}
+
+		/*文字列リストよりJSONに変換する関数
+		作成日：2017.9.12
+		作成者：K.Asada*/
+		Void ConversionJSON() {
+			ptree parent;
+			ptree child;
+			string tmp = "courseGuide";
+			//String^型の文字列リストをstring型へ変換する関数を呼び出す
+			Stos();
+			for (int i = 0; i < this->row; i++) {
+				child.clear();
+				for (auto itr = this->jsontable->begin(); itr != this->jsontable->end(); itr++) {
+					if (itr->second == "y" + to_string(i)) {
+						if (itr->first.first == "親キー") {
+							tmp = itr->first.second;
+						}
+						else {
+							child.put(itr->first.first, itr->first.second);
+							break;
+						}
+					}
+				}
+				for (int j = 0; j < this->column; j++) {
+					for (auto  itr = this->jsontable->begin(); itr != this->jsontable->end(); itr++){
+						if (itr->second == "x" + to_string(j) + to_string(i)) {
+							if (itr->first.first == "text") {
+								child.put(((itr - 1)->first.second + "." + itr->first.first), itr->first.second);
+							}else if (itr->first.first != "親キー") {
+								child.put(itr->first.first, itr->first.second);
+							}
+						}
+					}
+				}
+				parent.add_child(tmp, child);
+			}
+			write_json(std::cout, parent);
 		}
 
 		//ファイルより文字列を取得する関数
@@ -233,6 +272,21 @@ namespace process {
 				(const char*)(Marshal::StringToHGlobalAnsi(sys_string)).ToPointer();
 			std_string = chars;
 			Marshal::FreeHGlobal(IntPtr((void*)chars));
+		}
+
+		/*String^型のリストをstring型へ変換する関数
+		作成日：2017.9.12
+		作成者：K.Asada*/
+		void Stos() {
+			string key = "";
+			string value = "";
+			string point = "";
+			for (int i = 0; i < this->retPointTable->Count; i++) {
+				MarshalString(this->retPointTable[i]->first->first, key);
+				MarshalString(this->retPointTable[i]->first->second, value);
+				MarshalString(this->retPointTable[i]->second, point);
+				this->jsontable->push_back(pair<pair<string, string>, string>(make_pair(key, value), point));
+			}
 		}
 
 		/*文字コードの変換を行う関数

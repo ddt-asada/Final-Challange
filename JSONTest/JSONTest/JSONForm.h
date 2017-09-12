@@ -519,12 +519,18 @@ private: System::Void buttonCancel_Click(System::Object^  sender, System::EventA
 private: System::Void tabPage1_Click(System::Object^  sender, System::EventArgs^  e) {
 }
 private: System::Void buttonConversion_Click(System::Object^  sender, System::EventArgs^  e) {
+	Processing^ proc = gcnew Processing();
+	proc->retPointTable = this->TableInfo;
+	proc->row = this->Row;
+	proc->column = this->Column;
+	proc->JSONrun();
 }
 //選択箇所を取得する
 private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 	//クリックしたセルの座標を取得する関数を呼び出す
 	this->CalPoint(e);
-
+	//テキストボックスを削除する
+	this->pictureBox1->Controls->Remove(this->textBoxCell);
 	//選択箇所をハイライトする関数を呼び出す
 	this->pict(this->pictureBox2);
 }
@@ -550,7 +556,7 @@ private: System::Void pictureBox2_MouseClick(System::Object^  sender, System::Wi
 	for (int i = 0; i < this->TableInfo->Count; i++) {
 		if ((this->TableInfo[i]->first->first == "text" || this->TableInfo[i]->first->first == "array") && this->TableInfo[i]->second == ("x" + Convert::ToString(this->ColumnIndex) + Convert::ToString(this->RowIndex))) {
 			this->textBoxCell->Text = this->TableInfo[i]->first->second;
-			this->TextIndex = i;
+			this->Index->Add(i);
 			break;
 		}
 	}
@@ -559,22 +565,16 @@ private: System::Void textBoxCell_KeyDown(System::Object^  sender, System::Windo
 	//エンターキーが押されたときのイベント
 	if (e->KeyCode == Keys::Enter) {
 		//テキストボックスに入力された文字列を対象のセルの文字列として格納する
-		this->TableInfo[*this->TextIndex]->first->second = this->textBoxCell->Text;
+		this->TableInfo[this->Index[0]]->first->second = this->textBoxCell->Text;
 		//コントロールからテキストボックスを削除する
 		this->pictureBox1->Controls->Remove(this->textBoxCell);
+		//書き換えた部分だけ再描画する
+		this->ReTable(this->pictureBox1, 0);
+		//インデックスを削除する
+		this->Index->Clear();
 	}
 }
 private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-/*	//値変更画面へ出力するためのピクチャボックスをインスタンス化
-	PictureBox^ cellpict = gcnew PictureBox();
-	//オートサイズにする
-	cellpict->AutoSize = true;
-	//座標をフォームの左上に設定
-	cellpict->Location = System::Drawing::Point(0, 0);
-	//受け渡す表画像を生成し、ピクチャボックスに設定
-	cellpict->Image = this->ValueChange();
-	//表示先の画面に作成したピクチャボックスを載せる*/
-//	tble->picture->Add(cellpict);
 	//値変更画面をインスタンス化
 	TableInformation^ tble = gcnew TableInformation(this->TableInfo);
 	tble->RowIndex = this->RowIndex;
