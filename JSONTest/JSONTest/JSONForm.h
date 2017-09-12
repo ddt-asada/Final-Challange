@@ -2,8 +2,8 @@
 
 #include "CONSTANTSTRING.h"
 #include "TableInformation.h"
-#include "InputOption.h"
 #include "TableProcessing.h"
+#include "InputOption.h"
 #include "Processing.h"
 
 namespace JSONTest {
@@ -565,7 +565,7 @@ private: System::Void textBoxCell_KeyDown(System::Object^  sender, System::Windo
 	}
 }
 private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	//値変更画面へ出力するためのピクチャボックスをインスタンス化
+/*	//値変更画面へ出力するためのピクチャボックスをインスタンス化
 	PictureBox^ cellpict = gcnew PictureBox();
 	//オートサイズにする
 	cellpict->AutoSize = true;
@@ -573,10 +573,12 @@ private: System::Void textBoxCell_MouseDoubleClick(System::Object^  sender, Syst
 	cellpict->Location = System::Drawing::Point(0, 0);
 	//受け渡す表画像を生成し、ピクチャボックスに設定
 	cellpict->Image = this->ValueChange();
-	//表示先の画面に作成したピクチャボックスを載せる
+	//表示先の画面に作成したピクチャボックスを載せる*/
 //	tble->picture->Add(cellpict);
 	//値変更画面をインスタンス化
-	TableInformation^ tble = gcnew TableInformation(this->ValueChange());
+	TableInformation^ tble = gcnew TableInformation(this->TableInfo);
+	tble->RowIndex = this->RowIndex;
+	tble->ColumnIndex = this->ColumnIndex;
 	//画面を表示
 	tble->ShowDialog();
 }

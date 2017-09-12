@@ -34,7 +34,6 @@ Class JSONTest.InputOption: AutoLayout, AnsiClass, Class, Public, BeforeFieldIni
     get_ResultJSON(): PrivateScope, Public, HideBySig, SpecialName
 Class JSONTest.TableProcessing: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
-    Void .ctor(Int32, Int32, Int32, Int32, System.Collections.Generic.List`1[cliext.pair<System::String ^\,System::String ^>], System.Collections.Generic.List`1[cliext.pair<cliext::pair<System::String ^\,System::String ^> ^\,System::String ^>]): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
     System.ValueType Row Int32 IsBoxed : Public
@@ -44,7 +43,7 @@ Class JSONTest.TableProcessing: AutoLayout, AnsiClass, Class, Public, BeforeFiel
     System.ValueType RctWidth Int32 IsBoxed : Public
     System.ValueType RctHeight Int32 IsBoxed : Public
     System.Collections.Generic.List`1[System.String] join : Public
-    System.Collections.Generic.List`1[cliext.pair<System::String ^\,System::String ^>] TableOut : Public
+    System.Collections.Generic.List`1[System.Int32] Index : Public
     System.Collections.Generic.List`1[cliext.pair<cliext::pair<System::String ^\,System::String ^> ^\,System::String ^>] TableInfo : Public
   Methods:
     TableGenerate(PictureBox): PrivateScope, Public, HideBySig
@@ -54,7 +53,7 @@ Class JSONTest.TableProcessing: AutoLayout, AnsiClass, Class, Public, BeforeFiel
     CalPoint(MouseEventArgs): PrivateScope, Public, HideBySig
 Class JSONTest.TableInformation: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :JSONTest.TableProcessing
-    Void .ctor(System.Drawing.Bitmap): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+    Void .ctor(System.Collections.Generic.List`1[cliext.pair<cliext::pair<System::String ^\,System::String ^> ^\,System::String ^>]): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
     System.ComponentModel.Container components : Public

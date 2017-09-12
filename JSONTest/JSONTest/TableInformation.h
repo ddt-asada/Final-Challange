@@ -14,21 +14,27 @@ namespace JSONTest {
 	/// <summary>
 	/// TableInformation の概要
 	/// </summary>
-	public ref class TableInformation : public TableProcessing
+	public ref class TableInformation 
+		//: public System::Windows::Forms::Form
+		: public TableProcessing
 	{
 	public:
-		TableInformation(void)
+		TableInformation()
 		{
 			InitializeComponent();
+			this->pictureBoxSelect->Parent = this->pictureBoxDetail;
 			//
 			//TODO: ここにコンストラクター コードを追加します
 			//
 		}
 
-		TableInformation(Bitmap^ tblpict)
+		TableInformation(List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ tblinf)
 		{
+			this->TableInfo = tblinf;
+	//		this->RowIndex = rowindex;
+		//	this->ColumnIndex = columnindex;
 			InitializeComponent();
-			this->pictureBoxDetail->Image = tblpict;
+			this->pictureBoxSelect->Parent = this->pictureBoxDetail;
 			//
 			//TODO: ここにコンストラクター コードを追加します
 			//
@@ -87,11 +93,13 @@ namespace JSONTest {
 			// 
 			// textBox1
 			// 
-			this->textBox1->Location = System::Drawing::Point(657, 208);
+			this->textBox1->Location = System::Drawing::Point(682, 234);
 			this->textBox1->Multiline = true;
 			this->textBox1->Name = L"textBox1";
 			this->textBox1->Size = System::Drawing::Size(71, 30);
 			this->textBox1->TabIndex = 1;
+			this->textBox1->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &TableInformation::textBox1_KeyDown);
+			this->textBox1->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &TableInformation::textBox1_MouseDoubleClick);
 			// 
 			// pictureBoxSelect
 			// 
@@ -102,6 +110,7 @@ namespace JSONTest {
 			this->pictureBoxSelect->Size = System::Drawing::Size(100, 50);
 			this->pictureBoxSelect->TabIndex = 2;
 			this->pictureBoxSelect->TabStop = false;
+			this->pictureBoxSelect->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &TableInformation::pictureBoxSelect_MouseClick);
 			// 
 			// TableInformation
 			// 
@@ -113,6 +122,7 @@ namespace JSONTest {
 			this->Controls->Add(this->pictureBoxDetail);
 			this->Name = L"TableInformation";
 			this->Text = L"TableInformation";
+			this->Load += gcnew System::EventHandler(this, &TableInformation::TableInformation_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxDetail))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxSelect))->EndInit();
 			this->ResumeLayout(false);
@@ -126,5 +136,49 @@ namespace JSONTest {
 		//選択箇所をハイライトする
 		this->pict(this->pictureBoxSelect);
 	}
+private: System::Void TableInformation_Load(System::Object^  sender, System::EventArgs^  e) {
+	this->pictureBoxDetail->Image = this->ValueChange();
+	for (int i = 0; i < this->Index->Count; i++) {
+		this->join->Add("");
+	}
+	this->Row = this->Index->Count;
+	this->Column = 2;
+}
+private: System::Void pictureBoxSelect_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//コントロールにテキストボックスを追加する
+	this->pictureBoxDetail->Controls->Add(this->textBox1);
+	//テキストボックスを対象のセルの大きさと同じにする
+	this->textBox1->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
+	//テキストボックスの配置を対象のセルと同じ位置にする
+	this->textBox1->Location = System::Drawing::Point(0 + *this->RctWidth * *this->ColumnIndex, 0 + *this->RctHeight * *this->RowIndex);
+	//テキストボックスを前面に配置する
+	this->textBox1->BringToFront();
+	//テキストボックスへ文字列を配置するための分岐
+	if (this->ColumnIndex == 0) {
+		this->textBox1->Text = this->TableInfo[this->Index[*this->RowIndex]]->first->first;
+	}
+	else {
+		this->textBox1->Text = this->TableInfo[this->Index[*this->RowIndex]]->first->second;
+	}
+}
+private: System::Void textBox1_MouseDoubleClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+}
+private: System::Void textBox1_KeyDown(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
+	//エンターキーが押されたときのイベント
+	if (e->KeyCode == Keys::Enter) {
+		if (this->ColumnIndex == 0) {
+			//テキストボックスに入力された文字列を対象のセルの文字列として格納する
+			this->TableInfo[this->Index[*this->RowIndex]]->first->first = this->textBox1->Text;
+			//コントロールからテキストボックスを削除する
+			this->pictureBoxDetail->Controls->Remove(this->textBox1);
+		}
+		else {
+			//テキストボックスに入力された文字列を対象のセルの文字列として格納する
+			this->TableInfo[this->Index[*this->RowIndex]]->first->second = this->textBox1->Text;
+			//コントロールからテキストボックスを削除する
+			this->pictureBoxDetail->Controls->Remove(this->textBox1);
+		}
+	}
+}
 };
 }

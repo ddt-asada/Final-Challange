@@ -33,16 +33,11 @@ namespace JSONTest {
 		Int32^ RctWidth = 200;		//セル一つ当たりの幅
 		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
 		List<String^>^ join = gcnew List<String^>;
-		List<cliext::pair<String^, String^>^>^ TableOut = gcnew List<cliext::pair<String^, String^>^>();
+		List<int>^ Index = gcnew List<int>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 
 		TableProcessing() {
 		};
-		//コンストラクタ
-		TableProcessing(Int32 row, Int32 column, Int32 rowindex, Int32 columnindex, List<cliext::pair<String^, String^>^>^ strout, List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ tblinfo): Row(0), Column(0), RowIndex(0),ColumnIndex(0) {
-			this->TableOut = strout;
-			this->TableInfo = tblinfo;
-		}
 
 		/*表を生成する関数
 		*/
@@ -140,6 +135,8 @@ namespace JSONTest {
 					// 画像領域に文字列を書き込む
 					//表にインデックスを付ける
 					gr->DrawString(this->TableInfo[i]->first->second, myFont, Brushes::Black, *this->RctWidth, *this->RctHeight * count++);
+					//値をとりだした箇所の添え字を取得する。
+					this->Index->Add(i);
 				}
 			}
 			return img;
