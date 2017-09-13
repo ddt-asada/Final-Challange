@@ -54,7 +54,7 @@ namespace JSONTest {
 							// 画像領域に文字列を書き込む
 							System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 							//表にインデックスを付ける
-							gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * *this->Row / 2, *this->RctHeight * i);
+							gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * *this->Column / 2, *this->RctHeight * i);
 							break;
 						}
 					}
@@ -63,15 +63,7 @@ namespace JSONTest {
 					for (int j = 0; j < this->Column; j++) {
 						// 画像領域に線を描画
 						for (int k = 0; k < this->TableInfo->Count; k++) {
-						/*	if (i == 0 && j == 0 && this->TableInfo[k]->first->first == "text") {
-								gr->DrawRectangle(Pens::Black, 0, *this->RctHeight * i, *this->RctWidth * *this->Column, *this->RctHeight);
-								System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
-								//表にインデックスを付ける
-								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *this->RctWidth * j, *this->RctHeight * i);
-								break;
-							}*/
 							if ((this->TableInfo[k]->first->first == "text" || this->TableInfo[k]->first->first == "array") && this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
-						//		gr->DrawRectangle(Pens::Black, *this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
 								System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
 								gr->DrawRectangle(Pens::Black, *rct);
 								// 画像領域に文字列を書き込む
@@ -83,7 +75,6 @@ namespace JSONTest {
 						}
 					}
 				}
-
 			}
 			//作成した表画像を反映
 			PictBox->Image = img;

@@ -22,6 +22,7 @@ namespace process {
 		String^ DbJson = MyConst->EMPTY_STRING;		//DBより取得した文字列を格納する文字列。
 		Int32^ Row = *MyConst->ZERO;					//表の行数を格納する変数
 		Int32^ Column = *MyConst->ZERO;				//表の列数を格納する変数
+		List<String^>^ Join = gcnew List<String^>;
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 	public:
 		//デフォルトコンストラクタ
@@ -55,6 +56,7 @@ namespace process {
 					this->Column = test->column;
 				}
 				this->retTable = test->retPointTable;
+				this->Join = test->join;
 			}
 		}
 

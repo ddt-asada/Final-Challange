@@ -28,6 +28,7 @@ namespace process {
 		Int32^ column = *MyConst->ZERO;		//表の列数
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
+		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
 		vector<pair<pair<string, string>, string>>* jsontable = new vector<pair<pair<string, string>, string>>();
@@ -62,6 +63,10 @@ namespace process {
 			this->row = *this->row - *this->column;
 			//タイトルの行数を考慮して列数を補正する。
 			this->column = *this->tmp / *this->row;
+			//結合状態判定用の文字列を初期化する。
+			for (int i = 0; i < this->row; i++) {
+				this->join->Add("");
+			}
 
 			SetTablePoint();
 		}
@@ -194,6 +199,7 @@ namespace process {
 		作成者：K.Asada*/
 		Void SetTablePoint() {
 			int itr = 0;		//リストを走査する際のインデックス
+			int count = 0;					//要素を取り出した数をカウントする変数
 			this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String^>(%cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("title")));
 			itr++;
 			if (dic[itr]->first == "class") {
@@ -202,6 +208,7 @@ namespace process {
 			}
 
 			for (int i = 0; i < *this->row; i++) {
+				count = 0;
 				if (dic[itr]->second == "" && ((dic[itr + 1])->first != "text" && (dic[itr + 1])->first != "array" && (dic[itr + 1])->first != "html")) {
 					this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String^>(%cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("y") + Convert::ToString(i)));
 					itr++;
@@ -217,11 +224,12 @@ namespace process {
 							//							str = gcnew String((dic[itr]->second).c_);
 							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							itr++;
+							count++;
 							break;
 						}
 						else if (dic[itr]->first == "colspan") {
-							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^ >(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							j += Convert::ToInt32(dic[itr]->second) - 1;
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^ >(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 						}
 						else if (dic[itr]->second == "") {
 							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^ >(%cliext::make_pair(gcnew String("親キー"), dic[itr]->first), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
@@ -234,6 +242,9 @@ namespace process {
 					if (i == 0 && j == 0) {
 						break;
 					}
+				}
+				if (count == 1) {
+					this->join[i] = "0";
 				}
 			}
 		}

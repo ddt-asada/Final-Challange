@@ -42,6 +42,7 @@ namespace JSONTest {
 	private: System::Windows::Forms::TextBox^  textBoxList;
 
 	private: System::Windows::Forms::PictureBox^  pictureBox4;
+	private: System::Windows::Forms::PictureBox^  pictureBox5;
 
 	public:
 		constantstring::CONSTANTSTRING^ MyConst = gcnew constantstring::CONSTANTSTRING();
@@ -130,6 +131,7 @@ namespace JSONTest {
 			this->buttonInputOption2 = (gcnew System::Windows::Forms::Button());
 			this->textBoxRow2 = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
+			this->pictureBox5 = (gcnew System::Windows::Forms::PictureBox());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
@@ -137,6 +139,7 @@ namespace JSONTest {
 			this->tabPage2->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox5))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// labelRow
@@ -306,6 +309,7 @@ namespace JSONTest {
 			// tabPage2
 			// 
 			this->tabPage2->AutoScroll = true;
+			this->tabPage2->Controls->Add(this->pictureBox5);
 			this->tabPage2->Controls->Add(this->textBoxList);
 			this->tabPage2->Controls->Add(this->pictureBox4);
 			this->tabPage2->Controls->Add(this->pictureBox3);
@@ -338,9 +342,9 @@ namespace JSONTest {
 			// pictureBox4
 			// 
 			this->pictureBox4->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
-			this->pictureBox4->Location = System::Drawing::Point(1192, 39);
+			this->pictureBox4->Location = System::Drawing::Point(1034, 32);
 			this->pictureBox4->Name = L"pictureBox4";
-			this->pictureBox4->Size = System::Drawing::Size(159, 143);
+			this->pictureBox4->Size = System::Drawing::Size(120, 78);
 			this->pictureBox4->TabIndex = 16;
 			this->pictureBox4->TabStop = false;
 			this->pictureBox4->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::pictureBox4_MouseClick);
@@ -439,6 +443,16 @@ namespace JSONTest {
 			this->textBoxColumn2->TabIndex = 10;
 			this->textBoxColumn2->Text = L"0";
 			// 
+			// pictureBox5
+			// 
+			this->pictureBox5->BackColor = System::Drawing::Color::Transparent;
+			this->pictureBox5->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
+			this->pictureBox5->Location = System::Drawing::Point(1238, 32);
+			this->pictureBox5->Name = L"pictureBox5";
+			this->pictureBox5->Size = System::Drawing::Size(78, 83);
+			this->pictureBox5->TabIndex = 19;
+			this->pictureBox5->TabStop = false;
+			// 
 			// JSONForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -461,6 +475,7 @@ namespace JSONTest {
 			this->tabPage2->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox5))->EndInit();
 			this->ResumeLayout(false);
 
 		}
@@ -517,11 +532,9 @@ private: System::Void buttonOK_Click(System::Object^  sender, System::EventArgs^
 	this->Row = *proc->Row;
 	//取得した表に出力する文字列をメンバへ格納
 	this->TableInfo = proc->retTable;
+	//結合判定用の文字列を取得する
+	this->join = proc->Join;
 
-	//結合状態判定用の文字列を初期化する。
-	for (int i = 0; i < this->Row; i++) {
-		this->join->Add("");
-	}
 	this->TableGenerate(this->pictureBox1);
 }
 
@@ -588,7 +601,6 @@ private: System::Void pictureBox1_MouseClick(System::Object^  sender, System::Wi
 private: System::Void buttonJoin_Click(System::Object^  sender, System::EventArgs^  e) {
 	//選択箇所を結合状態にする関数を呼び出す
 	this->JoinRelease();
-
 	//表を再描画する
 	this->TableGenerate(this->pictureBox1);
 	//選択箇所をハイライトする
@@ -652,16 +664,12 @@ private: System::Void buttonOK2_Click(System::Object^  sender, System::EventArgs
 	this->TableInfo = proc->retTable;
 	//列用にセル一つ値の長さを伸ばす
 	this->RctWidth = 1000;
-
-	//結合状態判定用の文字列を初期化する。
-	for (int i = 0; i < this->Row; i++) {
-		this->join->Add("");
-	}
+	
 	this->TableGenerate(this->pictureBox3);
 }
 private: System::Void pictureBox4_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 	//コントロールにテキストボックスを追加する
-	this->pictureBox1->Controls->Add(this->textBoxList);
+	this->pictureBox3->Controls->Add(this->textBoxList);
 	//テキストボックスを対象のセルの大きさと同じにする
 	this->textBoxList->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
 	//テキストボックスの配置を対象のセルと同じ位置にする
@@ -692,6 +700,7 @@ private: System::Void pictureBox3_MouseClick(System::Object^  sender, System::Wi
 	this->pictureBox3->Controls->Remove(this->textBoxList);
 	//選択箇所をハイライトする関数を呼び出す
 	this->pict(this->pictureBox4);
+	this->pictureBox3->Controls->Add(this->pictureBox4);
 }
 private: System::Void textBoxList_KeyDown(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
 	//エンターキーが押されたときのイベント
