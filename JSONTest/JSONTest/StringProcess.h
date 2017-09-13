@@ -28,6 +28,7 @@ namespace process {
 		Int32^ column = *MyConst->ZERO;		//表の列数
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
+		int test = 0;
 		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
@@ -170,6 +171,7 @@ namespace process {
 			if (pt.get_child_optional(key)) {
 				//子の兄弟を走査する
 				BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
+					this->test++;
 					//判定を行うためにsecondを取得
 					const ptree& info = child.second;
 					//子のキー名を取得する
