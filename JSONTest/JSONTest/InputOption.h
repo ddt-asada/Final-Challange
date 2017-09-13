@@ -234,7 +234,6 @@ namespace JSONTest {
 		this->JFilePath = this->textBox1->Text;
 		//取得したDBへ投げるクエリをメンバ変数へ保存する。
 		this->Query = this->textBoxDBquery->Text;
-
 		//メイン画面へ戻る。
 		this->Close();
 	}

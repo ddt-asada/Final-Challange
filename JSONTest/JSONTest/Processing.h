@@ -3,6 +3,7 @@
 #include "CONSTANTSTRING.h"//定数クラスを扱うためのインクルード
 #include "StringProcess.h"//文字列処理クラスのインクルード
 #include "JSONForm.h"
+//#include "JSONDBManager.h"
 
 /*作成日：2017.9.2
 　入力された情報を処理するクラス
@@ -40,6 +41,16 @@ namespace process {
 		 　作成者：K.Asada
 		  */
 		Void run() {
+			//DBクエリが入力されていれば
+			/*
+			if (this->SendQuery != MyConst->EMPTY_STRING) {
+				string tmp;
+				this->MarshalString(this->SendQuery, tmp);
+				JSONDBManager dbmana;
+//				System::Windows::Forms::MessageBox::Show(this->Query);
+				//DB処理へ移行する
+				dbmana.DBrun(tmp);			
+			}*/
 			//ファイルパスを取得していれば
 			if (this->LoadFilePath != MyConst->EMPTY_STRING) {
 				//JSONより表を出力するために必要な情報を抜き出す関数を呼び出す
@@ -80,6 +91,7 @@ namespace process {
 					this->Column = test->column;
 				}
 				this->retTable = test->retPointTable;
+				this->Join = test->join;
 			}
 		}
 

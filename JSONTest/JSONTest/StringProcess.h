@@ -102,6 +102,10 @@ namespace process {
 			//タイトルの行数を考慮して列数を補正する。
 			this->column = 1;
 
+			for (int i = 0; i < this->row; i++) {
+				this->join->Add("");
+			}
+
 			SetTablePoint();
 		}
 
@@ -161,7 +165,7 @@ namespace process {
 				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
 				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 			}
-//子に整数があった場合
+			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
 				//キー名をペアにしてマップに格納する
 				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
@@ -171,7 +175,6 @@ namespace process {
 			if (pt.get_child_optional(key)) {
 				//子の兄弟を走査する
 				BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
-					this->test++;
 					//判定を行うためにsecondを取得
 					const ptree& info = child.second;
 					//子のキー名を取得する
@@ -184,9 +187,22 @@ namespace process {
 						//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
-						//	this->table->push_back(pair<string, string>(UTF8toSjis("array"), UTF8toSjis(str.get())));
-						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis("array").c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
-						//文字列をキー名をペアにしてマップに格納する。					
+						//配列を示す文字列を連結する
+						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arraybegin"), gcnew String("arraybegin")));
+						//キーと値の両方が存在しているときはイテレーターで走査
+						if (info.begin() != info.end()) {
+							for (auto itr = info.begin(); itr != info.end(); itr++) {
+								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<std::string>(itr->first)).c_str())));
+							}
+						}//値しか存在していないときは条件付きのfor文で走査
+						else {
+							BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
+							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(childkey)).c_str())));
+							//文字列をキー名をペアにしてマップに格納する。				
+							}
+						}
+						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
+						break;
 					}
 					else {
 						//再帰処理を行う
@@ -227,6 +243,13 @@ namespace process {
 							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							itr++;
 							count++;
+							break;
+						}
+						else if (dic[itr]->first == "arraybegin") {
+							for (; j < *this->column || dic[itr]->first == "arrayend"; j++) {
+								this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+								itr++;
+							}
 							break;
 						}
 						else if (dic[itr]->first == "colspan") {
@@ -277,14 +300,11 @@ namespace process {
 				for (int j = 0; j < this->column; j++) {
 					for (auto  itr = this->jsontable->begin(); itr != this->jsontable->end(); itr++){
 						if (itr->second == "x" + to_string(j) + to_string(i)) {
-							if (itr->first.first == "text") {
-								child.put((arrtmp + "." + itr->first.first), itr->first.second);
-							}
-							else if (itr->first.first == "array") {
+							if (itr->first.first == "array") {
 								arrtmp = (itr - 1)->first.second;
 								ptree tmp;
 								ptree arr;
-								for (; itr->first.first == "array"; itr++) {
+								for (; itr != this->jsontable->end() && itr->first.first == "array"; ++itr) {
 									arr.push_back(std::make_pair("", (tmp.put("", itr->first.second))));
 									write_json(std::cout, arr);
 								}
@@ -292,12 +312,15 @@ namespace process {
 								j += *this->column;
 								break;
 							}
-							else if (itr->first.first != "親キー") {
-								child.put(itr->first.first, itr->first.second);
-							}
 							else if (itr->first.first == "親キー") {
 								arrtmp = itr->first.second;
 							}
+							else if (itr->first.first != "親キー" ){// && itr->first.first != "class") {
+								child.put((arrtmp + "." + itr->first.first), itr->first.second);
+							}/*
+							else if (itr->first.first != "親キー") {
+								child.put(itr->first.first, itr->first.second);
+							}*/
 						}
 					}
 				}

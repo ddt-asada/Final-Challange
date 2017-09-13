@@ -42,7 +42,8 @@ namespace JSONTest {
 	private: System::Windows::Forms::TextBox^  textBoxList;
 
 	private: System::Windows::Forms::PictureBox^  pictureBox4;
-	private: System::Windows::Forms::PictureBox^  pictureBox5;
+	private: System::Windows::Forms::Button^  buttonListConv;
+
 
 	public:
 		constantstring::CONSTANTSTRING^ MyConst = gcnew constantstring::CONSTANTSTRING();
@@ -70,7 +71,7 @@ namespace JSONTest {
 	private: System::Windows::Forms::TabControl^  tabControl1;
 	private: System::Windows::Forms::TabPage^  tabPage1;
 	private: System::Windows::Forms::TabPage^  tabPage2;
-	private: System::Windows::Forms::Button^  buttonConversion2;
+
 
 	private: System::Windows::Forms::Button^  buttonCancel2;
 
@@ -123,7 +124,6 @@ namespace JSONTest {
 			this->textBoxList = (gcnew System::Windows::Forms::TextBox());
 			this->pictureBox4 = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBox3 = (gcnew System::Windows::Forms::PictureBox());
-			this->buttonConversion2 = (gcnew System::Windows::Forms::Button());
 			this->buttonCancel2 = (gcnew System::Windows::Forms::Button());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->buttonOK2 = (gcnew System::Windows::Forms::Button());
@@ -131,7 +131,7 @@ namespace JSONTest {
 			this->buttonInputOption2 = (gcnew System::Windows::Forms::Button());
 			this->textBoxRow2 = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
-			this->pictureBox5 = (gcnew System::Windows::Forms::PictureBox());
+			this->buttonListConv = (gcnew System::Windows::Forms::Button());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
@@ -139,7 +139,6 @@ namespace JSONTest {
 			this->tabPage2->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox5))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// labelRow
@@ -309,11 +308,10 @@ namespace JSONTest {
 			// tabPage2
 			// 
 			this->tabPage2->AutoScroll = true;
-			this->tabPage2->Controls->Add(this->pictureBox5);
+			this->tabPage2->Controls->Add(this->buttonListConv);
 			this->tabPage2->Controls->Add(this->textBoxList);
 			this->tabPage2->Controls->Add(this->pictureBox4);
 			this->tabPage2->Controls->Add(this->pictureBox3);
-			this->tabPage2->Controls->Add(this->buttonConversion2);
 			this->tabPage2->Controls->Add(this->buttonCancel2);
 			this->tabPage2->Controls->Add(this->label1);
 			this->tabPage2->Controls->Add(this->buttonOK2);
@@ -359,19 +357,6 @@ namespace JSONTest {
 			this->pictureBox3->TabIndex = 15;
 			this->pictureBox3->TabStop = false;
 			this->pictureBox3->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONForm::pictureBox3_MouseClick);
-			// 
-			// buttonConversion2
-			// 
-			this->buttonConversion2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-			this->buttonConversion2->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(128)));
-			this->buttonConversion2->Location = System::Drawing::Point(1275, 744);
-			this->buttonConversion2->Name = L"buttonConversion2";
-			this->buttonConversion2->Size = System::Drawing::Size(169, 101);
-			this->buttonConversion2->TabIndex = 14;
-			this->buttonConversion2->Text = L"変換";
-			this->buttonConversion2->UseVisualStyleBackColor = true;
-			this->buttonConversion2->Click += gcnew System::EventHandler(this, &JSONForm::buttonConversion_Click);
 			// 
 			// buttonCancel2
 			// 
@@ -443,15 +428,18 @@ namespace JSONTest {
 			this->textBoxColumn2->TabIndex = 10;
 			this->textBoxColumn2->Text = L"0";
 			// 
-			// pictureBox5
+			// buttonListConv
 			// 
-			this->pictureBox5->BackColor = System::Drawing::Color::Transparent;
-			this->pictureBox5->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
-			this->pictureBox5->Location = System::Drawing::Point(1238, 32);
-			this->pictureBox5->Name = L"pictureBox5";
-			this->pictureBox5->Size = System::Drawing::Size(78, 83);
-			this->pictureBox5->TabIndex = 19;
-			this->pictureBox5->TabStop = false;
+			this->buttonListConv->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
+			this->buttonListConv->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->buttonListConv->Location = System::Drawing::Point(1275, 744);
+			this->buttonListConv->Name = L"buttonListConv";
+			this->buttonListConv->Size = System::Drawing::Size(169, 101);
+			this->buttonListConv->TabIndex = 20;
+			this->buttonListConv->Text = L"変換";
+			this->buttonListConv->UseVisualStyleBackColor = true;
+			this->buttonListConv->Click += gcnew System::EventHandler(this, &JSONForm::buttonListConv_Click);
 			// 
 			// JSONForm
 			// 
@@ -475,7 +463,6 @@ namespace JSONTest {
 			this->tabPage2->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox5))->EndInit();
 			this->ResumeLayout(false);
 
 		}
@@ -664,6 +651,7 @@ private: System::Void buttonOK2_Click(System::Object^  sender, System::EventArgs
 	this->TableInfo = proc->retTable;
 	//列用にセル一つ値の長さを伸ばす
 	this->RctWidth = 1000;
+	this->join = proc->Join;
 	
 	this->TableGenerate(this->pictureBox3);
 }
@@ -714,6 +702,13 @@ private: System::Void textBoxList_KeyDown(System::Object^  sender, System::Windo
 		//インデックスを削除する
 		this->Index->Clear();
 	}
+}
+private: System::Void buttonListConv_Click(System::Object^  sender, System::EventArgs^  e) {
+	Processing^ proc = gcnew Processing();
+	proc->retPointTable = this->TableInfo;
+	proc->row = this->Row;
+	proc->column = this->Column;
+	proc->JSONrun();
 }
 };
 }
