@@ -10,6 +10,7 @@
 #include <string>
 #include <vector> 
 #include "CONSTANTSTRING.h"
+#include "JSONDBManager.h"
 
 namespace process {
 	using namespace std;
@@ -62,7 +63,7 @@ namespace process {
 			//JSONから表の列数を割り出す関数を呼び出す。
 			CountColumn();
 
-			this->row =  *this->row / *this->column + 1;
+			this->row =  *this->row / *this->column;
 			if (this->row < 0) {
 				this->row = abs(*this->row);
 			}
@@ -106,6 +107,53 @@ namespace process {
 			//タイトルの行数を考慮して列数を補正する。
 			this->column = 1;
 
+			for (int i = 0; i < this->row; i++) {
+				this->join->Add("");
+			}
+
+			SetTablePoint();
+		}
+
+		/*DBとの通信結果を表にするために必要な文字列を取得する関数
+		作成日：2017.9.14
+		作成者：K.Asada*/
+		Void DBTable(string result) {
+	//		StringProcess^ test = gcnew StringProcess();
+		//	string result;			//通信結果を格納する文字列
+		//	string tmp;
+	//		this->MarshalString(this->SendQuery, tmp);
+			JSONDBManager dbmana;
+			//DB処理へ移行する
+//			result = dbmana.DBrun(tmp);*/
+			ptree pt;		//ファイルより取得したJSONを格納するツリー
+			string JSON = "";
+			JSON = dbmana.DBrun(result);
+//			JSON = UTF8toSjis(JSON);
+//			cout <<JSON << '\n';
+	//		JSON = SjistoUTF8(JSON);
+		//	cout << JSON << '\n';
+			//JSON = UTF8toSjis(JSON);
+			//cout <<JSON << '\n';
+
+			//受け取ったファイルパスより文字列を呼び出す。
+			stringstream ss;
+			ss << JSON;
+
+			//取得した文字列よりJSONを取得する。
+			read_json(ss, pt);
+
+			//JSONから表の出力に必要な文字列を呼び出す。
+			TableString(pt, "");
+			//JSONから表の行数を割り出す関数を呼び出す。
+			//JSONから表の列数を割り出す関数を呼び出す。
+			CountColumn();
+
+			this->row = *this->row / *this->column;
+			if (this->row < 0) {
+				this->row = abs(*this->row);
+			}
+			//タイトルの行数を考慮して列数を補正する。
+			//結合状態判定用の文字列を初期化する。
 			for (int i = 0; i < this->row; i++) {
 				this->join->Add("");
 			}

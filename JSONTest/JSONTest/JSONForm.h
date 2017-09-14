@@ -43,6 +43,7 @@ namespace JSONTest {
 
 	private: System::Windows::Forms::PictureBox^  pictureBox4;
 	private: System::Windows::Forms::Button^  buttonListConv;
+	private: System::Windows::Forms::Button^  buttonConnect;
 
 
 	public:
@@ -121,6 +122,7 @@ namespace JSONTest {
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
 			this->buttonConversion = (gcnew System::Windows::Forms::Button());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
+			this->buttonListConv = (gcnew System::Windows::Forms::Button());
 			this->textBoxList = (gcnew System::Windows::Forms::TextBox());
 			this->pictureBox4 = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBox3 = (gcnew System::Windows::Forms::PictureBox());
@@ -131,7 +133,7 @@ namespace JSONTest {
 			this->buttonInputOption2 = (gcnew System::Windows::Forms::Button());
 			this->textBoxRow2 = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxColumn2 = (gcnew System::Windows::Forms::TextBox());
-			this->buttonListConv = (gcnew System::Windows::Forms::Button());
+			this->buttonConnect = (gcnew System::Windows::Forms::Button());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
@@ -193,7 +195,7 @@ namespace JSONTest {
 			// 
 			// buttonOK
 			// 
-			this->buttonOK->Location = System::Drawing::Point(612, 13);
+			this->buttonOK->Location = System::Drawing::Point(797, 14);
 			this->buttonOK->Name = L"buttonOK";
 			this->buttonOK->Size = System::Drawing::Size(143, 36);
 			this->buttonOK->TabIndex = 5;
@@ -203,7 +205,7 @@ namespace JSONTest {
 			// 
 			// buttonCancel
 			// 
-			this->buttonCancel->Location = System::Drawing::Point(612, 76);
+			this->buttonCancel->Location = System::Drawing::Point(797, 76);
 			this->buttonCancel->Name = L"buttonCancel";
 			this->buttonCancel->Size = System::Drawing::Size(143, 36);
 			this->buttonCancel->TabIndex = 6;
@@ -225,6 +227,7 @@ namespace JSONTest {
 			// tabPage1
 			// 
 			this->tabPage1->AutoScroll = true;
+			this->tabPage1->Controls->Add(this->buttonConnect);
 			this->tabPage1->Controls->Add(this->textBoxCell);
 			this->tabPage1->Controls->Add(this->buttonJoin);
 			this->tabPage1->Controls->Add(this->pictureBox2);
@@ -252,7 +255,7 @@ namespace JSONTest {
 			this->textBoxCell->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 			this->textBoxCell->Font = (gcnew System::Drawing::Font(L"MS UI Gothic", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(128)));
-			this->textBoxCell->Location = System::Drawing::Point(1089, 32);
+			this->textBoxCell->Location = System::Drawing::Point(1132, 354);
 			this->textBoxCell->Multiline = true;
 			this->textBoxCell->Name = L"textBoxCell";
 			this->textBoxCell->Size = System::Drawing::Size(221, 79);
@@ -274,7 +277,7 @@ namespace JSONTest {
 			// 
 			this->pictureBox2->BackColor = System::Drawing::Color::Transparent;
 			this->pictureBox2->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
-			this->pictureBox2->Location = System::Drawing::Point(911, 44);
+			this->pictureBox2->Location = System::Drawing::Point(1275, 265);
 			this->pictureBox2->Name = L"pictureBox2";
 			this->pictureBox2->Size = System::Drawing::Size(78, 83);
 			this->pictureBox2->TabIndex = 18;
@@ -326,6 +329,19 @@ namespace JSONTest {
 			this->tabPage2->TabIndex = 1;
 			this->tabPage2->Text = L"tabPage2";
 			this->tabPage2->UseVisualStyleBackColor = true;
+			// 
+			// buttonListConv
+			// 
+			this->buttonListConv->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
+			this->buttonListConv->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->buttonListConv->Location = System::Drawing::Point(1275, 744);
+			this->buttonListConv->Name = L"buttonListConv";
+			this->buttonListConv->Size = System::Drawing::Size(169, 101);
+			this->buttonListConv->TabIndex = 20;
+			this->buttonListConv->Text = L"変換";
+			this->buttonListConv->UseVisualStyleBackColor = true;
+			this->buttonListConv->Click += gcnew System::EventHandler(this, &JSONForm::buttonListConv_Click);
 			// 
 			// textBoxList
 			// 
@@ -428,18 +444,15 @@ namespace JSONTest {
 			this->textBoxColumn2->TabIndex = 10;
 			this->textBoxColumn2->Text = L"0";
 			// 
-			// buttonListConv
+			// buttonConnect
 			// 
-			this->buttonListConv->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-			this->buttonListConv->Font = (gcnew System::Drawing::Font(L"ＭＳ ゴシック", 13.875F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(128)));
-			this->buttonListConv->Location = System::Drawing::Point(1275, 744);
-			this->buttonListConv->Name = L"buttonListConv";
-			this->buttonListConv->Size = System::Drawing::Size(169, 101);
-			this->buttonListConv->TabIndex = 20;
-			this->buttonListConv->Text = L"変換";
-			this->buttonListConv->UseVisualStyleBackColor = true;
-			this->buttonListConv->Click += gcnew System::EventHandler(this, &JSONForm::buttonListConv_Click);
+			this->buttonConnect->Location = System::Drawing::Point(612, 13);
+			this->buttonConnect->Name = L"buttonConnect";
+			this->buttonConnect->Size = System::Drawing::Size(179, 99);
+			this->buttonConnect->TabIndex = 21;
+			this->buttonConnect->Text = L"接続";
+			this->buttonConnect->UseVisualStyleBackColor = true;
+			this->buttonConnect->Click += gcnew System::EventHandler(this, &JSONForm::buttonConnect_Click);
 			// 
 			// JSONForm
 			// 
@@ -709,6 +722,30 @@ private: System::Void buttonListConv_Click(System::Object^  sender, System::Even
 	proc->row = this->Row;
 	proc->column = this->Column;
 	proc->JSONrun();
+}
+private: System::Void buttonConnect_Click(System::Object^  sender, System::EventArgs^  e) {
+	//文字列から表に必要な情報を取得するためのクラスをインスタンス化
+	Processing^ proc = gcnew Processing(this->JSONFilePath, this->DBQuery);
+	//メイン画面の「タテ」テキストボックスの中身を処理のメンバへ格納
+	proc->Row = Convert::ToInt32(this->textBoxRow->Text);
+	//メイン画面の「ヨコ」テキストボックスの中身を処理のメンバへ格納
+	proc->Column = Convert::ToInt32(this->textBoxColumn->Text);
+
+	//JSON文字列の処理を実行
+	proc->Queryrun();
+
+	//取得した表の行数をメンバへ格納
+	this->Column = *proc->Column;
+	System::Windows::Forms::MessageBox::Show(Convert::ToString(this->Column));
+	//取得した表の列数をメンバへ格納
+	this->Row = *proc->Row;
+	System::Windows::Forms::MessageBox::Show(Convert::ToString(this->Row));
+	//取得した表に出力する文字列をメンバへ格納
+	this->TableInfo = proc->retTable;
+	//結合判定用の文字列を取得する
+	this->join = proc->Join;
+
+	this->TableGenerate(this->pictureBox1);
 }
 };
 }
