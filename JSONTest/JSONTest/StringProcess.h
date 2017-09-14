@@ -262,30 +262,43 @@ namespace process {
 						//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
+						//完成したrあ関数に移行する予定
 						this->resetcount--;
 						//配列を示す文字列を連結する
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arraybegin"), gcnew String("arraybegin")));
 						//キーと値の両方が存在しているときはイテレーターで走査
 						if (info.begin() != info.end()) {
+							//配列の中身を走査する
 							for (auto itr = info.begin(); itr != info.end(); itr++) {
+								//キー名と値をセットにしてマップに格納する
 								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<std::string>(itr->first)).c_str())));
+								//列数をカウントする
 								this->colcount++;
 							}
 						}//値しか存在していないときは条件付きのfor文で走査
 						else {
+							//配列を走査する
 							BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
-							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(childkey)).c_str())));
-							//文字列をキー名をペアにしてマップに格納する。
-							this->colcount++;
+								//文字列をキー名をペアにしてマップに格納する。
+								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(childkey)).c_str())));
+								//列数をカウントする
+								this->colcount++;
 							}
 						}
+						//配列の終端を示す文字列を格納する
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
-						break;
+			//			break;
 					}
+					//子の子（孫）が存在しておらず子のペアを文字列として取得できれば
 					else if (boost::optional<std::string> str = (test.get_optional<std::string>(childkey))){
+						//完成したら関数に移行する予定
+						//子のペアが表の要素となりうる文字列であった場合
 						if (str.get() != "" && childkey == "text") {
-							cout <<UTF8toSjis(str.get()) << '\n';
+							//テスト用
+							//cout <<UTF8toSjis(str.get()) << '\n';
+							//文字列をペアにしてマップに格納
 							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
+							//列数をカウントする
 							this->colcount++;
 							this->resetcount--;
 						}
@@ -294,6 +307,7 @@ namespace process {
 							cout << UTF8toSjis(str.get()) << '\n';
 						}
 						else {
+							//通常のJSON用の再帰処理
 							//再帰処理を行う
 							this->resetcount++;
 							if (resetcount >= 2) {
@@ -307,9 +321,34 @@ namespace process {
 							cout << "aaa" << '\n';
 						}
 					}
+					//JSONが配列であった場合ここに抜けてきます
+					else {
+						//現在の階層の要素の数を取得し、前回取得した数より多ければ列数として取得
+						if (this->column < this->colcount) {
+							//列数を取得
+							this->column = this->colcount;
+							//階層を判定する変数をリセット
+							this->resetcount = 1;
+							//列数をカウントする変数をリセット
+							this->colcount = 0;
+						}
+						//子について再帰処理する
+						TableString(pt.get_child(key), childkey);
+					}
+					if (this->column < this->colcount) {
+						//列数を取得
+						this->column = this->colcount;
+						//階層を判定する変数をリセット
+						this->resetcount = 1;
+						//列数をカウントする変数をリセット
+						this->colcount = 0;
+					}
+					this->colcount = 0;
 				}
 			}
+			//JSONを走査し終わったときにカウントしていた列数が大きければ
 			if (this->column == 0) {
+				//表の列数として取得
 				this->column = this->colcount;
 			}
 		}
@@ -422,15 +461,15 @@ namespace process {
 								string emp = "";
 								for (; itr != this->jsontable->end() && itr->first.first != "arrayend"; ++itr) {
 						//			tmp.add_child(itr->first.first, itr->first.second);
-									arr.push_back(std::make_pair(itr->first.first, tmp.put("", itr->first.second)));
+									arr.push_back(std::make_pair("", tmp.put(itr->first.first, itr->first.second)));
 									emp = itr->first.first;
 								}
 								if (itr != this->jsontable->end()) {
 									itr++;
 								}
 								if (emp != "") {
-							//		arr.push_back(std::make_pair("", tmp));
-									tmp = arr;
+									tmp.put_child(arrtmp, arr);
+									arr = tmp;
 								}
 								child.add_child(arrtmp, arr);
 								j += *this->column;
@@ -452,6 +491,7 @@ namespace process {
 //				parent.push_back(std::make_pair(title, child));
 				if (stmp == "") {
 					parent.add_child(title, child);
+					write_json(std::cout, parent);
 				}
 				else {
 					parent.add_child((title + "." + stmp), child);
