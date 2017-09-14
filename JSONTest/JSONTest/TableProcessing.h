@@ -72,7 +72,7 @@ namespace JSONTest {
 								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *rct);
 								break;
 							}
-							else if (this->TableInfo[k]->first->first == "arraybegin") {
+							else if (this->TableInfo[k]->first->first == "arraybegin"&& this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
 								k += 1;
 								for (; j < this->Column; j++) {
 									System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);

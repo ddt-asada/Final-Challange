@@ -28,7 +28,8 @@ namespace process {
 		Int32^ column = *MyConst->ZERO;		//表の列数
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
-		int test = 0;
+		int resetcount = 0;
+		int colcount = 0;
 		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
@@ -56,14 +57,17 @@ namespace process {
 			//JSONから表の出力に必要な文字列を呼び出す。
 			TableString(pt, "");
 			//JSONから表の行数を割り出す関数を呼び出す。
-			CountRows();
-			this->tmp = *this->row;
+//			CountRows();
+	//		this->tmp = *this->row;
 			//JSONから表の列数を割り出す関数を呼び出す。
 			CountColumn();
 
-			this->row = *this->row - *this->column;
+			this->row =  *this->row / *this->column + 1;
+			if (this->row < 0) {
+				this->row = abs(*this->row);
+			}
 			//タイトルの行数を考慮して列数を補正する。
-			this->column = *this->tmp / *this->row;
+//			this->column = *this->column / *this->row;
 			//結合状態判定用の文字列を初期化する。
 			for (int i = 0; i < this->row; i++) {
 				this->join->Add("");
@@ -118,12 +122,21 @@ namespace process {
 			for (int i = 0; i < this->dic->Count; i++) {
 				//表の要素を見つけたら列数をカウント
 				if (this->dic[i]->first == "text" || this->dic[i]->first == "array" || this->dic[i]->first == "html") {
-					*this->column += 1;
+					*this->row += 1;
+				}
+				else if (this->dic[i]->first == "arraybegin") {
+					i += 1;
+					for (; i < this->dic->Count; i++) {
+						if (this->dic[i]->first == "arrayend") {
+							break;
+						}
+						*this->row += 1;
+					}
 				}
 				//結合を示すキー名があれば
 				else if (this->dic[i]->first == "colspan") {
 					//結合の行数をプラスする
-					*this->column += Convert::ToInt32(this->dic[i]->second) - 1;
+					*this->row += Convert::ToInt32(this->dic[i]->second) - 1;
 				}
 			}
 		}
@@ -135,9 +148,19 @@ namespace process {
 			//イテレーターにより走査する。
 			for (int i = 0; i < this->dic->Count; i++) {
 				//親のノードまたは子が配列の時に列数をカウント
-				if ((this->dic[i]->second == "" && (this->dic[i + 1])->first != "array") || this->dic[i]->first == "array" || this->dic[i]->first == "html") {
+				if (this->dic[i]->second == "" || this->dic[i]->first == "html") {
 					//列数をインクリメント
 					*this->row += 1;
+				}
+				else if (this->dic[i]->first == "arraybegin") {
+					i += 1;
+					*this->row -= 1;
+					for (; i < this->dic->Count; i++) {
+						if (this->dic[i]->first == "arrayend") {
+							break;
+						}
+						*this->row += 1;
+					}
 				}
 				else if (this->dic[i]->first == "colspan") {
 					//結合の行数をプラスする
@@ -177,8 +200,12 @@ namespace process {
 				BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
 					//判定を行うためにsecondを取得
 					const ptree& info = child.second;
+					ptree test = pt.get_child(key);
 					//子のキー名を取得する
 					childkey = child.first;
+		//			ptree::value_type& testchild;
+			//		push_back(test.get_child(childkey));
+				//	test = test.get_child(childkey);
 					//子要素が配列かつ整数であれば
 					if (boost::optional<int> value = info.get_optional<int>(childkey)) {
 						//キー名をペアにしてマップに格納する
@@ -187,28 +214,55 @@ namespace process {
 						//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
+						this->resetcount--;
 						//配列を示す文字列を連結する
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arraybegin"), gcnew String("arraybegin")));
 						//キーと値の両方が存在しているときはイテレーターで走査
 						if (info.begin() != info.end()) {
 							for (auto itr = info.begin(); itr != info.end(); itr++) {
 								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<std::string>(itr->first)).c_str())));
+								this->colcount++;
 							}
 						}//値しか存在していないときは条件付きのfor文で走査
 						else {
 							BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
 							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(childkey)).c_str())));
-							//文字列をキー名をペアにしてマップに格納する。				
+							//文字列をキー名をペアにしてマップに格納する。
+							this->colcount++;
 							}
 						}
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
 						break;
 					}
-					else {
-						//再帰処理を行う
-						TableString(pt.get_child(key), childkey);
+					else if (boost::optional<std::string> str = (test.get_optional<std::string>(childkey))){
+						if (str.get() != "" && childkey == "text") {
+							cout <<UTF8toSjis(str.get()) << '\n';
+							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
+							this->colcount++;
+							this->resetcount--;
+						}
+						else if (str.get() != "") {
+							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
+							cout << UTF8toSjis(str.get()) << '\n';
+						}
+						else {
+							//再帰処理を行う
+							this->resetcount++;
+							if (resetcount >= 2) {
+								if (this->column < this->colcount) {
+									this->column = this->colcount;
+								}
+								this->resetcount = 1;
+								this->colcount = 0;
+							}
+							TableString(pt.get_child(key), childkey);
+							cout << "aaa" << '\n';
+						}
 					}
 				}
+			}
+			if (this->column == 0) {
+				this->column = this->colcount;
 			}
 		}
 
@@ -246,10 +300,18 @@ namespace process {
 							break;
 						}
 						else if (dic[itr]->first == "arraybegin") {
-							for (; j < *this->column || dic[itr]->first == "arrayend"; j++) {
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							itr++;
+							for (; j < *this->column; j++) {
 								this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 								itr++;
+								if (dic[itr]->first == "arrayend") {
+									break;
+								}
+								count++;
 							}
+							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
+							itr++;
 							break;
 						}
 						else if (dic[itr]->first == "colspan") {
@@ -300,13 +362,16 @@ namespace process {
 				for (int j = 0; j < this->column; j++) {
 					for (auto  itr = this->jsontable->begin(); itr != this->jsontable->end(); itr++){
 						if (itr->second == "x" + to_string(j) + to_string(i)) {
-							if (itr->first.first == "array") {
+							if (itr->first.first == "arraybegin") {
 								arrtmp = (itr - 1)->first.second;
+								itr++;
 								ptree tmp;
 								ptree arr;
-								for (; itr != this->jsontable->end() && itr->first.first == "array"; ++itr) {
-									arr.push_back(std::make_pair("", (tmp.put("", itr->first.second))));
-									write_json(std::cout, arr);
+								for (; itr != this->jsontable->end() && itr->first.first != "arrayend"; ++itr) {
+									arr.push_back(std::make_pair(itr->first.first, (tmp.put("", itr->first.second))));
+								}
+								if (itr != this->jsontable->end()) {
+									itr++;
 								}
 								child.put_child(arrtmp, arr);
 								j += *this->column;
