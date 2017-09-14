@@ -10,7 +10,7 @@
 #include <string>
 #include <vector> 
 #include "CONSTANTSTRING.h"
-#include "JSONDBManager.h"
+//#include "JSONDBManager.h"
 
 namespace process {
 	using namespace std;
@@ -114,52 +114,52 @@ namespace process {
 			SetTablePoint();
 		}
 
-		/*DBとの通信結果を表にするために必要な文字列を取得する関数
-		作成日：2017.9.14
-		作成者：K.Asada*/
-		Void DBTable(string result) {
-	//		StringProcess^ test = gcnew StringProcess();
-		//	string result;			//通信結果を格納する文字列
-		//	string tmp;
-	//		this->MarshalString(this->SendQuery, tmp);
-			JSONDBManager dbmana;
-			//DB処理へ移行する
-//			result = dbmana.DBrun(tmp);*/
-			ptree pt;		//ファイルより取得したJSONを格納するツリー
-			string JSON = "";
-			JSON = dbmana.DBrun(result);
-//			JSON = UTF8toSjis(JSON);
-//			cout <<JSON << '\n';
-	//		JSON = SjistoUTF8(JSON);
-		//	cout << JSON << '\n';
-			//JSON = UTF8toSjis(JSON);
-			//cout <<JSON << '\n';
-
-			//受け取ったファイルパスより文字列を呼び出す。
-			stringstream ss;
-			ss << JSON;
-
-			//取得した文字列よりJSONを取得する。
-			read_json(ss, pt);
-
-			//JSONから表の出力に必要な文字列を呼び出す。
-			TableString(pt, "");
-			//JSONから表の行数を割り出す関数を呼び出す。
-			//JSONから表の列数を割り出す関数を呼び出す。
-			CountColumn();
-
-			this->row = *this->row / *this->column;
-			if (this->row < 0) {
-				this->row = abs(*this->row);
-			}
-			//タイトルの行数を考慮して列数を補正する。
-			//結合状態判定用の文字列を初期化する。
-			for (int i = 0; i < this->row; i++) {
-				this->join->Add("");
-			}
-
-			SetTablePoint();
-		}
+//		/*DBとの通信結果を表にするために必要な文字列を取得する関数
+//		作成日：2017.9.14
+//		作成者：K.Asada*/
+//		Void DBTable(string result) {
+//	//		StringProcess^ test = gcnew StringProcess();
+//		//	string result;			//通信結果を格納する文字列
+//		//	string tmp;
+//	//		this->MarshalString(this->SendQuery, tmp);
+//			JSONDBManager dbmana;
+//			//DB処理へ移行する
+////			result = dbmana.DBrun(tmp);*/
+//			ptree pt;		//ファイルより取得したJSONを格納するツリー
+//			string JSON = "";
+//			JSON = dbmana.DBrun(result);
+////			JSON = UTF8toSjis(JSON);
+////			cout <<JSON << '\n';
+//	//		JSON = SjistoUTF8(JSON);
+//		//	cout << JSON << '\n';
+//			//JSON = UTF8toSjis(JSON);
+//			//cout <<JSON << '\n';
+//
+//			//受け取ったファイルパスより文字列を呼び出す。
+//			stringstream ss;
+//			ss << JSON;
+//
+//			//取得した文字列よりJSONを取得する。
+//			read_json(ss, pt);
+//
+//			//JSONから表の出力に必要な文字列を呼び出す。
+//			TableString(pt, "");
+//			//JSONから表の行数を割り出す関数を呼び出す。
+//			//JSONから表の列数を割り出す関数を呼び出す。
+//			CountColumn();
+//
+//			this->row = *this->row / *this->column;
+//			if (this->row < 0) {
+//				this->row = abs(*this->row);
+//			}
+//			//タイトルの行数を考慮して列数を補正する。
+//			//結合状態判定用の文字列を初期化する。
+//			for (int i = 0; i < this->row; i++) {
+//				this->join->Add("");
+//			}
+//
+//			SetTablePoint();
+//		}
 
 		/*出力する表の列数を割り出す関数
 		作成日：2017.9.5
@@ -390,16 +390,20 @@ namespace process {
 		Void ConversionJSON() {
 			ptree parent;
 			ptree child;
-			string tmp = "courseGuide";
+			string title = "";
+			string stmp = "";
 			string arrtmp = "";
+			ptree tmp;
 			//String^型の文字列リストをstring型へ変換する関数を呼び出す
 			Stos();
+			auto itr = this->jsontable->begin();
+			title = itr->first.second;
+			child.add((itr + 1)->first.first, (itr + 1)->first.second);
 			for (int i = 0; i < this->row; i++) {
-				child.clear();
 				for (auto itr = this->jsontable->begin(); itr != this->jsontable->end(); itr++) {
 					if (itr->second == "y" + to_string(i)) {
 						if (itr->first.first == "親キー") {
-							tmp = itr->first.second;
+							stmp = itr->first.second;
 						}
 						else {
 							child.put(itr->first.first, itr->first.second);
@@ -413,15 +417,22 @@ namespace process {
 							if (itr->first.first == "arraybegin") {
 								arrtmp = (itr - 1)->first.second;
 								itr++;
-								ptree tmp;
+							//	ptree tmp;
 								ptree arr;
+								string emp = "";
 								for (; itr != this->jsontable->end() && itr->first.first != "arrayend"; ++itr) {
-									arr.push_back(std::make_pair(itr->first.first, (tmp.put("", itr->first.second))));
+						//			tmp.add_child(itr->first.first, itr->first.second);
+									arr.push_back(std::make_pair(itr->first.first, tmp.put("", itr->first.second)));
+									emp = itr->first.first;
 								}
 								if (itr != this->jsontable->end()) {
 									itr++;
 								}
-								child.put_child(arrtmp, arr);
+								if (emp != "") {
+							//		arr.push_back(std::make_pair("", tmp));
+									tmp = arr;
+								}
+								child.add_child(arrtmp, arr);
 								j += *this->column;
 								break;
 							}
@@ -429,7 +440,7 @@ namespace process {
 								arrtmp = itr->first.second;
 							}
 							else if (itr->first.first != "親キー" ){// && itr->first.first != "class") {
-								child.put((arrtmp + "." + itr->first.first), itr->first.second);
+								child.add((arrtmp + "." + itr->first.first), itr->first.second);
 							}/*
 							else if (itr->first.first != "親キー") {
 								child.put(itr->first.first, itr->first.second);
@@ -437,7 +448,17 @@ namespace process {
 						}
 					}
 				}
-				parent.add_child(tmp, child);
+//				tmp.push_back(std::make_pair(stmp, child));
+//				parent.push_back(std::make_pair(title, child));
+				if (stmp == "") {
+					parent.add_child(title, child);
+				}
+				else {
+					parent.add_child((title + "." + stmp), child);
+					write_json(std::cout, parent);
+				}
+				child.clear();
+				tmp.clear();
 			}
 			write_json(std::cout, parent);
 		}

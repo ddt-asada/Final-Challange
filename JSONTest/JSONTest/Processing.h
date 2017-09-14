@@ -94,36 +94,36 @@ namespace process {
 			this->ConversionJSON();
 		}
 
-		/*DBとの通信を行う入り口となる関数
-		作成日：2017.9.14
-		作成者：K.Asada*/
+//		/*DBとの通信を行う入り口となる関数
+//		作成日：2017.9.14
+//		作成者：K.Asada*/
 		Void Queryrun() {
-			StringProcess^ test = gcnew StringProcess();
-/*			string result;			//通信結果を格納する文字列
-			//DBクエリが入力されていれば
-			if (this->SendQuery != MyConst->EMPTY_STRING) {
-			string tmp;
-			this->MarshalString(this->SendQuery, tmp);
-			JSONDBManager dbmana;
-			//				System::Windows::Forms::MessageBox::Show(this->Query);
-			//DB処理へ移行する
-			result = dbmana.DBrun(tmp);
-			}*/
-			string tmp;
-			this->MarshalString(this->SendQuery, tmp);
-			test->DBTable(tmp);
-			//JSONより取得した行数とメンバ変数の行数を比較する。
-			if (*this->Row < *test->row) {
-				//大きい方を採用する。
-				this->Row = test->row;
-			}
-			//JSONより取得した列数とメンバ変数の列数を比較する。
-			if (*this->Column < *test->column) {
-				//大きい方を採用する
-				this->Column = test->column;
-			}
-			this->retTable = test->retPointTable;
-			this->Join = test->join;
+//			StringProcess^ test = gcnew StringProcess();
+///*			string result;			//通信結果を格納する文字列
+//			//DBクエリが入力されていれば
+//			if (this->SendQuery != MyConst->EMPTY_STRING) {
+//			string tmp;
+//			this->MarshalString(this->SendQuery, tmp);
+//			JSONDBManager dbmana;
+//			//				System::Windows::Forms::MessageBox::Show(this->Query);
+//			//DB処理へ移行する
+//			result = dbmana.DBrun(tmp);
+//			}*/
+//			string tmp;
+//			this->MarshalString(this->SendQuery, tmp);
+//			test->DBTable(tmp);
+//			//JSONより取得した行数とメンバ変数の行数を比較する。
+//			if (*this->Row < *test->row) {
+//				//大きい方を採用する。
+//				this->Row = test->row;
+//			}
+//			//JSONより取得した列数とメンバ変数の列数を比較する。
+//			if (*this->Column < *test->column) {
+//				//大きい方を採用する
+//				this->Column = test->column;
+//			}
+//			this->retTable = test->retPointTable;
+//			this->Join = test->join;
 		}
 
 
