@@ -657,17 +657,14 @@ private: System::Void buttonOK2_Click(System::Object^  sender, System::EventArgs
 	proc->Listrun();
 
 	//Žæ“¾‚µ‚½•\‚Ìs”‚ðƒƒ“ƒo‚ÖŠi”[
-	this->Row = *proc->Column;
+	this->Row = *proc->Row;
 	//Žæ“¾‚µ‚½•\‚Ì—ñ”‚ðƒƒ“ƒo‚ÖŠi”[
-	this->Column = *proc->Row;
+	this->Column = *proc->Column;
 	//Žæ“¾‚µ‚½•\‚Éo—Í‚·‚é•¶Žš—ñ‚ðƒƒ“ƒo‚ÖŠi”[
 	this->TableInfo = proc->retTable;
 	//—ñ—p‚ÉƒZƒ‹ˆê‚Â’l‚Ì’·‚³‚ðL‚Î‚·
 	this->RctWidth = 1000;
 	this->join = proc->Join;
-	for (int i = 0; i < this->Row; i++) {
-		this->join->Add("");
-	}
 	
 	this->TableGenerate(this->pictureBox3);
 }

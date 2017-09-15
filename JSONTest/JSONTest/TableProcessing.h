@@ -32,6 +32,7 @@ namespace JSONTest {
 		Int32^ ColumnIndex = 0;	//クリックされたセルの列座標
 		Int32^ RctWidth = 200;		//セル一つ当たりの幅
 		Int32^ RctHeight = 100;	//セル一つ当たりの高さ
+		int judge = 0;
 		List<String^>^ join = gcnew List<String^>;
 		List<int>^ Index = gcnew List<int>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ TableInfo = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
@@ -63,7 +64,7 @@ namespace JSONTest {
 					for (int j = 0; j < this->Column; j++) {
 						// 画像領域に線を描画
 						for (int k = 0; k < this->TableInfo->Count; k++) {
-							if ((this->TableInfo[k]->first->first == "text" || this->TableInfo[k]->first->first == "array") && this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
+							if ((this->TableInfo[k]->first->first == "text") && this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
 								System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
 								gr->DrawRectangle(Pens::Black, *rct);
 								// 画像領域に文字列を書き込む
@@ -72,8 +73,14 @@ namespace JSONTest {
 								gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *rct);
 								break;
 							}
-							else if (this->TableInfo[k]->first->first == "arraybegin"&& this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) {
-								k += 1;
+							else if ((this->TableInfo[k]->first->first == "arrayend"&& this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i)))) {
+								this->judge = 0;
+							}
+							else if ((this->TableInfo[k]->first->first == "arraybegin"&& this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i))) || (this->judge == 1 && this->TableInfo[k]->second == ("x" + Convert::ToString(j) + Convert::ToString(i)))) {
+								if (this->judge == 0) {
+									k += 1;
+									this->judge = 1;
+								}
 								for (; j < this->Column; j++) {
 									System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * j, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
 									gr->DrawRectangle(Pens::Black, *rct);
@@ -81,6 +88,9 @@ namespace JSONTest {
 									System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 									//表にインデックスを付ける
 									gr->DrawString(this->TableInfo[k++]->first->second, myFont, Brushes::Black, *rct);
+									if (this->TableInfo[k]->first->first == "arrayend") {
+										this->judge = 0;
+									}
 								}
 								break;
 							}

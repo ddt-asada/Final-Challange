@@ -42,6 +42,7 @@ Class JSONTest.TableProcessing: AutoLayout, AnsiClass, Class, Public, BeforeFiel
     System.ValueType ColumnIndex Int32 IsBoxed : Public
     System.ValueType RctWidth Int32 IsBoxed : Public
     System.ValueType RctHeight Int32 IsBoxed : Public
+    Int32 judge : Public
     System.Collections.Generic.List`1[System.String] join : Public
     System.Collections.Generic.List`1[System.Int32] Index : Public
     System.Collections.Generic.List`1[cliext.pair<cliext::pair<System::String ^\,System::String ^> ^\,System::String ^>] TableInfo : Public

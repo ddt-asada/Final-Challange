@@ -139,7 +139,7 @@ namespace process {
 						else if (dic[itr]->first == "arraybegin") {
 							this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 							itr++;
-							for (; j < *this->column; j++) {
+							for (; i < *this->row; i++) {
 								this->retPointTable->Add(%cliext::pair<cliext::pair<String^, String^>^, String ^>(%cliext::make_pair(dic[itr]->first, dic[itr]->second), gcnew String("x") + Convert::ToString(j) + Convert::ToString(i)));
 								itr++;
 								if (itr > this->dic->Count || dic[itr]->first == "arrayend") {
@@ -166,7 +166,7 @@ namespace process {
 					}
 					//初回処理時はタイトルを取得したとしてループを抜ける
 					if (i == 0 && j == 0) {
-					//	break;
+						break;
 					}
 				}
 				if (count == 1) {
