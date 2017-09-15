@@ -30,9 +30,7 @@ namespace process {
 		Int32^ column = *MyConst->ZERO;		//表の列数
 		Int32^ row = *MyConst->ZERO;		//表の行数
 		Int32^ tmp = *MyConst->ZERO;
-		int resetcount = 0;
-		int colcount = 0;
-		int testcount = 0;
+		int colcount = 0;					//列数カウント用の変数
 		std::set<string> *countset = new std::set<string>;
 		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
@@ -46,7 +44,6 @@ namespace process {
 		//ファイルパスより文字列を取得してその文字列から行数、列数、文字列を抜き出す。
 		Void ReadyString(String^ JSONPath) {
 			ptree pt;		//ファイルより取得したJSONを格納するツリー
-		//	String^ SJSON = "";
 			string JSON = "";
 			string path = "";
 			MarshalString(JSONPath, path);
@@ -59,20 +56,10 @@ namespace process {
 			read_json(ss, pt);
 
 			//JSONから表の出力に必要な文字列を呼び出す。
-			TableString(pt, "", "");
-			//JSONから表の行数を割り出す関数を呼び出す。
-//			CountRows();
-	//		this->tmp = *this->row;
-			//JSONから表の列数を割り出す関数を呼び出す。
-			this->row = Convert::ToInt32(this->countset->size());
-	/*		CountColumn();
+			TableString(pt, "");
 
-			this->row =  *this->row / *this->column;
-			if (this->row < 0) {
-				this->row = abs(*this->row);
-			}
-			//タイトルの行数を考慮して列数を補正する。
-//			this->column = *this->column / *this->row;*/
+			this->row = Convert::ToInt32(this->countset->size());
+
 			//結合状態判定用の文字列を初期化する。
 			for (int i = 0; i < this->row; i++) {
 				this->join->Add("");
@@ -165,34 +152,6 @@ namespace process {
 //			SetTablePoint();
 		}
 
-		/*出力する表の列数を割り出す関数
-		作成日：2017.9.5
-		作成者：K.Asada
-		*/
-		Void CountColumn() {
-			//イテレーターにより走査する。
-			for (int i = 0; i < this->dic->Count; i++) {
-				//表の要素を見つけたら列数をカウント
-				if (this->dic[i]->first == "text" || this->dic[i]->first == "array" || this->dic[i]->first == "html") {
-					*this->row += 1;
-				}
-				else if (this->dic[i]->first == "arraybegin") {
-					i += 1;
-					for (; i < this->dic->Count; i++) {
-						if (this->dic[i]->first == "arrayend") {
-							break;
-						}
-						*this->row += 1;
-					}
-				}
-				//結合を示すキー名があれば
-				else if (this->dic[i]->first == "colspan") {
-					//結合の行数をプラスする
-					*this->row += Convert::ToInt32(this->dic[i]->second) - 1;
-				}
-			}
-		}
-
 		/*出力する表の行数を割り出すための関数
 		作成日：2017.9.4
 		作成者：K.Asada*/
@@ -225,9 +184,8 @@ namespace process {
 		作成日：2017.9.4
 		作成者：K.Asada
 		*/
-		string TableString(ptree pt, string key, string tmp) {
-			string strtest = key;
-			string ret = tmp;
+		Void TableString(ptree pt, string key) {
+			string strtest = key;		//兄弟を判定用の文字列を格納する文字列
 			string childkey = "";		//再帰処理の時に必要な子のキー名を格納する文字列。
 			//キー名が空の時（初回ループ時）
 			if (key == "") {
@@ -244,7 +202,6 @@ namespace process {
 			//子に整数があった場合
 			else if (boost::optional<int> value = pt.get_optional<int>(key)) {
 				//キー名をペアにしてマップに格納する
-				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(to_string(value.get()))));
 				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String((UTF8toSjis(to_string(value.get()))).c_str())));
 			}
 			//子がまだいる場合
@@ -259,55 +216,24 @@ namespace process {
 					//子要素が配列かつ整数であれば
 					if (boost::optional<int> value = info.get_optional<int>(childkey)) {
 						//キー名をペアにしてマップに格納する
-				//		this->table->push_back(pair<string, string>(UTF8toSjis(childkey), UTF8toSjis(to_string(value.get()))));
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(to_string(value.get())).c_str())));
-						//子要素が配列かつ文字列であれば
+					//子要素が配列かつ文字列であれば
 					}
 					else if (boost::optional<std::string> str = info.get_optional<std::string>(childkey)) {
-						//完成したrあ関数に移行する予定
-						this->resetcount--;
+						//完成したら関数に移行する予定
 						//配列を示す文字列を連結する
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arraybegin"), gcnew String("arraybegin")));
 						//キーと値の両方が存在しているときはイテレーターで走査
 						if (info.begin() != info.end()) {
-							//配列の中身を走査する
-							for (auto itr = info.begin(); itr != info.end(); itr++) {
-								//キー名と値をセットにしてマップに格納する
-								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<std::string>(itr->first)).c_str())));
-								//列数をカウントする
-								this->testcount++;
-							}
-							if (this->testcount != 0) {
-								//列数を取得
-								this->column = this->testcount;
-								//階層を判定する変数をリセット
-								this->resetcount = 1;
-								//列数をカウントする変数をリセット
-								this->testcount = 0;
-							}
-							this->testcount = 0;
-						}//値しか存在していないときは条件付きのfor文で走査
+							//文字列に変換する関数を呼び出す
+							this->ArrayJSONpair(info);
+						}//値しか存在していないとき（中身がただの配列の時）
 						else {
-							//配列を走査する
-							BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
-								//文字列をキー名をペアにしてマップに格納する。
-								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(childkey)).c_str())));
-								//列数をカウントする
-								this->testcount++;
-							}
-							if (this->testcount != 0) {
-								//列数を取得
-								this->column = this->testcount;
-								//階層を判定する変数をリセット
-								this->resetcount = 1;
-								//列数をカウントする変数をリセット
-								this->testcount = 0;
-							}
-							this->testcount = 0;
+							//文字列に変換する関数を呼び出す
+							this->ArrayJSON(pt, key);
+							//兄弟のループを抜ける
+							break;
 						}
-						//配列の終端を示す文字列を格納する
-						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
-						break;
 					}
 					//子の子（孫）が存在しておらず子のペアを文字列として取得できれば
 					else if (boost::optional<std::string> str = (test.get_optional<std::string>(childkey))) {
@@ -315,39 +241,83 @@ namespace process {
 						//子のペアが表の要素となりうる文字列であった場合
 						if (str.get() != "" && childkey == "text") {
 							childkey = child.first;
-							ret = childkey;
 							//文字列をペアにしてマップに格納
 							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
 							//列数をカウントする
-							this->testcount++;
+							this->colcount++;
 						}
 						//表の要素以外の付加情報であった場合
 						else if (str.get() != "") {
 							//文字列をペアにしてマップに格納
-							ret = childkey;
 							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
 						}
 						//子がいる場合
 						else {
-							//すでに列の要素数を取得していた場合比較を行い、大きい方を採用する。
 							//再帰処理を行う			
-							ret = TableString(pt.get_child(key), childkey, key);
-							cout << key << '\n';
-							cout << strtest << "\n\n";
+							TableString(pt.get_child(key), childkey);
+							//再帰処理を行ったときの親を重複しないように取得
 							this->countset->insert(key);
-							//すでに列の要素数を取得していた場合比較を行い、大きい方を採用する。
+							//キーの比較を行う。異なる場合は兄弟を移動しているため列数のカウントをリセット
 							if (strtest != key) {
-								if (this->testcount > this->column) {
-									this->column = this->testcount;
-								}
-								this->testcount = 0;
+								//列数を比較する関数を呼び出す
+								this->CountColumn();
 							}
 						}
 					}
 				}
 			}
-			//JSONを走査し終わったときにカウントしていた列数が大きければ
-			return key;
+		}
+
+		/*表の列数を取得するための比較を行う関数
+		作成日：2017.9.15
+		作成者：K.Asada*/
+		Void CountColumn() {
+			//メンバの列数と比較し、大きい方を採用する
+			if (this->colcount > this->column) {
+				this->column = this->colcount;
+			}
+			//列数のカウントをリセットする
+			this->colcount = 0;
+		}
+
+		/*JSONの中身がオブジェクトの配列になっているものを文字列に格納する関数
+		作成日：2017.9.15
+		作成者：K.Asada*/
+		Void ArrayJSONpair(const ptree& info) {
+			//配列の中身を走査する
+			for (auto itr = info.begin(); itr != info.end(); itr++) {
+				//キー名と値をセットにしてマップに格納する
+				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<std::string>(itr->first)).c_str())));
+				//列数をカウントする
+				this->colcount++;
+			}
+			//列数をカウントしていれば
+			if (this->colcount != 0) {
+				//列数を比較する関数を呼び出す
+				this->CountColumn();
+			}
+			//配列の終端を示す文字列を格納する
+			this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
+		}
+
+		/*JSONの中身がただの配列になっているものを文字列に格納する関数
+		作成日：2017.9.15
+		作成者：K.Asada*/
+		Void ArrayJSON(ptree pt, string key) {
+			//配列を走査する
+			BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
+				//文字列をキー名をペアにしてマップに格納する。
+				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(child.first)).c_str())));
+				//列数をカウントする
+				this->colcount++;
+			}
+			//列数をカウントしていれば
+			if (this->colcount != 0) {
+				//列数を比較する関数を呼び出す
+				this->CountColumn();
+			}
+			//配列の終端を示す文字列を格納する
+			this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
 		}
 
 		/*文字列リストに座標を紐づける関数
@@ -607,5 +577,13 @@ namespace process {
 
 			return strUTF8;
 		}
+
+		/*string型のペアをString^型のペアに変換する関数
+		作成日：2017.9.15
+		作成者：K.Asada*/
+//		List<cliext::pair<String^, String^>^> MyStrPair(string pair, string with) {
+			//String型のペアにして返却する
+	//		return cliext::pair<String^, String^>(%cliext::make_pair(gcnew String(pair.c_str()), gcnew String(with.c_str())));
+		//}
 	};
 }
