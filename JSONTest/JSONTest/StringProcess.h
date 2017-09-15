@@ -8,15 +8,16 @@
 #include <Windows.h>
 #include <iostream>
 #include <string>
-#include <vector> 
+#include <vector>
+#include <set>
 #include "CONSTANTSTRING.h"
-//#include "JSONDBManager.h"
+#include "JSONDBManager.h"
 
 namespace process {
 	using namespace std;
 	using namespace System;
 	using namespace constantstring;
-	using namespace  System::Collections::Generic;
+	using namespace System::Collections::Generic;
 	using namespace boost::property_tree;
 
 	//作成日：2017.9.2
@@ -31,6 +32,8 @@ namespace process {
 		Int32^ tmp = *MyConst->ZERO;
 		int resetcount = 0;
 		int colcount = 0;
+		int testcount = 0;
+		std::set<string> *countset = new std::set<string>;
 		List<String^>^ join = gcnew List<String^>;
 		List<cliext::pair<String^, String^>^>^ dic = gcnew List<cliext::pair<String^, String^>^>();
 		List<cliext::pair<cliext::pair<String^, String^>^, String^>^>^ retPointTable = gcnew List<cliext::pair<cliext::pair<String^, String^>^, String^>^>();
@@ -56,19 +59,20 @@ namespace process {
 			read_json(ss, pt);
 
 			//JSONから表の出力に必要な文字列を呼び出す。
-			TableString(pt, "");
+			TableString(pt, "", "");
 			//JSONから表の行数を割り出す関数を呼び出す。
 //			CountRows();
 	//		this->tmp = *this->row;
 			//JSONから表の列数を割り出す関数を呼び出す。
-			CountColumn();
+			this->row = Convert::ToInt32(this->countset->size());
+	/*		CountColumn();
 
 			this->row =  *this->row / *this->column;
 			if (this->row < 0) {
 				this->row = abs(*this->row);
 			}
 			//タイトルの行数を考慮して列数を補正する。
-//			this->column = *this->column / *this->row;
+//			this->column = *this->column / *this->row;*/
 			//結合状態判定用の文字列を初期化する。
 			for (int i = 0; i < this->row; i++) {
 				this->join->Add("");
@@ -96,7 +100,7 @@ namespace process {
 			read_json(ss, pt);
 
 			//JSONから表の出力に必要な文字列を呼び出す。
-			TableString(pt, "");
+//			TableString(pt, "");
 			//JSONから表の行数を割り出す関数を呼び出す。
 			CountRows();
 			this->tmp = *this->row;
@@ -114,10 +118,10 @@ namespace process {
 			SetTablePoint();
 		}
 
-//		/*DBとの通信結果を表にするために必要な文字列を取得する関数
-//		作成日：2017.9.14
-//		作成者：K.Asada*/
-//		Void DBTable(string result) {
+		/*DBとの通信結果を表にするために必要な文字列を取得する関数
+		作成日：2017.9.14
+		作成者：K.Asada*/
+		Void DBTable(string result) {
 //	//		StringProcess^ test = gcnew StringProcess();
 //		//	string result;			//通信結果を格納する文字列
 //		//	string tmp;
@@ -159,7 +163,7 @@ namespace process {
 //			}
 //
 //			SetTablePoint();
-//		}
+		}
 
 		/*出力する表の列数を割り出す関数
 		作成日：2017.9.5
@@ -221,7 +225,9 @@ namespace process {
 		作成日：2017.9.4
 		作成者：K.Asada
 		*/
-		Void TableString(ptree pt, string key) {
+		string TableString(ptree pt, string key, string tmp) {
+			string strtest = key;
+			string ret = tmp;
 			string childkey = "";		//再帰処理の時に必要な子のキー名を格納する文字列。
 			//キー名が空の時（初回ループ時）
 			if (key == "") {
@@ -233,7 +239,6 @@ namespace process {
 			//子に文字列があった場合
 			if (boost::optional<std::string> str = pt.get_optional<std::string>(key)) {
 				//文字列をキー名をペアにしてマップに格納する。
-				//this->table->push_back(pair<string, string>(UTF8toSjis(key), UTF8toSjis(str.get())));
 				this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(key).c_str()), gcnew String(UTF8toSjis(str.get()).c_str())));
 			}
 			//子に整数があった場合
@@ -251,9 +256,6 @@ namespace process {
 					ptree test = pt.get_child(key);
 					//子のキー名を取得する
 					childkey = child.first;
-		//			ptree::value_type& testchild;
-			//		push_back(test.get_child(childkey));
-				//	test = test.get_child(childkey);
 					//子要素が配列かつ整数であれば
 					if (boost::optional<int> value = info.get_optional<int>(childkey)) {
 						//キー名をペアにしてマップに格納する
@@ -273,8 +275,17 @@ namespace process {
 								//キー名と値をセットにしてマップに格納する
 								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<std::string>(itr->first)).c_str())));
 								//列数をカウントする
-								this->colcount++;
+								this->testcount++;
 							}
+							if (this->testcount != 0) {
+								//列数を取得
+								this->column = this->testcount;
+								//階層を判定する変数をリセット
+								this->resetcount = 1;
+								//列数をカウントする変数をリセット
+								this->testcount = 0;
+							}
+							this->testcount = 0;
 						}//値しか存在していないときは条件付きのfor文で走査
 						else {
 							//配列を走査する
@@ -282,75 +293,61 @@ namespace process {
 								//文字列をキー名をペアにしてマップに格納する。
 								this->dic->Add(%cliext::pair<String^, String^>(gcnew String(""), gcnew String(UTF8toSjis(child.second.get<std::string>(childkey)).c_str())));
 								//列数をカウントする
-								this->colcount++;
+								this->testcount++;
 							}
+							if (this->testcount != 0) {
+								//列数を取得
+								this->column = this->testcount;
+								//階層を判定する変数をリセット
+								this->resetcount = 1;
+								//列数をカウントする変数をリセット
+								this->testcount = 0;
+							}
+							this->testcount = 0;
 						}
 						//配列の終端を示す文字列を格納する
 						this->dic->Add(%cliext::pair<String^, String^>(gcnew String("arrayend"), gcnew String("arrayend")));
-			//			break;
+						break;
 					}
 					//子の子（孫）が存在しておらず子のペアを文字列として取得できれば
-					else if (boost::optional<std::string> str = (test.get_optional<std::string>(childkey))){
+					else if (boost::optional<std::string> str = (test.get_optional<std::string>(childkey))) {
 						//完成したら関数に移行する予定
 						//子のペアが表の要素となりうる文字列であった場合
 						if (str.get() != "" && childkey == "text") {
-							//テスト用
-							//cout <<UTF8toSjis(str.get()) << '\n';
+							childkey = child.first;
+							ret = childkey;
 							//文字列をペアにしてマップに格納
 							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
 							//列数をカウントする
-							this->colcount++;
-							this->resetcount--;
+							this->testcount++;
 						}
+						//表の要素以外の付加情報であった場合
 						else if (str.get() != "") {
+							//文字列をペアにしてマップに格納
+							ret = childkey;
 							this->dic->Add(%cliext::pair<String^, String^>(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(test.get<std::string>(childkey)).c_str())));
-							cout << UTF8toSjis(str.get()) << '\n';
 						}
+						//子がいる場合
 						else {
-							//通常のJSON用の再帰処理
-							//再帰処理を行う
-							this->resetcount++;
-							if (resetcount >= 2) {
-								if (this->column < this->colcount) {
-									this->column = this->colcount;
+							//すでに列の要素数を取得していた場合比較を行い、大きい方を採用する。
+							//再帰処理を行う			
+							ret = TableString(pt.get_child(key), childkey, key);
+							cout << key << '\n';
+							cout << strtest << "\n\n";
+							this->countset->insert(key);
+							//すでに列の要素数を取得していた場合比較を行い、大きい方を採用する。
+							if (strtest != key) {
+								if (this->testcount > this->column) {
+									this->column = this->testcount;
 								}
-								this->resetcount = 1;
-								this->colcount = 0;
+								this->testcount = 0;
 							}
-							TableString(pt.get_child(key), childkey);
-							cout << "aaa" << '\n';
 						}
 					}
-					//JSONが配列であった場合ここに抜けてきます
-					else {
-						//現在の階層の要素の数を取得し、前回取得した数より多ければ列数として取得
-						if (this->column < this->colcount) {
-							//列数を取得
-							this->column = this->colcount;
-							//階層を判定する変数をリセット
-							this->resetcount = 1;
-							//列数をカウントする変数をリセット
-							this->colcount = 0;
-						}
-						//子について再帰処理する
-						TableString(pt.get_child(key), childkey);
-					}
-					if (this->column < this->colcount) {
-						//列数を取得
-						this->column = this->colcount;
-						//階層を判定する変数をリセット
-						this->resetcount = 1;
-						//列数をカウントする変数をリセット
-						this->colcount = 0;
-					}
-					this->colcount = 0;
 				}
 			}
 			//JSONを走査し終わったときにカウントしていた列数が大きければ
-			if (this->column == 0) {
-				//表の列数として取得
-				this->column = this->colcount;
-			}
+			return key;
 		}
 
 		/*文字列リストに座標を紐づける関数
