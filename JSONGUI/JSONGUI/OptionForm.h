@@ -93,6 +93,7 @@ namespace JSONGUI {
 			this->buttonOptionCancel->TabIndex = 2;
 			this->buttonOptionCancel->Text = L"キャンセル";
 			this->buttonOptionCancel->UseVisualStyleBackColor = true;
+			this->buttonOptionCancel->Click += gcnew System::EventHandler(this, &OptionForm::OptionCancelClisk);
 			// 
 			// buttonOptionOK
 			// 
@@ -102,19 +103,22 @@ namespace JSONGUI {
 			this->buttonOptionOK->TabIndex = 3;
 			this->buttonOptionOK->Text = L"OK";
 			this->buttonOptionOK->UseVisualStyleBackColor = true;
+			this->buttonOptionOK->Click += gcnew System::EventHandler(this, &OptionForm::OptionOKClick);
 			// 
 			// buttonLoadFile
 			// 
-			this->buttonLoadFile->Location = System::Drawing::Point(1067, 88);
+			this->buttonLoadFile->Location = System::Drawing::Point(1074, 88);
 			this->buttonLoadFile->Name = L"buttonLoadFile";
 			this->buttonLoadFile->Size = System::Drawing::Size(145, 53);
 			this->buttonLoadFile->TabIndex = 4;
 			this->buttonLoadFile->Text = L"参照";
 			this->buttonLoadFile->UseVisualStyleBackColor = true;
+			this->buttonLoadFile->Click += gcnew System::EventHandler(this, &OptionForm::LoadButtonClick);
 			// 
 			// openFileDialog
 			// 
 			this->openFileDialog->FileName = L"openFileDialog";
+			this->openFileDialog->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &OptionForm::FileDialogOK);
 			// 
 			// OptionForm
 			// 
@@ -128,6 +132,7 @@ namespace JSONGUI {
 			this->Controls->Add(this->textBoxPath);
 			this->Name = L"OptionForm";
 			this->Text = L"OptionForm";
+			this->Load += gcnew System::EventHandler(this, &OptionForm::OptionForm_Load);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -137,5 +142,65 @@ namespace JSONGUI {
 		ConstantString^ Constants = gcnew ConstantString();		//定数クラスをインスタンス化
 		String^ FilePath = Constants->EMPTY_STRING;				//テキストボックスに入力されたJSONのファイルパスを保管する文字列
 		String^ SendQuery = Constants->EMPTY_STRING;			//テキストボックスに入力されたDBクエリを保管する文字列
-	};
+
+	/*概要：フォームロード時のイベント、前回起動したときの情報を対応したテキストボックスに配置する
+	引数：sender：イベント発生時の各種情報を格納したオブジェクトクラス
+		：EventArg：
+	戻り値：なし
+	作成日：2017.9.20
+	作成者：K.Asada*/
+	private: System::Void OptionForm_Load(System::Object^  sender, System::EventArgs^  e) {
+		//ファイルパステキストボックスに前回起動時に取得したファイルパスを格納する
+		this->textBoxPath->Text = this->FilePath;
+		//DBクエリテキストボックスに前回起動時に取得したDBクエリを格納する
+		this->textBoxDBQuery->Text = this->SendQuery;
+	}
+
+	/*参照ボタンクリック時のイベント、ファイルパスを取得するためのダイアログを開く
+	引数：Sender
+		：EventArgs
+	作成日：2017.9.20
+	作成者：K.Asada*/
+	private: System::Void LoadButtonClick(System::Object^  sender, System::EventArgs^  e) {
+		//新規ダイアログを開き、キャンセルボタンが押されたときの動作を設定しておく
+		if (this->openFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) {
+			//何もせずにダイアログを閉じる
+			return;
+		}
+}
+
+	/*概要：JSONファイル読み込みダイアログ上でOKボタンがクリックされたときにそのファイルパスをテキストボックスに格納する
+	引数：
+	戻り値：
+	作成日：2017.9.20
+	作成者：K.Asada */
+	private: System::Void FileDialogOK(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
+		//OKボタンが押されたときはテキストボックスにファイルパスを格納する
+		this->textBoxPath->Text = this->openFileDialog->FileName;
+}
+
+	/*概要：OKボタンがクリックされたときのイベント、テキストボックスの値をメンバの文字列に格納する
+	引数：
+	戻り値：なし
+	作成日：2017.9.20
+	作成者：K.Asada*/
+private: System::Void OptionOKClick(System::Object^  sender, System::EventArgs^  e) {
+	//呼び出し元の画面に渡すためにテキストボックスに入力されたファイルパスをメンバの文字列に格納する
+	this->FilePath = this->textBoxPath->Text;
+	//呼び出し元の画面に渡すためにテキストボックスに入力されたDBクエリをメンバの文字列に格納する
+	this->SendQuery = this->textBoxDBQuery->Text;
+	//画面を閉じる
+	this->Close();
+}
+
+	/*概要：キャンセルボタンクリック時のイベント、テキストボックスの値をそのままにして画面を閉じる
+	引数：
+	戻り値：なし
+	作成日：2017.9.20
+	作成者：K.Asada*/
+private: System::Void OptionCancelClisk(System::Object^  sender, System::EventArgs^  e) {
+	//テキストボックスの値を破棄したいので何も処理せずに画面を閉じる
+	this->Close();
+}
+};
 }
