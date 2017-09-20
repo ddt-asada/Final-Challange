@@ -4,11 +4,12 @@
 作成日：2017.9.20
 作成者：K.Asada*/
 public class CellDataChain {
+public:
 	//デフォルトコンストラクタ
 	CellDataChain() {
 
 	}
-public:
+
 	//双方向チェインデータの構造体
 	typedef struct cellchain {
 		char* key;					//キー名
@@ -157,5 +158,19 @@ public:
 		chain->lower = nullptr;
 		//対象の弟に新たな構造体を連結をした構造体を返す
 		return target;
+	}
+
+	/*概要：指定された箇所の要素をチェイン構造より取得する関数
+	引数：int：取得したい要素の行座標
+		：int：取得したい要素の列座標
+	作成日：2017.9.20
+	作成者：K.Asada*/
+	char* GetChainData(int rowindex, int columnindex, cellchain* grandparent) {
+		cellchain* search = grandparent;		//走査用の構造体を宣言
+		//構造体の行方向への移動を行う
+		for (int i = 0; search->next == nullptr && i < rowindex; i++, search = search->next) {
+		}
+
+		return search->key;
 	}
 };
