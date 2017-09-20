@@ -84,6 +84,7 @@ namespace JSONGUI {
 		{
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage = (gcnew System::Windows::Forms::TabPage());
+			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->buttonTableConv = (gcnew System::Windows::Forms::Button());
 			this->buttonTableCancel = (gcnew System::Windows::Forms::Button());
 			this->buttonTableOK = (gcnew System::Windows::Forms::Button());
@@ -104,7 +105,6 @@ namespace JSONGUI {
 			this->textBoxList = (gcnew System::Windows::Forms::TextBox());
 			this->pictureBoxListCurr = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxList = (gcnew System::Windows::Forms::PictureBox());
-			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->tabControl1->SuspendLayout();
 			this->tabPage->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCurrent))->BeginInit();
@@ -146,6 +146,15 @@ namespace JSONGUI {
 			this->tabPage->TabIndex = 0;
 			this->tabPage->Text = L"テーブル";
 			this->tabPage->UseVisualStyleBackColor = true;
+			// 
+			// buttonJoin
+			// 
+			this->buttonJoin->Location = System::Drawing::Point(507, 6);
+			this->buttonJoin->Name = L"buttonJoin";
+			this->buttonJoin->Size = System::Drawing::Size(167, 68);
+			this->buttonJoin->TabIndex = 10;
+			this->buttonJoin->Text = L"結合/解除";
+			this->buttonJoin->UseVisualStyleBackColor = true;
 			// 
 			// buttonTableConv
 			// 
@@ -191,6 +200,7 @@ namespace JSONGUI {
 			this->buttonOption->TabIndex = 5;
 			this->buttonOption->Text = L"設定";
 			this->buttonOption->UseVisualStyleBackColor = true;
+			this->buttonOption->Click += gcnew System::EventHandler(this, &JSONGUI::buttonOption_Click);
 			// 
 			// textBoxRow
 			// 
@@ -329,15 +339,6 @@ namespace JSONGUI {
 			this->pictureBoxList->TabIndex = 11;
 			this->pictureBoxList->TabStop = false;
 			// 
-			// buttonJoin
-			// 
-			this->buttonJoin->Location = System::Drawing::Point(507, 6);
-			this->buttonJoin->Name = L"buttonJoin";
-			this->buttonJoin->Size = System::Drawing::Size(167, 68);
-			this->buttonJoin->TabIndex = 10;
-			this->buttonJoin->Text = L"結合/解除";
-			this->buttonJoin->UseVisualStyleBackColor = true;
-			// 
 			// JSONGUI
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -347,6 +348,7 @@ namespace JSONGUI {
 			this->Controls->Add(this->tabControl1);
 			this->Name = L"JSONGUI";
 			this->Text = L"JSONGUI";
+			this->Load += gcnew System::EventHandler(this, &JSONGUI::JSONGUI_Load);
 			this->tabControl1->ResumeLayout(false);
 			this->tabPage->ResumeLayout(false);
 			this->tabPage->PerformLayout();
@@ -360,7 +362,20 @@ namespace JSONGUI {
 
 		}
 #pragma endregion
-	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
-	}
+
+/*概要：メイン画面ロード時の初期化イベント*/
+private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  e) {
+}
+
+/*概要：テーブルタブの設定ボタンクリック時のイベント、設定画面を開く
+引数：Sender：クリック時のフォームの情報が格納されたオブジェクトクラス
+	：EventArgs：クリック時のマウス関係の情報が格納されたイベントクラス
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada*/
+private: System::Void buttonOption_Click(System::Object^  sender, System::EventArgs^  e) {
+	//設定画面を開くために設定画面クラスをインスタンス化
+	
+}
 };
 }
