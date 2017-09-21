@@ -5,6 +5,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <cliext/utility>
 
 namespace process {
 
@@ -25,7 +26,7 @@ namespace process {
 		Int32^ colcount = 0;	//列数をカウントする変数
 		Int32^ rowcount = 0;	//行数をカウントする変数
 		CellDataChain::cellchain* Tablechain = nullptr;	//JSONを文字列に変換して親子、兄弟関係のデータチェインを行うための構造体
-		List<Int32>^ joinInfo = gcnew List<Int32>();	//結合情報を保持する動的配列
+//		List<int>^ joinInfo = gcnew List<int>();	//結合情報を保持する動的配列
 		
 		/*概要：JSONを表に必要な文字列に変換する関数
 		引数：String^：DBから取得したJSONまたはファイルからJSONを読み込むためのファイルパス
@@ -33,15 +34,6 @@ namespace process {
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		Void TableString(String^ json) {
-
-		}
-
-		/*概要：ファイルから文字列を取得するための関数
-		引数：String^：読み込み先のファイルパス
-		戻り値：String^；読み込んだ文字列
-		作成日：207.9.21
-		作成者：K.Asada*/
-		String^ LoadJSON(String^ path) {
 
 		}
 
@@ -107,7 +99,7 @@ namespace process {
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		CellDataChain::cellchain* ArrayJSONocject(const boost::property_tree::ptree& info, CellDataChain::cellchain* brother) {
-			
+			return brother;
 		}
 
 		/*概要：配列の文字列処理を行う関数
@@ -117,7 +109,7 @@ namespace process {
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		CellDataChain::cellchain* ArrayJSON(boost::property_tree::ptree pt, CellDataChain::cellchain* brother) {
-
+			return brother;
 		}
 
 		/*概要：文字列処理の初回に実行される関数
@@ -126,7 +118,7 @@ namespace process {
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		CellDataChain::cellchain* MakeParent(boost::property_tree::ptree pt) {
-			
+			return this->Tablechain;
 		}
 
 		/*概要：行数と列数をカウントする関数

@@ -32,7 +32,7 @@ namespace TableInformation {
 		Int32^ ColumnIndex = Constants->ZERO;				//クリックされた表のヨコ座標
 		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
 		Int32^ RctHeight = 100;								//表の格子一つ当たりの高さ
-		List<Int32>^ JoinIndex = gcnew List<Int32>();		//セルの結合情報を保持するリスト型配列
+		List<int>^ JoinIndex = gcnew List<int>();		//セルの結合情報を保持するリスト型配列
 		CellDataChain::cellchain* TableElem = NULL;					//表の情報が格納されたデータチェイン
 		String^ JSONFilePath = Constants->EMPTY_STRING;		//読み込むJSONのファイルパス
 		String^ DBQuery = Constants->EMPTY_STRING;			//DBよりJSON文字列を取得するためのクエリ
@@ -249,7 +249,7 @@ namespace TableInformation {
 		作成者：K.Asada*/
 		Void ShowOptionForm() {
 			//設定画面を開くために設定画面クラスをインスタンス化
-			OptionForm^ opt = gcnew OptionForm();
+			option::OptionForm^ opt = gcnew option::OptionForm();
 			//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
 			opt->FilePath = this->JSONFilePath;
 			//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す

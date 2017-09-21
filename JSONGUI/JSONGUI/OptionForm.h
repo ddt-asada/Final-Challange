@@ -1,7 +1,7 @@
 #pragma once
 #include "ConstantString.h"	//自作定数クラスのヘッダ
 
-namespace JSONGUI {
+namespace option {
 
 	using namespace System;
 	using namespace System::ComponentModel;
