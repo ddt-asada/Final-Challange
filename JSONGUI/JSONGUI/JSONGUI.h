@@ -2,6 +2,7 @@
 
 #include "OptionForm.h"			//設定画面クラスのヘッダ
 #include "TableInformation.h"	//表画像関係の関数をまとめたクラスのヘッダ
+#include "MoreDetailForm.h"		//詳細画面クラスのヘッダ
 #include "Processing.h"			//内部処理クラスのヘッダ
 
 namespace JSONGUI {
@@ -235,7 +236,7 @@ namespace JSONGUI {
 			this->textBoxCell->Name = L"textBoxCell";
 			this->textBoxCell->Size = System::Drawing::Size(140, 76);
 			this->textBoxCell->TabIndex = 2;
-			this->textBoxCell->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUI::TextBoxCellMouseClick);
+			this->textBoxCell->DoubleClick += gcnew System::EventHandler(this, &JSONGUI::TextBoxCellClick);
 			// 
 			// pictureBoxCurrent
 			// 
@@ -245,7 +246,7 @@ namespace JSONGUI {
 			this->pictureBoxCurrent->Size = System::Drawing::Size(83, 102);
 			this->pictureBoxCurrent->TabIndex = 1;
 			this->pictureBoxCurrent->TabStop = false;
-			this->pictureBoxCurrent->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUI::PictureBoxCurrentClick);
+			this->pictureBoxCurrent->Click += gcnew System::EventHandler(this, &JSONGUI::PictureBoxCurrentClick);
 			// 
 			// pictureBoxTable
 			// 
@@ -255,6 +256,7 @@ namespace JSONGUI {
 			this->pictureBoxTable->SizeMode = System::Windows::Forms::PictureBoxSizeMode::AutoSize;
 			this->pictureBoxTable->TabIndex = 0;
 			this->pictureBoxTable->TabStop = false;
+			this->pictureBoxTable->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUI::PictureBoxTableMouseClick);
 			// 
 			// tabPage2
 			// 
@@ -339,6 +341,7 @@ namespace JSONGUI {
 			this->textBoxList->Name = L"textBoxList";
 			this->textBoxList->Size = System::Drawing::Size(140, 76);
 			this->textBoxList->TabIndex = 13;
+			this->textBoxList->DoubleClick += gcnew System::EventHandler(this, &JSONGUI::TextBoxListClick);
 			// 
 			// pictureBoxListCurr
 			// 
@@ -348,6 +351,7 @@ namespace JSONGUI {
 			this->pictureBoxListCurr->Size = System::Drawing::Size(83, 102);
 			this->pictureBoxListCurr->TabIndex = 12;
 			this->pictureBoxListCurr->TabStop = false;
+			this->pictureBoxListCurr->Click += gcnew System::EventHandler(this, &JSONGUI::PictureBoxListCurrClick);
 			// 
 			// pictureBoxList
 			// 
@@ -357,6 +361,7 @@ namespace JSONGUI {
 			this->pictureBoxList->SizeMode = System::Windows::Forms::PictureBoxSizeMode::AutoSize;
 			this->pictureBoxList->TabIndex = 11;
 			this->pictureBoxList->TabStop = false;
+			this->pictureBoxList->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUI::PictureBoxListMouseClick);
 			// 
 			// JSONGUI
 			// 
@@ -393,19 +398,8 @@ private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  
 作成日：2017.9.20
 作成者：K.Asada*/
 private: System::Void buttonOption_Click(System::Object^  sender, System::EventArgs^  e) {
-	//設定画面を開くために設定画面クラスをインスタンス化
-	OptionForm^ opt = gcnew OptionForm();
-	//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
-	opt->FilePath = this->JSONFilePath;
-	//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
-	opt->SendQuery = this->DBQuery;
-	//設定画面を開く
-	opt->ShowDialog();
-	//設定画面にて取得したJSONファイルパスを取得する
-	this->JSONFilePath = opt->FilePath;
-	//設定画面にて取得したDBクエリを取得する
-	this->DBQuery = opt->SendQuery;
-	
+	//設定画面を開く関数を呼び出す
+	this->ShowOptionForm();
 }
 
 /*概要：プログラム終了時のイベント、終了するどうかの確認を行う。
@@ -447,28 +441,6 @@ private: System::Void TableCancelClick(System::Object^  sender, System::EventArg
 	this->TableInit();
 }
 
-/*概要：表画像のハイライトされている箇所をクリックしたときのイベント、テキストボックスを配置して編集可能状態にする
-引数：
-戻り値：なし
-作成日：2017.9.20
-作成者：K.Asada*/
-private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	//テキストボックスに情報を設定する関数を呼び出す
-	this->CellTextGenerate(this->textBoxCell);
-	//生成したテキストボックスをメイン画面のコントロールに乗せる
-	this->Controls->Add(this->textBoxCell);
-}
-
-/*概要：表画像上のテキストボックスをダブルクリックしたときのイベント、詳細情報変種画面を開く
-引数：
-戻り値：なし
-作成日：2017.9.20
-作成者：K.Asada */
-private: System::Void TextBoxCellMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	//詳細画面クラスをインスタンス化する
-	//詳細画面を表示する
-}
-
 /*概要：通信ボタンのクリックイベント、DBクエリ処理関数を呼び出す
 引数：
 戻り値：なし
@@ -492,8 +464,9 @@ private: System::Void ButtonConnectClick(System::Object^  sender, System::EventA
 	//取得した結合情報をメンバへ格納する
 	this->JoinIndex = proc->joinInfo;
 	//表画像を生成する関数を呼び出す
-	//修正予定
-	//this->TableGenerate(this->pictureBoxTable);
+	this->TableGenerate(this->pictureBoxTable);
+	//コントロールへがピクチャボックスを追加する
+	this->Controls->Add(this->pictureBoxTable);
 }
 
 /*概要：テーブルタブのOKボタンクリックイベント、内部処理クラスへ移行する
@@ -502,6 +475,26 @@ private: System::Void ButtonConnectClick(System::Object^  sender, System::EventA
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  e) {
+	//内部処理クラスをインスタンス化
+	process::Processing^ proc = gcnew process::Processing();
+	//テキストボックスに入力された行数をInt32型に変換してから渡す
+	proc->row = Convert::ToInt32(this->textBoxRow->Text);
+	//テキストボックスに入力された列数をInt32型に変換してから渡す
+	proc->column = Convert::ToInt32(this->textBoxCol->Text);
+	//JSONをチェイン構造に変換する関数を呼び出す
+	proc->Tablerun(this->JSONFilePath);
+	//取得した列数をメンバへ格納する
+	this->Column = proc->column;
+	//取得した行数をメンバへ格納する
+	this->Row = proc->row;
+	//構造体をメンバへ格納する
+	this->TableElem = proc->Tablechain;
+	//結合情報をメンバへ格納する
+	this->JoinIndex = proc->joinInfo;
+	//表画像を生成する関数を呼び出す
+	this->TableGenerate(this->pictureBoxTable);
+	//コントロールへピクチャボックスを追加する
+	this->Controls->Add(this->pictureBoxTable);
 }
 
 /*概要：テーブルタブの変換ボタンクリック時のイベント
@@ -529,16 +522,18 @@ private: System::Void TableJoinClick(System::Object^  sender, System::EventArgs^
 作成日：2017.9.21
 作成者：K.Asada*/
 private: Void ListInit() {
+	//表画像を削除する
+	this->Controls->Remove(this->pictureBoxList);
+	//表画像ハイライト用の画像を削除する
+	this->Controls->Remove(this->pictureBoxListCurr);
 	//配列数テキストタブを初期化する
 	this->textBoxListRow->Clear();
 	//表画像の値編集用テキストボックスを初期化する
 	this->textBoxList->Clear();
-	//表画像を削除する
-	//修正予定
-	this->pictureBoxList->Clear();
-	//表画像ハイライト用の画像を削除する
-	//修正予定
-	this->pictureBoxListCurr->clear();
+	//テキストボックスを除去する
+	this->Controls->Remove(this->textBoxList);
+	//基底クラスの初期化関数を呼び出す
+	this->InfoInit();
 }
 
 /*概要：リストタブのOKボタンクリックイベント、ファイルパスからJSONを読み込んで処理する
@@ -547,11 +542,22 @@ private: Void ListInit() {
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void ListOKClick(System::Object^  sender, System::EventArgs^  e) {
-	//いろいろたりない
+	//内部処理クラスをインスタンス化
+	process::Processing^ proc = gcnew process::Processing();
+	//行数を渡す
+	proc->row = Convert::ToInt32(this->textBoxListRow);
 	//内部処理関数を呼び出す
-	//proc->Listrun();
+	proc->Listrun(this->JSONFilePath);
+	//取得した行数をメンバへ格納する
+	this->Row = proc->row;
+	//取得した構造体をメンバへ格納する
+	this->TableElem = proc->Tablechain;
+	//取得した結合情報をメンバへ格納する
+	this->JoinIndex = proc->joinInfo;
 	//表画像生成関数を呼び出す
-	//this->TableGenerate();
+	this->TableGenerate(this->pictureBoxList);
+	//作成した画像をコントロールへ追加する
+	this->Controls->Add(this->pictureBoxList);
 }
 
 /*概要：リストタブのキャンセルボタンクリックイベント、初期化関数を呼び出す
@@ -568,6 +574,82 @@ private: System::Void ListConvClick(System::Object^  sender, System::EventArgs^ 
 private: System::Void ListConnectClick(System::Object^  sender, System::EventArgs^  e) {
 }
 private: System::Void ListOptionClick(System::Object^  sender, System::EventArgs^  e) {
+}
+
+/*表画像上をクリックしたときのイベント、選択状態にする関数を呼び出す
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void PictureBoxTableMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//選択状態を保持するためにクリックした表画像上の座標をメンバへ保存する関数を呼び出す
+	this->GetCellPoint(e);
+	//選択箇所がわかりやすいようにハイライトする関数を呼び出す
+	this->SelecteCell(this->pictureBoxCurrent);
+	//ハイライト画像をコントロールへ追加する
+	this->Controls->Add(this->pictureBoxCurrent);
+}
+
+/*概要：リストタブの表画像上をクリックしたときのイベント、選択状態にする関数を呼び出す
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void PictureBoxListMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//選択状態を保持するためにクリックした表画像上の座標をメンバへ保存する関数を呼び出す
+	this->GetCellPoint(e);
+	//選択箇所がわかりやすいようにハイライトする関数を呼び出す
+	this->SelecteCell(this->pictureBoxListCurr);
+	//ハイライト画像をコントロールへ追加する
+	this->Controls->Add(this->pictureBoxListCurr);
+}
+
+/*概要：表画像のハイライトされている箇所をクリックしたときのイベント、テキストボックスを配置して編集可能状態にする
+引数：
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada*/
+private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::EventArgs^  e) {
+	//テキストボックスに情報を設定する関数を呼び出す
+	this->CellTextGenerate(this->textBoxCell);
+	//生成したテキストボックスをメイン画面のコントロールに乗せる
+	this->Controls->Add(this->textBoxCell);
+}
+
+/*概要：リストタブの画像のハイライト部分をクリックしたときのイベント、編集用のテキストボックスを表示
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void PictureBoxListCurrClick(System::Object^  sender, System::EventArgs^  e) {
+	//テキストボックスを配置するための情報を設定する関数を呼び出す
+	this->CellTextGenerate(this->textBoxList);
+	//情報が設定されたテキストボックスをコントロールに追加して表示する
+	this->Controls->Add(this->textBoxList);
+}
+
+/*概要：表画像の値編集用のテキストボックスがダブルクリックされたときのイベント
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void TextBoxListClick(System::Object^  sender, System::EventArgs^  e) {
+	//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
+	MoreDetailForm^ more = gcnew MoreDetailForm();
+	//新規ダイアログで表示する
+	more->ShowDialog();
+}
+
+/*概要：表画像の値編集用のテキストボックスがダブルクリックされたときのイベント
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void TextBoxCellClick(System::Object^  sender, System::EventArgs^  e) {
+	//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
+	MoreDetailForm^ more = gcnew MoreDetailForm();
+	//新規ダイアログで表示する
+	more->ShowDialog();
 }
 };
 }

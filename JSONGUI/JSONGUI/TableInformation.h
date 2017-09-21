@@ -1,4 +1,5 @@
 #pragma once
+#include "OptionForm.h"			//設定画面クラスのヘッダ
 #include "ConstantString.h"		//自作定数クラスのヘッダ
 #include "CellDataChain.h"		//自作データチェインクラスのヘッダ
 #include <list>
@@ -41,7 +42,7 @@ namespace TableInformation {
 		戻り値：Bitmap^：生成した表画像
 		作成日：2017.9.20
 		作成者：K.Asada*/
-		Bitmap^ TableGenerate() {
+		PictureBox^ TableGenerate(PictureBox^ pict) {
 			//チェイン構造操作クラスをインスタンス化
 			CellDataChain* CellCtrl = new CellDataChain();
 			//空のビットマップを生成
@@ -68,8 +69,10 @@ namespace TableInformation {
 					}
 				}
 			}
+			//作成した画像をピクチャボックスへのセル
+			pict->Image = img;
 			//作成の終えたビットマップ画像を返す
-			return img;
+			return pict;
 		}
 
 		/*概要：選択箇所のセルをハイライトする関数
@@ -237,6 +240,26 @@ namespace TableInformation {
 			this->JoinIndex->Clear();					//結合情報を初期化する
 			this->JSONFilePath = Constants->EMPTY_STRING;//読み込み先のファイルパスを初期化する
 			this->DBQuery = Constants->EMPTY_STRING;	//DBへ投げるクエリを初期化する
+		}
+
+		/*概要：設定画面を開くための関数
+		引数：なし
+		戻り値：なし
+		作成日：2017.9.21
+		作成者：K.Asada*/
+		Void ShowOptionForm() {
+			//設定画面を開くために設定画面クラスをインスタンス化
+			OptionForm^ opt = gcnew OptionForm();
+			//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
+			opt->FilePath = this->JSONFilePath;
+			//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
+			opt->SendQuery = this->DBQuery;
+			//設定画面を開く
+			opt->ShowDialog();
+			//設定画面にて取得したJSONファイルパスを取得する
+			this->JSONFilePath = opt->FilePath;
+			//設定画面にて取得したDBクエリを取得する
+			this->DBQuery = opt->SendQuery;
 		}
 	};
 }
