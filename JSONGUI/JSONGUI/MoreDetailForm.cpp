@@ -1,0 +1,2 @@
+#include "MoreDetailForm.h"
+
