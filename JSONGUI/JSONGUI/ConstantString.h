@@ -14,6 +14,5 @@ namespace CONSTANTS {
 		System::String^ ZERO_STRING = "0";
 		System::String^ ERROR_STRING = "“ü—Í€–Ú‚ğŠm”F‚µ‚Ä‚­‚¾‚³‚¢";
 		System::Int32 ZERO = 0;
-
 	};
 }
