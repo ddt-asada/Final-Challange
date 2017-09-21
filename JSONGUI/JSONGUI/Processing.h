@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CellDataChain.h"	//自作のデータチェインクラスのヘッダ
+#include "StringProcessing.h"	//文字列処理クラスのヘッダ
 
 //内部処理関係の名前空間
 namespace process {
@@ -9,7 +10,7 @@ namespace process {
 	/*概要：内部処理の入り口となるクラス
 	作成日：2017.9.21
 	作成者：K.Asada*/
-	public ref class Processing {
+	public ref class Processing : public StringProcessing{
 	public:
 		//デフォルトコンストラクタ
 		Processing() {
@@ -25,7 +26,7 @@ namespace process {
 		戻り値：なし
 		作成日：2017.9.21
 		作成者：K.Asada*/
-		Void Tablerun() {
+		Void Tablerun(String^ path) {
 		}
 
 		/*概要：JSONを読み込んで箇条書きの表を出力するための文字列処理を行う入り口となる関数
@@ -33,7 +34,7 @@ namespace process {
 		戻り値：なし
 		作成日：2017.9.21
 		作成者：K.Asada*/
-		Void Listrun() {
+		Void Listrun(String^ path) {
 		}
 
 		/*概要：DBからJSONを読み込んで表を出力するための文字列処理を行う入り口となる関数

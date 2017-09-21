@@ -24,7 +24,8 @@ namespace process {
 		Int32^ column = 0;		//表の列数
 		Int32^ colcount = 0;	//列数をカウントする変数
 		Int32^ rowcount = 0;	//行数をカウントする変数
-		CellDataChain::cellchain* Tablechain;	//JSONを文字列に変換して親子、兄弟関係のデータチェインを行うための構造体
+		CellDataChain::cellchain* Tablechain = nullptr;	//JSONを文字列に変換して親子、兄弟関係のデータチェインを行うための構造体
+		List<Int32>^ joinInfo = gcnew List<Int32>();	//結合情報を保持する動的配列
 		
 		/*概要：JSONを表に必要な文字列に変換する関数
 		引数：String^：DBから取得したJSONまたはファイルからJSONを読み込むためのファイルパス
@@ -137,6 +138,5 @@ namespace process {
 		Void CountCell(CellDataChain::cellchain* target, int tmp) {
 
 		}
-
 	};
 }

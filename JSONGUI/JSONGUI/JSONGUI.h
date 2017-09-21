@@ -1,5 +1,9 @@
 #pragma once
 
+#include "OptionForm.h"			//設定画面クラスのヘッダ
+#include "TableInformation.h"	//表画像関係の関数をまとめたクラスのヘッダ
+#include "Processing.h"			//内部処理クラスのヘッダ
+
 namespace JSONGUI {
 
 	using namespace System;
@@ -8,6 +12,7 @@ namespace JSONGUI {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace TableInformation;
 
 	/// <summary>
 	/// JSONGUI の概要
@@ -15,7 +20,9 @@ namespace JSONGUI {
 	/*概要：JSONを視覚的に作成するためのGUIメイン画面
 	作成日：2017.9.20
 	作成者：K.Asada*/
-	public ref class JSONGUI : public System::Windows::Forms::Form
+	public ref class JSONGUI
+		: public TableInformation
+	//	: public System::Windows::Forms::Form
 	{
 	public:
 		JSONGUI(void)
@@ -155,6 +162,7 @@ namespace JSONGUI {
 			this->buttonJoin->TabIndex = 10;
 			this->buttonJoin->Text = L"結合/解除";
 			this->buttonJoin->UseVisualStyleBackColor = true;
+			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONGUI::TableJoinClick);
 			// 
 			// buttonTableConv
 			// 
@@ -164,6 +172,7 @@ namespace JSONGUI {
 			this->buttonTableConv->TabIndex = 9;
 			this->buttonTableConv->Text = L"変換";
 			this->buttonTableConv->UseVisualStyleBackColor = true;
+			this->buttonTableConv->Click += gcnew System::EventHandler(this, &JSONGUI::TableConvClick);
 			// 
 			// buttonTableCancel
 			// 
@@ -173,6 +182,7 @@ namespace JSONGUI {
 			this->buttonTableCancel->TabIndex = 8;
 			this->buttonTableCancel->Text = L"キャンセル";
 			this->buttonTableCancel->UseVisualStyleBackColor = true;
+			this->buttonTableCancel->Click += gcnew System::EventHandler(this, &JSONGUI::TableCancelClick);
 			// 
 			// buttonTableOK
 			// 
@@ -182,6 +192,7 @@ namespace JSONGUI {
 			this->buttonTableOK->TabIndex = 7;
 			this->buttonTableOK->Text = L"OK";
 			this->buttonTableOK->UseVisualStyleBackColor = true;
+			this->buttonTableOK->Click += gcnew System::EventHandler(this, &JSONGUI::TableOKClick);
 			// 
 			// buttonConnect
 			// 
@@ -191,6 +202,7 @@ namespace JSONGUI {
 			this->buttonConnect->TabIndex = 6;
 			this->buttonConnect->Text = L"通信";
 			this->buttonConnect->UseVisualStyleBackColor = true;
+			this->buttonConnect->Click += gcnew System::EventHandler(this, &JSONGUI::ButtonConnectClick);
 			// 
 			// buttonOption
 			// 
@@ -223,6 +235,7 @@ namespace JSONGUI {
 			this->textBoxCell->Name = L"textBoxCell";
 			this->textBoxCell->Size = System::Drawing::Size(140, 76);
 			this->textBoxCell->TabIndex = 2;
+			this->textBoxCell->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUI::TextBoxCellMouseClick);
 			// 
 			// pictureBoxCurrent
 			// 
@@ -232,6 +245,7 @@ namespace JSONGUI {
 			this->pictureBoxCurrent->Size = System::Drawing::Size(83, 102);
 			this->pictureBoxCurrent->TabIndex = 1;
 			this->pictureBoxCurrent->TabStop = false;
+			this->pictureBoxCurrent->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUI::PictureBoxCurrentClick);
 			// 
 			// pictureBoxTable
 			// 
@@ -269,6 +283,7 @@ namespace JSONGUI {
 			this->buttonListConv->TabIndex = 19;
 			this->buttonListConv->Text = L"変換";
 			this->buttonListConv->UseVisualStyleBackColor = true;
+			this->buttonListConv->Click += gcnew System::EventHandler(this, &JSONGUI::ListConvClick);
 			// 
 			// buttonListCancel
 			// 
@@ -278,6 +293,7 @@ namespace JSONGUI {
 			this->buttonListCancel->TabIndex = 18;
 			this->buttonListCancel->Text = L"キャンセル";
 			this->buttonListCancel->UseVisualStyleBackColor = true;
+			this->buttonListCancel->Click += gcnew System::EventHandler(this, &JSONGUI::ListCancelClilck);
 			// 
 			// buttonListOK
 			// 
@@ -287,6 +303,7 @@ namespace JSONGUI {
 			this->buttonListOK->TabIndex = 17;
 			this->buttonListOK->Text = L"OK";
 			this->buttonListOK->UseVisualStyleBackColor = true;
+			this->buttonListOK->Click += gcnew System::EventHandler(this, &JSONGUI::ListOKClick);
 			// 
 			// buttonListConnect
 			// 
@@ -296,6 +313,7 @@ namespace JSONGUI {
 			this->buttonListConnect->TabIndex = 16;
 			this->buttonListConnect->Text = L"通信";
 			this->buttonListConnect->UseVisualStyleBackColor = true;
+			this->buttonListConnect->Click += gcnew System::EventHandler(this, &JSONGUI::ListConnectClick);
 			// 
 			// buttonListOption
 			// 
@@ -305,6 +323,7 @@ namespace JSONGUI {
 			this->buttonListOption->TabIndex = 15;
 			this->buttonListOption->Text = L"設定";
 			this->buttonListOption->UseVisualStyleBackColor = true;
+			this->buttonListOption->Click += gcnew System::EventHandler(this, &JSONGUI::ListOptionClick);
 			// 
 			// textBoxListRow
 			// 
@@ -375,7 +394,180 @@ private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  
 作成者：K.Asada*/
 private: System::Void buttonOption_Click(System::Object^  sender, System::EventArgs^  e) {
 	//設定画面を開くために設定画面クラスをインスタンス化
+	OptionForm^ opt = gcnew OptionForm();
+	//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
+	opt->FilePath = this->JSONFilePath;
+	//前回呼び出し時のデータが設定画面のテキストボックスに格納されるように渡す
+	opt->SendQuery = this->DBQuery;
+	//設定画面を開く
+	opt->ShowDialog();
+	//設定画面にて取得したJSONファイルパスを取得する
+	this->JSONFilePath = opt->FilePath;
+	//設定画面にて取得したDBクエリを取得する
+	this->DBQuery = opt->SendQuery;
 	
+}
+
+/*概要：プログラム終了時のイベント、終了するどうかの確認を行う。
+引数：
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada*/
+private: System::Void FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
+	//閉じる前にメッセージボックスを表示して確認を行う。
+	if (System::Windows::Forms::DialogResult::Cancel == MessageBox::Show("終了しますか？", "確認", MessageBoxButtons::OKCancel, MessageBoxIcon::Question)) {
+		//プログラムを終了する。
+		e->Cancel = true;
+	}
+}
+
+/*概要：テーブルタブに関する情報を初期化する関数
+引数：なし
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada*/
+private: Void TableInit() {
+	//基底クラスの初期化関数を呼び出す
+	this->InfoInit();
+	//表画像をコントロールから除外する
+	this->Controls->Remove(this->pictureBoxTable);
+	//選択箇所をハイライトする画像をコントロールから除外する
+	this->Controls->Remove(this->pictureBoxCurrent);
+	//表画像上のテキストボックスをコントロールから除外する
+	this->Controls->Remove(this->textBoxCell);
+}
+
+/*概要：テーブルタブのキャンセルボタンクリック時のイベント、テーブルタブに関する情報を初期化する関数を呼び出す
+引数：
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada*/
+private: System::Void TableCancelClick(System::Object^  sender, System::EventArgs^  e) {
+	//テーブルタブに関する情報を初期化する関数を呼び出す
+	this->TableInit();
+}
+
+/*概要：表画像のハイライトされている箇所をクリックしたときのイベント、テキストボックスを配置して編集可能状態にする
+引数：
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada*/
+private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//テキストボックスに情報を設定する関数を呼び出す
+	this->CellTextGenerate(this->textBoxCell);
+	//生成したテキストボックスをメイン画面のコントロールに乗せる
+	this->Controls->Add(this->textBoxCell);
+}
+
+/*概要：表画像上のテキストボックスをダブルクリックしたときのイベント、詳細情報変種画面を開く
+引数：
+戻り値：なし
+作成日：2017.9.20
+作成者：K.Asada */
+private: System::Void TextBoxCellMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+	//詳細画面クラスをインスタンス化する
+	//詳細画面を表示する
+}
+
+/*概要：通信ボタンのクリックイベント、DBクエリ処理関数を呼び出す
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void ButtonConnectClick(System::Object^  sender, System::EventArgs^  e) {
+	//内部処理クラスをインスタンス化
+	process::Processing^ proc = gcnew process::Processing(this->DBQuery);
+	//行数が入力されていれば行数を渡す、テキストボックスの中身はString^型のためInt32に変換を行う
+	proc->row = Convert::ToInt32(this->textBoxRow->Text);
+	//列数が入力されていれば列数を渡す、テキストボックスの中身はString^型のためInt32に変換を行う
+	proc->column = Convert::ToInt32(this->textBoxCol->Text);
+	//DBの内部処理関数を呼び出す
+	proc->DBrun(this->DBQuery);
+	//内部処理にて取得した行数をメンバへ格納する
+	this->Column = proc->column;
+	//内部処理にて取得した列数をメンバへ格納する
+	this->Row = proc->row;
+	//取得した構造体をメンバへ格納する
+	this->TableElem = proc->Tablechain;
+	//取得した結合情報をメンバへ格納する
+	this->JoinIndex = proc->joinInfo;
+	//表画像を生成する関数を呼び出す
+	//修正予定
+	//this->TableGenerate(this->pictureBoxTable);
+}
+
+/*概要：テーブルタブのOKボタンクリックイベント、内部処理クラスへ移行する
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  e) {
+}
+
+/*概要：テーブルタブの変換ボタンクリック時のイベント
+作成日：201.9.21
+作成者：K.Asada*/
+private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^  e) {
+	//内部処理クラスをインスタンス化
+	//コンストラクタを変更する可能性あり
+	process::Processing^ proc = gcnew process::Processing();
+	//文字列構造体を渡す
+	proc->Tablechain = this->TableElem;
+	//行数を渡す
+	proc->row = this->Row;
+	//列数を渡す
+	proc->column = this->Column;
+	//JSONに変換する関数を呼び出す
+	//proc->JSONRUN();
+}
+private: System::Void TableJoinClick(System::Object^  sender, System::EventArgs^  e) {
+}
+
+/*概要：箇条書き関係の情報を初期化する関数
+引数：なし
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: Void ListInit() {
+	//配列数テキストタブを初期化する
+	this->textBoxListRow->Clear();
+	//表画像の値編集用テキストボックスを初期化する
+	this->textBoxList->Clear();
+	//表画像を削除する
+	//修正予定
+	this->pictureBoxList->Clear();
+	//表画像ハイライト用の画像を削除する
+	//修正予定
+	this->pictureBoxListCurr->clear();
+}
+
+/*概要：リストタブのOKボタンクリックイベント、ファイルパスからJSONを読み込んで処理する
+引数：
+戻り値：なし
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void ListOKClick(System::Object^  sender, System::EventArgs^  e) {
+	//いろいろたりない
+	//内部処理関数を呼び出す
+	//proc->Listrun();
+	//表画像生成関数を呼び出す
+	//this->TableGenerate();
+}
+
+/*概要：リストタブのキャンセルボタンクリックイベント、初期化関数を呼び出す
+引数：
+戻り値：
+作成日：2017.9.21
+作成者：K.Asada*/
+private: System::Void ListCancelClilck(System::Object^  sender, System::EventArgs^  e) {
+	//初期化関数を呼び出す
+	this->ListInit();
+}
+private: System::Void ListConvClick(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void ListConnectClick(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void ListOptionClick(System::Object^  sender, System::EventArgs^  e) {
 }
 };
 }
