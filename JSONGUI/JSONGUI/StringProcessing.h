@@ -38,8 +38,10 @@ namespace process {
 		作成者：K.Asada*/
 		Void TableString(string json) {
 			ptree pt;						//ツリー構造にしたJSONを格納するためのツリー
+			stringstream ss;
+			ss << json;
 			//JSONを処理する準備として取得したJSON文字列をツリー構造にする
-			read_json(json, pt);
+			read_json(ss, pt);
 			//取得したJSON文字列をチェイン構造化する関数を呼び出す
 			this->Tablechain = this->JSONString(pt, "", nullptr);
 		}
@@ -115,8 +117,8 @@ namespace process {
 			CellDataChain::cellchain^ brother = gcnew CellDataChain::cellchain();		//兄弟を連結するための構造体
 			//初回ループ時の処理（初回はキー名がわからない、構造体が存在していないために作る）
 			if (key == "") {
-				//最上位の親の構造体を作成する
-				brother = MakeParent(pt);
+				auto itr = pt.begin();		//親キーを取得するためのイテレーターを宣言
+				string key = itr->first;	//初回処理の時はキー名が未知のためイテレーターにより動的に確保
 			}
 			//JSONツリーの兄弟について走査する
 			BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)) {
@@ -153,11 +155,11 @@ namespace process {
 						//弟にデータを連結する関数を呼び出す
 						brother = ChainCtrl.ChainYoungBrother(gcnew String(childkey.c_str()), gcnew String(childtree.get <std::string>(childkey).c_str()), brother);
 						//子にデータを連結するために再帰処理を行う
-						this->JSONString(childtree, childkey, brother);
+						brother->lower = this->JSONString(childtree, childkey, brother);
 					}
 				}
 			}
-			return brother;
+			return %*ChainCtrl.FirstChain(brother);
 		}
 
 
@@ -175,9 +177,9 @@ namespace process {
 			//引数に受け取った構造体の子として配列要素の構造体を連結する
 			arrayparent = ChainCtrl.ChainChild(gcnew String(key.c_str()), "", brother);
 			//イテレーターにより配列の要素を走査して連結してく
-			for (auto itr = info.begin; itr != info.end; itr++) {
+			for (auto itr = info.begin(); itr != info.end(); itr++) {
 				//弟として連結していく
-				arrayparent = ChainCtrl.ChainYoungBrother(gcnew String(itr->first.c_str()), gcnew String(itr->second.c_str()), arrayparent);
+				arrayparent = ChainCtrl.ChainYoungBrother(gcnew String(itr->first.c_str()), gcnew String(info.get<string>(itr->first).c_str()), arrayparent);
 			}
 			return brother;
 		}

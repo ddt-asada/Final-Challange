@@ -40,6 +40,9 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
+			if (target->key == nullptr && target->value == nullptr) {
+				return chain;
+			}
 			//連結対象に親がいるかを調べる
 			if (target->upper != nullptr) {
 				//元の親の子として連結用の構造体を連結する
@@ -60,6 +63,8 @@ public:
 			chain->prev = nullptr;
 			//弟がいないことを格納する
 			chain->next = nullptr;
+			//対象の親に新たな構造体を連結をした構造体を返す
+			return chain;
 		}
 		catch (NullReferenceException^ e) {
 			Console::WriteLine(e);
@@ -67,8 +72,6 @@ public:
 		catch (ArgumentNullException^ e) {
 			Console::WriteLine(e);
 		}
-		//対象の親に新たな構造体を連結をした構造体を返す
-		return target;
 	}
 
 	/*概要：子へデータを連結する関数
@@ -83,6 +86,10 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
+			//対象が空の場合は連結用の構造体をそのまま返す
+			if (target->key == nullptr && target->value == nullptr) {
+				return chain;
+			}
 			//連結対象に子がいるかを調べる
 			if (target->lower != nullptr) {
 				//元の子の親として連結用の構造体を連結する
@@ -103,6 +110,8 @@ public:
 			chain->prev = nullptr;
 			//弟がいないことを格納する
 			chain->next = nullptr;
+			//対象の子に新たな構造体を連結をした構造体を返す
+			return chain;
 		}
 		catch (NullReferenceException^ e) {
 			Console::WriteLine(e);
@@ -110,8 +119,6 @@ public:
 		catch (ArgumentNullException^ e) {
 			Console::WriteLine(e);
 		}
-		//対象の子に新たな構造体を連結をした構造体を返す
-		return target;
 	}
 
 	/*概要：兄へデータを連結する関数
@@ -126,6 +133,9 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
+			if (target->key == nullptr && target->value == nullptr) {
+				return chain;
+			}
 			//連結対象に兄がいるかを調べる
 			if (target->prev != nullptr) {
 				//元の兄の弟として連結用の構造体を連結する
@@ -146,6 +156,8 @@ public:
 			chain->upper = nullptr;
 			//子がいないことを格納する
 			chain->lower = nullptr;
+			//対象の兄に新たな構造体を連結をした構造体を返す
+			return chain;
 		}
 		catch (NullReferenceException^ e) {
 			Console::WriteLine(e);
@@ -153,8 +165,6 @@ public:
 		catch (ArgumentNullException^ e) {
 			Console::WriteLine(e);
 		}
-		//対象の兄に新たな構造体を連結をした構造体を返す
-		return target;
 	}
 
 	/*概要：弟へデータを連結する関数
@@ -169,6 +179,9 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
+			if (target->key == nullptr && target->value == nullptr) {
+				return chain;
+			}
 			//連結対象に弟がいるかを調べる
 			if (target->next != nullptr) {
 				//元の弟の兄として連結用の構造体を連結する
@@ -189,6 +202,8 @@ public:
 			chain->upper = nullptr;
 			//子がいないことを格納する
 			chain->lower = nullptr;
+			//対象の弟に新たな構造体を連結をした構造体を返す
+			return chain;
 		}
 		catch (NullReferenceException^ e) {
 			Console::WriteLine(e);
@@ -196,8 +211,6 @@ public:
 		catch (ArgumentNullException^ e) {
 			Console::WriteLine(e);
 		}
-		//対象の弟に新たな構造体を連結をした構造体を返す
-		return target;
 	}
 
 	/*指定された箇所の要素をチェイン構造から削除する関数
@@ -287,5 +300,11 @@ public:
 		catch (ArgumentNullException^ e) {
 			Console::WriteLine(e);
 		}
+	}
+
+	cellchain^ FirstChain(cellchain^ chain) {
+		for (; chain->prev != nullptr; chain = chain->prev) {
+		}
+		return chain;
 	}
 };

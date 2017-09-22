@@ -221,6 +221,7 @@ namespace JSONGUI {
 			this->textBoxRow->Name = L"textBoxRow";
 			this->textBoxRow->Size = System::Drawing::Size(100, 31);
 			this->textBoxRow->TabIndex = 4;
+			this->textBoxRow->Text = L"0";
 			// 
 			// textBoxCol
 			// 
@@ -228,6 +229,7 @@ namespace JSONGUI {
 			this->textBoxCol->Name = L"textBoxCol";
 			this->textBoxCol->Size = System::Drawing::Size(100, 31);
 			this->textBoxCol->TabIndex = 3;
+			this->textBoxCol->Text = L"0";
 			// 
 			// textBoxCell
 			// 
@@ -363,14 +365,14 @@ namespace JSONGUI {
 			this->pictureBoxList->TabStop = false;
 			this->pictureBoxList->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUIForm::PictureBoxListMouseClick);
 			// 
-			// JSONGUI
+			// JSONGUIForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->ClientSize = System::Drawing::Size(1460, 869);
 			this->Controls->Add(this->tabControl1);
-			this->Name = L"JSONGUI";
+			this->Name = L"JSONGUIForm";
 			this->Text = L"JSONGUI";
 			this->Load += gcnew System::EventHandler(this, &JSONGUIForm::JSONGUI_Load);
 			this->tabControl1->ResumeLayout(false);
@@ -448,7 +450,7 @@ private: System::Void TableCancelClick(System::Object^  sender, System::EventArg
 作成者：K.Asada*/
 private: System::Void ButtonConnectClick(System::Object^  sender, System::EventArgs^  e) {
 	//内部処理クラスをインスタンス化
-	process::Processing^ proc = gcnew process::Processing(this->DBQuery);
+	process::Processing^ proc = gcnew process::Processing();
 	//行数が入力されていれば行数を渡す、テキストボックスの中身はString^型のためInt32に変換を行う
 	proc->row = Convert::ToInt32(this->textBoxRow->Text);
 	//列数が入力されていれば列数を渡す、テキストボックスの中身はString^型のためInt32に変換を行う

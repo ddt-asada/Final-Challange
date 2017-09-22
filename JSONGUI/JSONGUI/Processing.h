@@ -75,7 +75,7 @@ namespace process {
 			//ファイルパスをstring型に変換する
 			this->MarshalString(jsonpath, path);
 			//文字列からJSONツリーを作成する
-			json = this->ConvertJSON();
+			json = this->ConvertJSON(path, nullptr);
 			//作成したJSONツリーをファイルに出力する
 			write_json(path, json);
 		}

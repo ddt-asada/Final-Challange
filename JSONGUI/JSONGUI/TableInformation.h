@@ -33,7 +33,7 @@ namespace TableInformation {
 		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
 		Int32^ RctHeight = 100;								//表の格子一つ当たりの高さ
 		List<int>^ JoinIndex = gcnew List<int>();		//セルの結合情報を保持するリスト型配列
-		CellDataChain::cellchain* TableElem = NULL;					//表の情報が格納されたデータチェイン
+		CellDataChain::cellchain^ TableElem = gcnew CellDataChain::cellchain();					//表の情報が格納されたデータチェイン
 		String^ JSONFilePath = Constants->EMPTY_STRING;		//読み込むJSONのファイルパス
 		String^ DBQuery = Constants->EMPTY_STRING;			//DBよりJSON文字列を取得するためのクエリ
 
@@ -44,7 +44,7 @@ namespace TableInformation {
 		作成者：K.Asada*/
 		PictureBox^ TableGenerate(PictureBox^ pict) {
 			//チェイン構造操作クラスをインスタンス化
-			CellDataChain* CellCtrl = new CellDataChain();
+			CellDataChain^ CellCtrl = gcnew CellDataChain();
 			//空のビットマップを生成
 			Bitmap^ img = gcnew Bitmap(*this->RctWidth * *this->Column + 1, *this->RctHeight * *this->Row + 1);
 			//描画を行うためのグラフィッククラスをインスタンス化
@@ -116,7 +116,7 @@ namespace TableInformation {
 		作成日：2017.9.20
 		作成者：K.Asada*/
 		PictureBox^ MoreDetail(PictureBox^ detailtable) {
-			CellDataChain::cellchain* detail;	//詳細画面に乗せるための構造体
+			CellDataChain::cellchain^ detail = gcnew CellDataChain::cellchain();	//詳細画面に乗せるための構造体
 			//チェイン構造操作クラスをインスタンス化
 			CellDataChain CellCtrl;
 			//描画用のビットマップを生成
@@ -128,7 +128,7 @@ namespace TableInformation {
 			//構造体の選択箇所の親キーをすべて連結する関数を呼び出す
 			//detail = CellCtrl.GetChainParent(detail);
 			//構造体の中身がなくなるまでループ
-			for (CellDataChain::cellchain* tmp = detail; tmp->lower != nullptr; tmp = tmp->lower) {
+			for (CellDataChain::cellchain^ tmp = detail; tmp->lower != nullptr; tmp = tmp->lower) {
 				//グラフィッククラスをインスタンス化
 				Graphics^ gr = Graphics::FromImage(img);
 				//セルを描画する
