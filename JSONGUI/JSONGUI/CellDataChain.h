@@ -25,6 +25,8 @@ public:
 
 	}
 
+	int getcount = 0;
+
 	/*概要：親へデータを連結する関数
 	引数：String^：親へ連結する構造体のキー名
 		　String^：親へ連結する構造体の値
@@ -266,10 +268,10 @@ public:
 		：Int32：取得したい要素の列座標
 	作成日：2017.9.22
 	作成者：K.Asada*/
-	String^ GetChainData(Int32 rowindex, Int32 columnindex, cellchain^ grandparent) {
+	cellchain^ GetChainData(Int32 rowindex, Int32 columnindex, cellchain^ grandparent) {
 		try {
 			cellchain^ scan = grandparent;		//走査用の構造体を宣言
-			String^ ret = "";					//返却用の文字列を宣言
+			cellchain^ ret = gcnew cellchain();					//返却用の文字列を宣言
 			//構造体の行方向への移動を行う
 			scan = scan->lower;
 			for (int i = 0; i < rowindex; i++) {
@@ -278,21 +280,26 @@ public:
 			}
 			//既に要素があれば
 			if (scan->value != "") {
-				//返却用文字列に値を代入
-				ret = scan->value;
-			}//さらに走査を行う
-			else {
-				//子を取得する
-				scan = scan->lower;
-				//弟へ移動していく
-				for (int i = 0; i < columnindex; i++) {
-					//弟を取得する
-					scan = scan->next;
+				//数をカウント
+				if (this->getcount == columnindex) {
+					//取得したい要素の位置を同じであった場合は取得する
+					ret = %*scan;
 				}
-				//値をとりだす
-				ret = scan->value;
+				else {
+					//数をカウントする
+					this->getcount += 1;
+				}
+			}//子を走査する関数を呼び出す
+			else if(scan->lower != nullptr){
+				//子を走査してデータを取得
+				ret = GetValue(columnindex, scan->lower);
 			}
-			return ret;
+			//ここまでで指定した場所に要素が存在していなければ
+			if (ret == nullptr) {
+				ret = ChainYoungBrother("", "", grandparent);
+			}
+			this->getcount = 0;
+			return %*ret;
 		}
 		catch (NullReferenceException^ e) {
 			Console::WriteLine(e);
@@ -300,6 +307,139 @@ public:
 		catch (ArgumentNullException^ e) {
 			Console::WriteLine(e);
 		}
+	}
+
+	/*概要：表に表示する要素を取得するための再帰関数
+	引数：Int32 columnindex：列数
+		：cellchain^ parent：走査対象の構造体
+	作成日：2017.9.24
+	作成者：K.Asada*/
+	cellchain^ GetValue(Int32 columnindex, cellchain^ parent) {
+		cellchain^ retdata = gcnew cellchain();
+		for (; this->getcount <= columnindex && parent != nullptr; parent = parent->next) {
+			//取得すべき要素があった場合
+			if (parent->value != "") {
+				//数をカウント
+				if (this->getcount == columnindex) {
+					//取得したい要素の位置を同じであった場合は取得する
+					retdata = %*parent;
+				}
+				else {
+					//数をカウントする
+					this->getcount += 1;
+				}
+			}
+			if (retdata->value != nullptr) {
+				break;
+			}
+			else if (parent->lower != nullptr) {
+				retdata = this->GetValue(columnindex, parent->lower);
+			}
+		}
+
+		return %*retdata;
+	}
+
+	/*概要：対象の構造体のすべての親キーを取得して連結した構造体を作る関数
+	引数：cellchain^ child：親キーを取得したい構造体
+	戻り値：cellchain^ child：対象の親キーをすべて連結した構造体
+	作成日：2017.9.25
+	作成者：K.Asad*/
+	cellchain^ GetParents(cellchain^ child) {
+		//取得した親キーを格納するための構造体
+		cellchain^ parent = gcnew cellchain();
+		//対象の構造体の長男まで移動する
+		for (; child->prev != nullptr; child = child->prev) {
+			//兄に移動していく
+		}
+		//長男に親が存在していた場合
+		if (child->upper != nullptr) {
+			//再帰して親の親キーがないかを調べて取得
+			parent = GetParents(child->upper);
+			//取得した親キーの子として現在の構造体を連結する
+			child = ChainChild(child->key, child->value, parent);
+		}
+		//親キーを連結した構造体を返却する
+		return child;
+	}
+
+	/*概要：行の要素の構造体を取得するための関数
+	引数：Int32：rowindex：取得対象の行
+		：Int32：colindex：取得対象の座標
+		：cellchain^ parent：要素が含まれた構造体
+	戻り値：要素の構造体
+	作成日：2017.9.25
+	作成者：K.Asada*/
+	cellchain^ GetColumnChain(Int32 rowindex, Int32 colindex, cellchain^ parent) {
+		int i = 0;
+		//取得した構造体を格納するための返却用の構造体
+		cellchain^ colchain = gcnew cellchain();
+		//親要素から取得対象の行の構造体を取得する
+		parent = GetRowChain(rowindex, parent);
+		//行の要素（子）が存在していれば対象の構造体を探す
+		if (parent->lower != nullptr) {
+			//子を取得
+			parent = parent->lower;
+			//取得対象の構造体まで移動する
+			for (; i < colindex; i++) {
+				//取得対象の構造体が存在していなければ中断する
+				if (parent->next != nullptr) {
+					//弟が存在していれば弟に移動する
+					parent = parent->next;
+				}
+				else {
+					//ループを抜ける
+					break;
+				}
+			}
+			//対象の構造体まで移動できなかったとき
+			if (i != colindex) {
+				//新たに弟を連結して連結先の構造体を取得する
+				colchain = this->ChainYoungBrother("", "", parent);
+			}
+			else {
+				//取得できていれば構造体を返却する
+				colchain = parent;
+			}
+		}//子がいなければ子を作る
+		else {
+			colchain = this->ChainChild("", "", parent);
+		}
+		return colchain;
+	}
+
+	/*概要：行の先頭の構造体を取得するための関数
+	引数：Int32 rowindex：取得対象の行
+		：cellchain^ parent：親の構造体
+	戻り値：cellchain^ rowchain：取得対象の構造体
+	作成日：2017.9.25
+	作成者：K.Asada*/
+	cellchain^ GetRowChain(Int32 rowindex, cellchain^ parent) {
+		//返却用の構造体を宣言する
+		cellchain^ rowchain = gcnew cellchain();
+		//走査用の変数
+		int i = 0;
+		//取得対象の構造体の位置まで移動する
+		for (; i < rowindex; i++) {
+			//移動先がなくなったときは中断する
+			if (parent->next != nullptr) {
+				parent = parent->next;
+			}
+			else {
+				break;
+			}
+		}
+		//対象の位置まで移動できていれば
+		if (i != rowindex) {
+			//新たに弟として構造体を連結する
+			rowchain = this->ChainYoungBrother("", "", parent);
+		}
+		else {
+			//取得対象の構造体を取得する
+			rowchain = parent;
+		}
+		//取得した構造体を返却する
+		return rowchain;
 	}
 
 	cellchain^ FirstChain(cellchain^ chain) {

@@ -24,12 +24,7 @@ namespace process {
 
 		}
 
-		Int32^ row = 0;			//表の行数
-		Int32^ column = 0;		//表の列数
-		Int32^ colcount = 0;	//列数をカウントする変数
-		Int32^ rowcount = 0;	//行数をカウントする変数
 		CellDataChain::cellchain^ Tablechain = gcnew CellDataChain::cellchain();	//JSONを文字列に変換して親子、兄弟関係のデータチェインを行うための構造体
-//		List<int>^ joinInfo = gcnew List<int>();	//結合情報を保持する動的配列
 		
 		/*概要：JSONを表に必要な文字列に変換する関数
 		引数：string json：ファイルから読み込んだJSON文字列
@@ -132,8 +127,10 @@ namespace process {
 				if (boost::optional<string>str = info.get_optional <string>(childkey)) {
 					//配列の要素がオブジェクトかただの配列かで処理を分岐
 					if (info.begin() != info.end()) {
+						brother = ChainCtrl.ChainYoungBrother(gcnew String(childkey.c_str()), gcnew String(childtree.get <std::string>(childkey).c_str()), brother);
 						//配列オブジェクトを構造体にチェインする関数を呼び出す
-						brother = this->ArrayJSONobject(info, brother, childkey);
+						brother->lower = this->ArrayJSONobject(info, brother, childkey);
+						brother->lower->upper = brother;
 					}//ただの配列だった場合
 					else {
 						//配列の構造体にチェインする関数を呼び出す
@@ -156,6 +153,7 @@ namespace process {
 						brother = ChainCtrl.ChainYoungBrother(gcnew String(childkey.c_str()), gcnew String(childtree.get <std::string>(childkey).c_str()), brother);
 						//子にデータを連結するために再帰処理を行う
 						brother->lower = this->JSONString(childtree, childkey, brother);
+						brother->lower->upper = brother;
 					}
 				}
 			}
@@ -175,13 +173,13 @@ namespace process {
 			CellDataChain::cellchain^ arrayparent = gcnew CellDataChain::cellchain();	//配列の要素を連結するための構造体を宣言
 			CellDataChain ChainCtrl;				//データチェインを操作するためにクラスをインスタンス化
 			//引数に受け取った構造体の子として配列要素の構造体を連結する
-			arrayparent = ChainCtrl.ChainChild(gcnew String(key.c_str()), "", brother);
+		//	arrayparent = ChainCtrl.ChainChild(gcnew String(key.c_str()), "", brother);
 			//イテレーターにより配列の要素を走査して連結してく
 			for (auto itr = info.begin(); itr != info.end(); itr++) {
 				//弟として連結していく
 				arrayparent = ChainCtrl.ChainYoungBrother(gcnew String(itr->first.c_str()), gcnew String(info.get<string>(itr->first).c_str()), arrayparent);
 			}
-			return brother;
+			return %*ChainCtrl.FirstChain(arrayparent);
 		}
 
 		/*概要：配列の文字列処理を行う関数
@@ -195,7 +193,7 @@ namespace process {
 			//配列を操作する
 			BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)){
 				//引数の構造体の弟として配列の要素を連結していく
-				brother = ChainCtrl.ChainYoungBrother("", gcnew String(child.first.c_str()), brother);
+				brother = ChainCtrl.ChainYoungBrother("", gcnew String(child.second.get<string>(child.first).c_str()), brother);
 			}
 			return brother;
 		}
@@ -215,55 +213,6 @@ namespace process {
 			return parent;
 		}
 
-		/*概要：行数と列数をカウントする関数
-		引数：CellDataChain::cellchain^：カウント対象の構造体
-			：int：再帰処理の際に利用する変数
-		戻り値：なし
-		作成日：2017.9.21
-		作成者：K.Asada*/
-		int CountCell(CellDataChain::cellchain^ target, int retcount) {
-			CellDataChain::cellchain^ scan = gcnew CellDataChain::cellchain();		//走査用の構造体を宣言
-			//弟方向に操作する
-			for (scan = target; scan->next != nullptr; scan = scan->next) {
-				//表に表示すべき要素（親キー以外）があれば
-				if (scan->value != "") {
-					//行カウントをインクリメント
-					*this->rowcount = 1;
-					//列カウントをインクリメント
-					*this->colcount += 1;
-				}
-				//子がいる場合は再帰処理していく
-				if (scan->lower != nullptr) {
-					//2回目以降の再帰であれば
-					if (retcount > 0) {
-						//再帰した回数に補正をかけながら再帰
-						CountCell(scan, retcount - 1);
-					}
-					else {
-						//そのまま再帰する
-						CountCell(scan, retcount);
-					}
-				}
-				//2階層以上上がるか最上位階層まで戻ったら
-				if (scan->upper == nullptr || retcount >= 2) {
-					//メンバの行数をインクリメント
-					*this->row += *this->rowcount;
-					//メンバの列数と比較し大きい方を採用
-					if (*this->column < *this->colcount) {
-						//大きい方を採用する
-						*this->column = *this->colcount;
-						//再帰回数をリセットする
-						retcount = -1;
-						//列数カウントをリセットする
-						this->colcount = 0;
-					}
-					this->rowcount = 0;
-				}
-				//階層カウントをインクリメントしながら戻る
-				return ++retcount;
-			}
-		}
-
 		/*String^型をstring型へ変換する関数
 		引数：String^ sys_string：変換対象の文字列
 		：string& std_string：変換後の文字列の格納先
@@ -278,5 +227,6 @@ namespace process {
 			std_string = chars;
 			Marshal::FreeHGlobal(IntPtr((void*)chars));
 		}
+
 	};
 }
