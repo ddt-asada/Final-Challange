@@ -1,18 +1,20 @@
 #pragma once
 
-#include "CellDataChain.h"	//自作データチェインクラス
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <Windows.h>
 #include <iostream>
 #include <string>
+#include "CellDataChain.h"	//自作データチェインクラス
 
-namespace process {
+namespace process{
 
-	using namespace System;
 	using namespace std;
+	using namespace System;
 	using namespace boost::property_tree;
+
 
 	/*概要：文字列関係の処理を行う関数
 	作成日：2017.9.21
@@ -127,7 +129,7 @@ namespace process {
 				if (boost::optional<string>str = info.get_optional <string>(childkey)) {
 					//配列の要素がオブジェクトかただの配列かで処理を分岐
 					if (info.begin() != info.end()) {
-						brother = ChainCtrl.ChainYoungBrother(gcnew String(childkey.c_str()), gcnew String(childtree.get <std::string>(childkey).c_str()), brother);
+						brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
 						//配列オブジェクトを構造体にチェインする関数を呼び出す
 						brother->lower = this->ArrayJSONobject(info, brother, childkey);
 						brother->lower->upper = brother;
@@ -146,11 +148,11 @@ namespace process {
 						//子要素のキーを取り出す
 						childkey = child.first;
 						//弟にデータを連結する関数を呼び出す
-						brother = ChainCtrl.ChainYoungBrother(gcnew String(childkey.c_str()), gcnew String(childtree.get <std::string>(childkey).c_str()), brother);
+						brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
 					} //親の場合は弟にデータを連結しながら子へ再帰していく
 					else {
 						//弟にデータを連結する関数を呼び出す
-						brother = ChainCtrl.ChainYoungBrother(gcnew String(childkey.c_str()), gcnew String(childtree.get <std::string>(childkey).c_str()), brother);
+						brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
 						//子にデータを連結するために再帰処理を行う
 						brother->lower = this->JSONString(childtree, childkey, brother);
 						brother->lower->upper = brother;
@@ -177,7 +179,7 @@ namespace process {
 			//イテレーターにより配列の要素を走査して連結してく
 			for (auto itr = info.begin(); itr != info.end(); itr++) {
 				//弟として連結していく
-				arrayparent = ChainCtrl.ChainYoungBrother(gcnew String(itr->first.c_str()), gcnew String(info.get<string>(itr->first).c_str()), arrayparent);
+				arrayparent = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<string>(itr->first)).c_str()), arrayparent);
 			}
 			return %*ChainCtrl.FirstChain(arrayparent);
 		}
@@ -193,7 +195,7 @@ namespace process {
 			//配列を操作する
 			BOOST_FOREACH(const ptree::value_type& child, pt.get_child(key)){
 				//引数の構造体の弟として配列の要素を連結していく
-				brother = ChainCtrl.ChainYoungBrother("", gcnew String(child.second.get<string>(child.first).c_str()), brother);
+				brother = ChainCtrl.ChainYoungBrother("", gcnew String(UTF8toSjis(child.second.get<string>(child.first)).c_str()), brother);
 			}
 			return brother;
 		}
@@ -228,5 +230,66 @@ namespace process {
 			Marshal::FreeHGlobal(IntPtr((void*)chars));
 		}
 
+		/*文字コードの変換を行う関数
+		作成日：2017.9.5
+		作成者：K.Asada
+		*/
+		std::string UTF8toSjis(std::string srcUTF8) {
+			//Unicodeへ変換後の文字列長を得る
+			int lenghtUnicode = MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, NULL, 0);
+
+			//必要な分だけUnicode文字列のバッファを確保
+			wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
+
+			//UTF8からUnicodeへ変換
+			MultiByteToWideChar(CP_UTF8, 0, srcUTF8.c_str(), srcUTF8.size() + 1, bufUnicode, lenghtUnicode);
+
+			//ShiftJISへ変換後の文字列長を得る
+			int lengthSJis = WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+
+			//必要な分だけShiftJIS文字列のバッファを確保
+			char* bufShiftJis = new char[lengthSJis];
+
+			//UnicodeからShiftJISへ変換
+			WideCharToMultiByte(CP_THREAD_ACP, 0, bufUnicode, lenghtUnicode + 1, bufShiftJis, lengthSJis, NULL, NULL);
+
+			std::string strSJis(bufShiftJis);
+
+			delete bufUnicode;
+			delete bufShiftJis;
+
+			return strSJis;
+		}
+
+		/*文字コードの変換を行う関数
+		作成日：2017.9.5
+		作成者：K.Asada*/
+		std::string SjistoUTF8(std::string srcSjis) {
+			//Unicodeへ変換後の文字列長を得る
+			int lenghtUnicode = MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, NULL, 0);
+
+			//必要な分だけUnicode文字列のバッファを確保
+			wchar_t* bufUnicode = new wchar_t[lenghtUnicode];
+
+			//ShiftJISからUnicodeへ変換
+			MultiByteToWideChar(CP_THREAD_ACP, 0, srcSjis.c_str(), srcSjis.size() + 1, bufUnicode, lenghtUnicode);
+
+
+			//UTF8へ変換後の文字列長を得る
+			int lengthUTF8 = WideCharToMultiByte(CP_UTF8, 0, bufUnicode, -1, NULL, 0, NULL, NULL);
+
+			//必要な分だけUTF8文字列のバッファを確保
+			char* bufUTF8 = new char[lengthUTF8];
+
+			//UnicodeからUTF8へ変換
+			WideCharToMultiByte(CP_UTF8, 0, bufUnicode, lenghtUnicode + 1, bufUTF8, lengthUTF8, NULL, NULL);
+
+			std::string strUTF8(bufUTF8);
+
+			delete bufUnicode;
+			delete bufUTF8;
+
+			return strUTF8;
+		}
 	};
 }

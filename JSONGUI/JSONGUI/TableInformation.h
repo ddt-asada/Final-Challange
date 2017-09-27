@@ -35,7 +35,7 @@ namespace TableInformation {
 		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
 		Int32^ RctHeight = 100;								//表の格子一つ当たりの高さ
 		List<int>^ JoinIndex = gcnew List<int>();		//セルの結合情報を保持するリスト型配列
-		CellDataChain::cellchain^ TableElem = gcnew CellDataChain::cellchain();					//表の情報が格納されたデータチェイン
+		CellDataChain::cellchain^ TableElem = nullptr;					//表の情報が格納されたデータチェイン
 		String^ JSONFilePath = Constants->EMPTY_STRING;		//読み込むJSONのファイルパス
 		String^ DBQuery = Constants->EMPTY_STRING;			//DBよりJSON文字列を取得するためのクエリ
 
@@ -58,7 +58,7 @@ namespace TableInformation {
 			//行数についてループ
 			for (int i = 0; i < *this->Row; i++) {
 				//長方形の大きさを指定
-				Rectangle^ rct = gcnew Rectangle(0, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
+				System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(0, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
 				//描画対象のデータが連結状態であれば
 				if (this->JoinIndex[i] != Constants->ZERO) {
 					//表に表示するデータが入った構造体を取得
@@ -69,27 +69,12 @@ namespace TableInformation {
 					gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
 				}//結合されていなければそのまま列のループに移る
 				else {
-					//表に表示するデータが入った構造体を取得
-					CellDataChain::cellchain^ elem = CellCtrl->GetRowChain(i, this->TableElem->lower);
-					//長方形を描画する
-					gr->DrawRectangle(Pens::Black, *rct);
-					//表示すべき要素がオブジェクトであれば
-					if (elem->lower != nullptr) {
-						//子要素を持っていることを明示するために色付けを行う
-						gr->FillRectangle(br, *rct);
-						//塗りつぶしたうえにキー名を描画する
-						gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
-					}//データだった場合には
-					else {
-						//塗りつぶしを行わずに値のみを描画する
-						gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
-					}
 					//行の要素の描画に移行する
 					for (int j = 0; j < *this->Column; j++) {
 						//表示すべき要素が入った構造体を取得する
 						CellDataChain::cellchain^ elem = CellCtrl->GetColumnChain(i, j, this->TableElem->lower);
 						//描画する長方形の大きさを設定する
-						Rectangle^ rct = gcnew Rectangle(*this->RctWidth*(j + 1), *this->RctHeight*i, *this->RctWidth, *this->RctHeight);
+						System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth*j, *this->RctHeight*i, *this->RctWidth, *this->RctHeight);
 						//格子を作成する
 						gr->DrawRectangle(Pens::Black, *rct);
 						//表示すべき要素がオブジェクトかデータかを判定する
@@ -161,18 +146,10 @@ namespace TableInformation {
 			Bitmap^ img = gcnew Bitmap(*this->RctWidth, *this->RctHeight * *this->Row);
 			//文字列を描画するときの書体を宣言
 			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
-			//選択箇所の構造体を取得する
-			//detail = CellCtrl.GetChainData(*this->RowIndex, *this->ColumnIndex, this->TableElem);
-			//構造体の選択箇所の親キーをすべて連結する関数を呼び出す
-			//detail = CellCtrl.GetChainParent(detail);
 			//構造体の中身がなくなるまでループ
 			for (CellDataChain::cellchain^ tmp = detail; tmp->lower != nullptr; tmp = tmp->lower) {
 				//グラフィッククラスをインスタンス化
 				Graphics^ gr = Graphics::FromImage(img);
-				//セルを描画する
-				//gr->DrawRectangle(Pens::Black, *this->RctWidth, *this->RctHeight);
-				//文字を描画する
-				//gr->DrawString(tmp->key, myFont, Brushes::Black);
 			}
 			//生成した画像をピクチャボックスに反映する
 			detailtable->Image = img;
@@ -222,17 +199,39 @@ namespace TableInformation {
 		作成日：2017.9.20
 		作成者：K.Asada*/
 		PictureBox^ ReTableGenerate(PictureBox^ repict) {
-			CellDataChain CellCtrl;
 			//描画の対象をすでに生成されている表画像にしてグラフィッククラスをインスタンス化
 			Graphics^ gr = Graphics::FromImage(repict->Image);
-			//塗りつぶし用のブラシを作成
+			//塗りつぶし用のブラシを作成する
 			Brush^ br = gcnew SolidBrush(Color::FromArgb(255, Color::White));
+			//描画する文字のフォントを作成する
+			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+			//構造体操作クラスをインスタンス化
+			CellDataChain^ CellCtrl = gcnew CellDataChain();
+			//要素が格納された構造体を取得する
+			CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
+			//描画するセルを設定する
+			System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex, *this->RctWidth, *this->RctHeight);
+			//描画する要素が書くのされた構造体を取得する
+			elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
 			//白で上書きするためにセルの大きさと同じ塗りつぶし長方形を描画
-			gr->FillRectangle(br, *this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex, *this->RctWidth, *this->RctHeight);
-			//白で塗りつぶしたときに枠線が消えるため再描画する
-			gr->DrawRectangle(Pens::Black, *this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex, *this->RctWidth, *this->RctHeight);
-			//文字が消えているため再描画する
-			//gr->DrawString(CellCtrl.GetChainData(*this->RowIndex, *this->ColumnIndex), myFont, Brushes::Black, *this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
+			gr->FillRectangle(br, *rct);
+			//子がいるかどうかでオブジェクトかどうかを判定する
+			if (elem->lower != nullptr) {
+				//塗りつぶし用のブラシを作成する
+				Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Blue));
+				//子がいればオブジェクトとして色付けを行う
+				gr->FillRectangle(br, *rct);
+				//長方形の枠線を描画する
+				gr->DrawRectangle(Pens::Black, *rct);
+				//オブジェクトのため構造体からキー名を取得して描画する
+				gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
+			}//子がいないときはデータとして色付けは行わない
+			else {
+				//枠線が消えるため再描画する
+				gr->DrawRectangle(Pens::Black,*rct);
+				//データのためキー名ではなく値を描画する
+				gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
+			}
 			//再描画の終えたピクチャボックスを返す
 			return repict;
 		}
@@ -243,7 +242,6 @@ namespace TableInformation {
 		作成日：2017.9.20
 		作成者：K.Asada*/
 		TextBox^ CellTextGenerate(TextBox^ cell) {
-			CellDataChain CellCtrl;
 			//結合状態であれば
 			if (this->JoinIndex[*this->RowIndex] != Constants->ZERO) {
 				//結合状態のため座標をその行の左上に合わせる
@@ -257,10 +255,21 @@ namespace TableInformation {
 				//サイズをセル一つ当たりの大きさに合わせる
 				cell->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
 			}
-			//テキストボックスに元の表画像にあった文字列を載せる
-//			cell->Text = CellCtrl.GetChainData(*this->RowIndex, *this->ColumnIndex);
-			//テキストボックスが後ろに隠れて見えないことがあるので明示的に前に配置
-			cell->BringToFront();
+			//構造体を操作するためのクラスをインスタンス化
+			CellDataChain^ CellCtrl = gcnew CellDataChain();
+			//要素が入った構造体を格納するための構造体を宣言
+			CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
+			//対象の構造体を取得する
+			elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
+			//構造体がオブジェクトかどうかを判定する
+			if (elem->lower != nullptr) {
+				//テキストボックスに対象の構造体のキー名を載せる
+				cell->Text = elem->key;
+			}
+			else {
+				//データの場合は値を載せる
+				cell->Text = elem->value;
+			}
 			//加工を終えたテキストボックスを返す
 			return cell;
 		}
@@ -311,24 +320,18 @@ namespace TableInformation {
 			//挿入対象の構造体を格納するための構造体
 			CellDataChain::cellchain^ parent = gcnew CellDataChain::cellchain();
 			//挿入対象の構造体を取得する
-			parent = cellctrl.GetRowChain(rowindex, this->TableElem);
+			parent = cellctrl.GetRowChain(rowindex, this->TableElem->lower);
 			//対象の弟として空の構造体を連結する
 			parent = cellctrl.ChainYoungBrother("", "", parent);
 			//子として連結する構造体を宣言する
 			CellDataChain::cellchain^ child = gcnew CellDataChain::cellchain();
 			//子を連結する
 			child = cellctrl.ChainChild("", "", parent);
-			//孫を連結する
-			cellctrl.ChainChild("", "", child);
 			//列数と同じだけ子に弟を連結してく
-			for (int i = 0; i < column; i++) {
+			for (int i = 2; i < column; i++) {
 				//弟を連結する
 				child = cellctrl.ChainYoungBrother("", "", child);
-				//孫を連結する
-				cellctrl.ChainChild("", "" , child);
 			}
-			//行数が増えたのでその分行数をインクリメントする
-			*this->Row += 1;
 			return;
 		}
 
@@ -345,7 +348,7 @@ namespace TableInformation {
 			//列要素に当たる構造体を挿入するための関数
 			for (int i = 0; i < row; i++) {
 				//行ごとの追加対象の構造体を取得する
-				parent = cellctrl.GetColumnChain(row, columnindex, this->TableElem);
+				parent = cellctrl.GetColumnChain(i, columnindex, this->TableElem->lower);
 				//対象に弟を連結する
 				cellctrl.ChainYoungBrother("", "", parent);
 			}
@@ -376,7 +379,7 @@ namespace TableInformation {
 				//行の親も列の要素の一つとするために列数カウントをインクリメント
 				*this->colcount += 1;
 				//行数をインクリメント
-				*this->Row += 1;
+				*this->rowcount += 1;
 				//子がいれば再帰して列数のカウントに移る
 				if (rowchain->lower != nullptr) {
 					//列数をカウントする関数を呼び出す
@@ -390,6 +393,13 @@ namespace TableInformation {
 				//列数カウントをリセットする
 				this->colcount = 0;
 			}
+			//ここまでカウントしてきた行数が既存の行数より大きければ
+			if (*this->rowcount > *this->Row) {
+				//大きい方を採用する
+				this->Row = this->rowcount;
+			}
+			//行数カウントをリセットする
+			this->rowcount = 0;
 			return;
 		}
 
@@ -398,32 +408,31 @@ namespace TableInformation {
 		戻り値：PictureBox^ pict：必要情報を設定したピクチャボックス
 		作成日：2017.9.25
 		作成者：K.Asada*/
-		PictureBox^ infoTableGenerate(PictureBox^ pict) {
-			CellDataChain cellctrl;
-			//表画像に表示する要素が含まれた構造体を取得するための空の構造体
+		PictureBox^ infoTableGenerate(CellDataChain::cellchain^ tableelem, PictureBox^ pict, Int32 parentcount) {
+			//構造体を操作するためのクラスをインスタンス化する
+			CellDataChain^ CellCtrl = gcnew CellDataChain();
+			//描画する対象の構造体を取得するための構造体
 			CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
-			//対象の構造体のすべての親キーを連結した構造体
-			elem = cellctrl.GetParents(this->TableElem);
-			//表画像を描画するための空のビットマップを宣言
-			Bitmap^ img = gcnew Bitmap(*this->RctWidth * *this->Column, *this->RctHeight);
-			//描画のための関数群クラスをインスタンス化
+			//描画を行う空のビットマップを作成する
+			Bitmap^ img = gcnew Bitmap(*this->RctWidth * parentcount, *this->RctHeight);
+			//描画を行うためのグラフィッククラスをインスタンス化
 			Graphics^ gr = Graphics::FromImage(img);
-			//文字列を描画するときの書体を宣言
+			//描画する文字のフォントを作成する
 			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
-			//取得した構造体に腹案れる親キーをすべて描画する
-			for (int i = 0; i < *this->Column; i++) {
-				//描画するセル一つ当たりの大きさを設定
-				Rectangle^ rct = gcnew Rectangle(*this->RctWidth * i, 0, *this->RctWidth, *this->RctHeight);
-				//セルを描画する
+			//親キーがなくなるまで走査する
+			for (int i = parentcount;i > 0;i--) {
+				//秒が対象のキー名が格納された構造体を取得する
+				elem = CellCtrl->GetParent(tableelem, i);
+				//描画するセルのプロパティを入力する
+				System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * (parentcount - i), 0, *this->RctWidth, *this->RctHeight);
+				//長方形を描画する
 				gr->DrawRectangle(Pens::Black, *rct);
-				//セルに対応した文字を描画する
+				//文字列を描画する
 				gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
-				//次の要素を描画するために構造体の中身を移動させる
-				elem = elem->upper;
 			}
-			//描画した表画像を受け取ったピクチャボックスに渡す
-			pict->Image= img;
-			//設定の終えたピクチャボックスを返す
+			//描画を終えたビットマップを設定する
+			pict->Image = img;
+			//ピクチャボックスを返却する
 			return pict;
 		}
 	};

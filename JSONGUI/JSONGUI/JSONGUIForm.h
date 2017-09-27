@@ -4,6 +4,7 @@
 #include "TableInformation.h"	//表画像関係の関数をまとめたクラスのヘッダ
 #include "MoreDetailForm.h"		//詳細画面クラスのヘッダ
 #include "Processing.h"			//内部処理クラスのヘッダ
+#include "MoreInfoForm.h"
 
 namespace JSONGUI {
 
@@ -274,6 +275,7 @@ namespace JSONGUI {
 			// textBoxCell
 			// 
 			this->textBoxCell->Location = System::Drawing::Point(1246, 316);
+			this->textBoxCell->Multiline = true;
 			this->textBoxCell->Name = L"textBoxCell";
 			this->textBoxCell->Size = System::Drawing::Size(140, 31);
 			this->textBoxCell->TabIndex = 2;
@@ -433,12 +435,6 @@ namespace JSONGUI {
 /*概要：メイン画面ロード時の初期化イベント*/
 private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  e) {
 	if (this->TableElem != nullptr) {
-		//内部処理クラスをインスタンス化
-	//	process::Processing^ proc = gcnew process::Processing();
-		//JSONをチェイン構造に変換する関数を呼び出す
-	//	proc->Tablerun(this->JSONFilePath);
-		//構造体をメンバへ格納する
-	//	this->TableElem = %*proc->Tablechain;
 		//表画像を生成するための準備関数を呼び出す
 		this->ReadyPict(this->TableElem);
 		//表画像を生成する関数を呼び出す
@@ -653,7 +649,7 @@ private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::Ev
 	//テキストボックスに情報を設定する関数を呼び出す
 	this->CellTextGenerate(this->textBoxCell);
 	//生成したテキストボックスをメイン画面のコントロールに乗せる
-	this->pictureBoxCurrent->Controls->Add(this->textBoxCell);
+	this->pictureBoxTable->Controls->Add(this->textBoxCell);
 	this->textBoxCell->BringToFront();
 }
 
@@ -667,6 +663,8 @@ private: System::Void PictureBoxListCurrClick(System::Object^  sender, System::E
 	this->CellTextGenerate(this->textBoxList);
 	//情報が設定されたテキストボックスをコントロールに追加して表示する
 	this->Controls->Add(this->textBoxList);
+	//テキストボックスを前面に押し出す
+	this->textBoxList->BringToFront();
 }
 
 /*概要：表画像の値編集用のテキストボックスがダブルクリックされたときのイベント
@@ -688,9 +686,21 @@ private: System::Void TextBoxListClick(System::Object^  sender, System::EventArg
 作成者：K.Asada*/
 private: System::Void TextBoxCellClick(System::Object^  sender, System::EventArgs^  e) {
 	//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
-	MoreDetailForm^ more = gcnew MoreDetailForm();
+	MoreInfoForm^ more = gcnew MoreInfoForm();
+	//詳細ダイアログへ渡す構造体を宣言
+	CellDataChain::cellchain^ child = gcnew CellDataChain::cellchain();
+	//構造体操作クラスをインスタンス化
+	CellDataChain^ CellCtrl = gcnew CellDataChain();
+	//渡す構造体を取得する
+	child = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
+	//詳細ダイアログへ構造体を渡す
+	more->TableElem = child;
 	//新規ダイアログで表示する
 	more->ShowDialog();
+	//終わったら表画像を再描画する
+	this->ReadyPict(this->TableElem);
+	//表画像を再描画する
+	this->TableGenerate(this->pictureBoxTable);
 }
 
 /*行追加ボタンのクリックイベント、表画像に行を挿入する
@@ -699,6 +709,8 @@ private: System::Void TextBoxCellClick(System::Object^  sender, System::EventArg
 private: System::Void AddRowButtonClick(System::Object^  sender, System::EventArgs^  e) {
 	//行を挿入する関数を呼び出す
 	this->RowAdd(*this->RowIndex, *this->Column);
+	//行を追加したため表を再描画したいので準備を行う
+	this->ReadyPict(this->TableElem);
 	//行を挿入した後の表画像を再描画する関数を呼び出す
 	this->TableGenerate(this->pictureBoxTable);
 	return;
@@ -709,7 +721,9 @@ private: System::Void AddRowButtonClick(System::Object^  sender, System::EventAr
 作成者：K.Asada*/
 private: System::Void AddColumnButtonClick(System::Object^  sender, System::EventArgs^  e) {
 	//列を挿入する関数を呼び出す
-	this->ColumnAdd(*this->RowIndex, *this->ColumnIndex);
+	this->ColumnAdd(*this->Row, *this->ColumnIndex);
+	//列を追加したため表を再描画したいので準備を行う
+	this->ReadyPict(this->TableElem);
 	//列を挿入した後の表を再描画
 	this->TableGenerate(this->pictureBoxTable);
 	return;
@@ -724,11 +738,22 @@ private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows:
 	//エンターキーが押されたときのイベント
 	if (e->KeyCode == Keys::Enter) {
 		//挿入対象の構造体を取得するための構造体
-		CellDataChain::cellchain^ chain = gcnew CellDataChain::cellchain();
+		CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
 		//挿入対象のセルの構造体を取得する
-		chain = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem);
-		//対象のセルに値を格納する
-		chain->value = this->textBoxCell->Text;
+		elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
+		//対象の構造体のキー名と値のどちらに挿入するかを判定するために分岐を行う
+		if (elem->lower != nullptr) {
+			//対象のセルにキー名を格納する
+			elem->key = this->textBoxCell->Text;
+		}
+		else {
+			//対象のセルに値を格納する
+			elem->value = this->textBoxCell->Text;
+		}
+		//セルの再描画を行う
+		this->ReTableGenerate(this->pictureBoxTable);
+		//テキストボックスを表示しないようにする
+		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
 	}
 }
 
@@ -757,10 +782,11 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 	 //表示する構造体を取得して格納するための構造体
 	 CellDataChain::cellchain^ detailtable = gcnew CellDataChain::cellchain();
 	 //構造体を取得する
-	 detailtable = CellCtrl->GetRowChain(*this->RowIndex, this->TableElem->lower);
+	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
 	 //新規に開くダイアログの初期値として構造体を設定
 	 more->TableElem = detailtable;
 	 more->ShowDialog();
+	 this->ReTableGenerate(this->pictureBoxTable);
 	 return;
 }
 
