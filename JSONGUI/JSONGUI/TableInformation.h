@@ -51,22 +51,16 @@ namespace TableInformation {
 			Bitmap^ img = gcnew Bitmap(*this->RctWidth * *this->Column + 1, *this->RctHeight * *this->Row + 1);
 			//描画を行うためのグラフィッククラスをインスタンス化
 			Graphics^ gr = Graphics::FromImage(img);
-			//表に表示する要素としてオブジェクトがあった場合に色付けを行うためのブラシを生成
-			Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Blue));
-			//文字列を描画するときの書体を宣言
-			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 			//行数についてループ
 			for (int i = 0; i < *this->Row; i++) {
-				//長方形の大きさを指定
-				System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(0, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
 				//描画対象のデータが連結状態であれば
 				if (this->JoinIndex[i] != Constants->ZERO) {
 					//表に表示するデータが入った構造体を取得
 					CellDataChain::cellchain^ elem = CellCtrl->GetColumnChain(i, JoinIndex[i], this->TableElem->lower);
-					//その行を一つの格子で表現する
-					gr->DrawRectangle(Pens::Black, *rct);
-					//連結時に選択していた格子の文字列を描画する
-					gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
+					//描画するセルの情報を設定する
+					System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * *this->Column, *this->RctHeight * i, *this->RctWidth, *this->RctHeight);
+					//セルを描画する関数を呼び出す
+					this->DrawFigure(*rct, gr, elem);
 				}//結合されていなければそのまま列のループに移る
 				else {
 					//行の要素の描画に移行する
@@ -75,18 +69,8 @@ namespace TableInformation {
 						CellDataChain::cellchain^ elem = CellCtrl->GetColumnChain(i, j, this->TableElem->lower);
 						//描画する長方形の大きさを設定する
 						System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth*j, *this->RctHeight*i, *this->RctWidth, *this->RctHeight);
-						//格子を作成する
-						gr->DrawRectangle(Pens::Black, *rct);
-						//表示すべき要素がオブジェクトかデータかを判定する
-						if (elem->lower != nullptr) {
-							//子要素を持っていることを明示するために色付けを行う
-							gr->FillRectangle(br, *rct);
-							//塗りつぶしたうえにキー名を描画する
-							gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
-						}//データばあいは値を表示
-						else {
-							gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
-						}
+						//セルを描画する関数を呼び出す
+						this->DrawFigure(*rct, gr, elem);
 					}
 				}
 			}
@@ -203,8 +187,6 @@ namespace TableInformation {
 			Graphics^ gr = Graphics::FromImage(repict->Image);
 			//塗りつぶし用のブラシを作成する
 			Brush^ br = gcnew SolidBrush(Color::FromArgb(255, Color::White));
-			//描画する文字のフォントを作成する
-			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 			//構造体操作クラスをインスタンス化
 			CellDataChain^ CellCtrl = gcnew CellDataChain();
 			//要素が格納された構造体を取得する
@@ -215,23 +197,8 @@ namespace TableInformation {
 			elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
 			//白で上書きするためにセルの大きさと同じ塗りつぶし長方形を描画
 			gr->FillRectangle(br, *rct);
-			//子がいるかどうかでオブジェクトかどうかを判定する
-			if (elem->lower != nullptr) {
-				//塗りつぶし用のブラシを作成する
-				Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Blue));
-				//子がいればオブジェクトとして色付けを行う
-				gr->FillRectangle(br, *rct);
-				//長方形の枠線を描画する
-				gr->DrawRectangle(Pens::Black, *rct);
-				//オブジェクトのため構造体からキー名を取得して描画する
-				gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
-			}//子がいないときはデータとして色付けは行わない
-			else {
-				//枠線が消えるため再描画する
-				gr->DrawRectangle(Pens::Black,*rct);
-				//データのためキー名ではなく値を描画する
-				gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
-			}
+			//セルを描画する関数を呼び出す
+			this->DrawFigure(*rct, gr, elem);
 			//再描画の終えたピクチャボックスを返す
 			return repict;
 		}
@@ -242,36 +209,49 @@ namespace TableInformation {
 		作成日：2017.9.20
 		作成者：K.Asada*/
 		TextBox^ CellTextGenerate(TextBox^ cell) {
-			//結合状態であれば
-			if (this->JoinIndex[*this->RowIndex] != Constants->ZERO) {
-				//結合状態のため座標をその行の左上に合わせる
-				cell->Location = System::Drawing::Point(0, *this->RctHeight * *this->RowIndex);
-				//結合状態のため、サイズをその行全体の大きさに合わせる
-				cell->Size = System::Drawing::Size(*this->RctWidth * *this->Column, *this->RctHeight);
-			}//結合状態でなければ
-			else {
-				//座標を選択中のセルの左上に合わせる
-				cell->Location = System::Drawing::Point(*this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
-				//サイズをセル一つ当たりの大きさに合わせる
-				cell->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
+			//nullptrを指したときの例外処理
+			try {
+				//結合状態であれば
+				if (this->JoinIndex[*this->RowIndex] != Constants->ZERO) {
+					//結合状態のため座標をその行の左上に合わせる
+					cell->Location = System::Drawing::Point(0, *this->RctHeight * *this->RowIndex);
+					//結合状態のため、サイズをその行全体の大きさに合わせる
+					cell->Size = System::Drawing::Size(*this->RctWidth * *this->Column, *this->RctHeight);
+				}//結合状態でなければ
+				else {
+					//座標を選択中のセルの左上に合わせる
+					cell->Location = System::Drawing::Point(*this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
+					//サイズをセル一つ当たりの大きさに合わせる
+					cell->Size = System::Drawing::Size(*this->RctWidth + 1, *this->RctHeight + 1);
+				}
+				//構造体を操作するためのクラスをインスタンス化
+				CellDataChain^ CellCtrl = gcnew CellDataChain();
+				//要素が入った構造体を格納するための構造体を宣言
+				CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
+				//対象の構造体を取得する
+				elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
+				//構造体がオブジェクトかどうかを判定する
+				if (elem != nullptr && elem->lower != nullptr) {
+					//テキストボックスに対象の構造体のキー名を載せる
+					cell->Text = elem->key;
+				}
+				else if (elem != nullptr) {
+					//データの場合は値を載せる
+					cell->Text = elem->value;
+				}
+				else {
+					//構造体が取得できていない場合は空文字を挿入する
+					cell->Text = "";
+				}
+				//加工を終えたテキストボックスを返す
+				return cell;
 			}
-			//構造体を操作するためのクラスをインスタンス化
-			CellDataChain^ CellCtrl = gcnew CellDataChain();
-			//要素が入った構造体を格納するための構造体を宣言
-			CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
-			//対象の構造体を取得する
-			elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
-			//構造体がオブジェクトかどうかを判定する
-			if (elem->lower != nullptr) {
-				//テキストボックスに対象の構造体のキー名を載せる
-				cell->Text = elem->key;
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
 			}
-			else {
-				//データの場合は値を載せる
-				cell->Text = elem->value;
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
 			}
-			//加工を終えたテキストボックスを返す
-			return cell;
 		}
 
 		/*概要：このクラスのメンバ変数を初期化する関数
@@ -311,28 +291,41 @@ namespace TableInformation {
 
 		/*概要：表に行を挿入するための関数
 		引数：Int32 rowindex：挿入対象の行
-			：Int32 column：表全体の列数
+		引数：String^ select：挿入方向を示す文字列
 		戻り値：なし
 		作成日：2017.9.25
-		作成者：K.Asada*/
-		Void RowAdd(Int32 rowindex, Int32 column) {
-			CellDataChain cellctrl;
-			//挿入対象の構造体を格納するための構造体
-			CellDataChain::cellchain^ parent = gcnew CellDataChain::cellchain();
-			//挿入対象の構造体を取得する
-			parent = cellctrl.GetRowChain(rowindex, this->TableElem->lower);
-			//対象の弟として空の構造体を連結する
-			parent = cellctrl.ChainYoungBrother("", "", parent);
-			//子として連結する構造体を宣言する
-			CellDataChain::cellchain^ child = gcnew CellDataChain::cellchain();
-			//子を連結する
-			child = cellctrl.ChainChild("", "", parent);
-			//列数と同じだけ子に弟を連結してく
-			for (int i = 2; i < column; i++) {
-				//弟を連結する
-				child = cellctrl.ChainYoungBrother("", "", child);
+		作成者：K.Asada
+		更新内容：引数として行を与えるだけで動作するように変更、追加対象を兄弟だけに変更
+		更新日：2017.9.27
+		更新者：K.Asasda
+		更新内容：挿入方向を指定するように変更
+		更新日：2017.9.28
+		更新者：K.Asada
+		*/
+		Void RowAdd(Int32 rowindex, String^ select) {
+			try {
+				CellDataChain^ CellCtrl = gcnew CellDataChain();
+				//挿入対象の構造体を格納するための構造体
+				CellDataChain::cellchain^ parent = nullptr;
+				//挿入対象の構造体を取得する
+				parent = CellCtrl->GetRowChain(rowindex, this->TableElem->lower);
+				//行の挿入方向が上に指定されていたら
+				if (select == "ElderButton") {
+					//上方向に行を追加する
+					CellCtrl->ChainElderBrother("", "", parent);
+				}//行の挿入方向を下に指定する
+				else {
+					//下方向に行を追加する
+					parent = CellCtrl->ChainYoungBrother("", "", parent);
+				}
+				return;
 			}
-			return;
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
+			}
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
+			}
 		}
 
 		/*概要：表に列を追加するための関数
@@ -340,17 +333,59 @@ namespace TableInformation {
 			：Int32 columnindex：追加対象の列座標
 		戻り値：なし
 		作成日：2017.9.25
-		作成者：K.Asada*/
-		Void ColumnAdd(Int32 row, Int32 columnindex) {
-			CellDataChain cellctrl;
-			//表の親の構造体を格納するための構造体
-			CellDataChain::cellchain^ parent = gcnew CellDataChain::cellchain();
-			//列要素に当たる構造体を挿入するための関数
-			for (int i = 0; i < row; i++) {
-				//行ごとの追加対象の構造体を取得する
-				parent = cellctrl.GetColumnChain(i, columnindex, this->TableElem->lower);
-				//対象に弟を連結する
-				cellctrl.ChainYoungBrother("", "", parent);
+		作成者：K.Asada
+		更新内容：追加対象の構造体が取得できなかったときはその行の一番弟の構造体に一つ弟を追加するように変更
+		更新日：2017.9.27
+		更新者：K.Asada
+		更新内容：列を追加する方向を指定するように変更
+		更新日：2017.9.28
+		更新者：K.Asada*/
+		Void ColumnAdd(Int32 row, Int32 columnindex, String^ select) {
+			try {
+				CellDataChain^ CellCtrl = gcnew CellDataChain();
+				//表の親の構造体を格納するための構造体
+				CellDataChain::cellchain^ parent = gcnew CellDataChain::cellchain();
+				//列要素に当たる構造体を挿入するための関数
+				for (int i = 0; i < row; i++) {
+					//列座標が0より下の時は行の先頭を選択しているとするための分岐
+					if (columnindex > 0) {
+						//行ごとの追加対象の構造体を取得する
+						parent = CellCtrl->GetColumnChain(i, columnindex, this->TableElem->lower);
+						//対象の構造体が取得できなかったときはその行の先頭の構造体を取得する
+						if (parent == nullptr) {
+							//新規で列方向に構造体を連結するための関数を呼び出す
+							this->AddYoungColumn(i);
+						}//対象を取得できた場合はどの方向に追加するかを判定する
+						else {
+							//追加方向に左（自分より上）が指定されていたら
+							if (select == "ElderButton") {
+								//新規で兄を連結する関数を呼び出す
+								CellCtrl->ChainElderBrother("", "", parent);
+							}
+							else {
+								//対象に弟を連結する
+								CellCtrl->ChainYoungBrother("", "", parent);
+							}
+						}
+					}//行を選択している場合は行の直下の子供を追加するようにする
+					else {
+						//先頭より左側には列を追加できないのでそれをはじくための分岐
+						if (select == "ElderButton") {
+							//左側に列を追加できない旨を出力
+							MessageBox::Show("先頭より左方向に列は追加できません");
+						}//それ以外の時は右方向に列を構造体を連結する関数を呼び出す
+						else {
+							this->AddYoungColumn(i);
+						}
+					}
+				}
+				return;
+			}
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
+			}
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
 			}
 		}
 
@@ -417,23 +452,80 @@ namespace TableInformation {
 			Bitmap^ img = gcnew Bitmap(*this->RctWidth * parentcount, *this->RctHeight);
 			//描画を行うためのグラフィッククラスをインスタンス化
 			Graphics^ gr = Graphics::FromImage(img);
-			//描画する文字のフォントを作成する
-			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 			//親キーがなくなるまで走査する
-			for (int i = parentcount;i > 0;i--) {
+			for (int i = parentcount;i > 0 ;i--) {
 				//秒が対象のキー名が格納された構造体を取得する
 				elem = CellCtrl->GetParent(tableelem, i);
 				//描画するセルのプロパティを入力する
 				System::Drawing::Rectangle^ rct = gcnew System::Drawing::Rectangle(*this->RctWidth * (parentcount - i), 0, *this->RctWidth, *this->RctHeight);
-				//長方形を描画する
-				gr->DrawRectangle(Pens::Black, *rct);
-				//文字列を描画する
-				gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
+				//セルの描画を行う関数を呼び出す
+				this->DrawFigure(*rct, gr, elem);
 			}
 			//描画を終えたビットマップを設定する
 			pict->Image = img;
 			//ピクチャボックスを返却する
 			return pict;
+		}
+
+		/*概要：取得したデータより表画像のセルを一つ分描画する関数
+		引数：Rectangle^ rct：描画するセルの大きさと座標情報
+			：Graphics^ gr：描画対象のグラフィッククラス
+			：cellchain^ elem：描画したセルの中に表示する文字列が格納された構造体
+		戻り値：なし
+		作成日：2017.9.27
+		作成者：K.Asada*/
+		Void DrawFigure(System::Drawing::Rectangle^ rct, Graphics^ gr, CellDataChain::cellchain^ elem) {
+			//描画する文字列のフォントを宣言
+			System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
+			//描画対象の構造体がオブジェクトであったときに色付けを行うためのブラシを宣言
+			Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Blue));
+			//セルの外枠を描画する
+			gr->DrawRectangle(Pens::Black, *rct);
+			//対象の構造体に子が存在している場合はオブジェクトとして扱う
+			if (elem != nullptr && elem->lower != nullptr) {
+				//オブジェクトであることを明示するために色付けを行う
+				gr->FillRectangle(br, *rct);
+				//オブジェクトの場合はキー名を描画する
+				gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
+			}//子がいない構造体である場合はデータとして扱う
+			else if (elem != nullptr) {
+				//データの場合は値を描画する
+				gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
+			}//構造体を取得していなかったときは何も描画しない
+			return;
+		}
+
+		/*概要：対象のセルより若い方向（親または兄）に構造体を新規で連結する関数
+		引数：Int32 rowindex：追加対象のセル
+		戻り値：なし
+		作成日：2017.9.28
+		作成者：K.Asada*/
+		Void AddYoungColumn(Int32 rowindex) {
+			try {
+				//構造体操作クラスをインスタンス化
+				CellDataChain^ CellCtrl = gcnew CellDataChain();
+				CellDataChain::cellchain^ parent = nullptr;		//対象となる構造体を格納するための構造体
+				//対象となる構造体を取得する
+				parent = CellCtrl->GetRowChain(rowindex, this->TableElem->lower);
+				//対象の構造体に子がいれば
+				if (parent->lower != nullptr) {
+					//対象の構造体の一番弟を取得する
+					parent = CellCtrl->GetYoungChain(parent->lower);
+					//対象の弟として新規で構造体を連結する
+					CellCtrl->ChainYoungBrother("", "", parent);
+				}//子がいない場合は子を連結する
+				else {
+					//新規で子を連結する
+					CellCtrl->ChainChild("", "", parent);
+				}
+				return;
+			}
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
+			}
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
+			}
 		}
 	};
 }

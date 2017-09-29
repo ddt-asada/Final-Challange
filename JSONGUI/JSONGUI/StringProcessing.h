@@ -74,32 +74,71 @@ namespace process{
 			：cellchain^ json：値を取得するための親の構造体
 		戻り値：ptree：文字列から作成したJSONツリー
 		作成日：2017.9.21
-		作成者：K.Asada*/
-		ptree ConvertJSON(std::string key, CellDataChain::cellchain^ json) {
-			ptree parent;	//子要素を連結するための親ツリー
-			ptree child;	//親ツリーに連結する子ツリー
-			string parentkey;		//親キーを格納するための文字列
-			//弟に向かって走査する
-			for (; json->next != nullptr; json = json->next) {
-				//親キーを保管する
-				this->MarshalString(json->key,parentkey);
-				//子がいれば再帰して子に潜っていく
-				if (json->lower != nullptr) {
-					//再帰処理して帰ってきた子ツリーを取得する
-					child = ConvertJSON(parentkey, json);
-				}//子がいない場合は親キーと値をセットにしてツリーに追加
-				else {
-					string value;
-					MarshalString(json->value, value);
-					//親キーと値をセットにして子ツリーに格納
-					child.add(parentkey, value);
+		作成者：K.Asada
+		更新日：2017.9.27
+		更新者：K.Asada
+		更新内容：オブジェクト配列にも対応するように変更*/
+		ptree ConvertJSON(string parentkey, CellDataChain::cellchain^ parentjson) {
+			try {
+				ptree child;		//同じ階層のツリーを連結したものを格納するためのツリー
+				ptree grandchild;	//再帰から帰ってきたツリーを格納するためのツリー
+				string key = "";	//キー名を格納するための文字列
+				string value = "";	//値を格納するための文字列
+				//構造体の中身がなくなるまで走査する
+				for (; parentjson != nullptr; parentjson = parentjson->next) {
+					//文字列のキャストを行う
+					this->MarshalString(parentjson->key, key);
+					//文字列のキャストを行う
+					this->MarshalString(parentjson->value, value);
+					//キー名が空かどうかで配列の処理と通常の処理に分岐する
+					if (key != "") {
+						//構造体に子がいる場合は再帰処理して子のJSONをつくる
+						if(parentjson->lower != nullptr){
+							//再帰処理を行い子ツリーを取得する
+							grandchild = this->ConvertJSON(key, parentjson->lower);
+							//子ツリーをこの階層のツリーに連結していく
+							child.push_back(std::make_pair(key, grandchild));
+							//再帰処理にて取得した子ツリーを次の処理に備えて初期化する
+							grandchild.clear();
+						}//子がいない場合はキーと値をペアにしてノードを作る
+						else {
+							//子ノードを作る
+							child.add(key, value);
+						}
+					}
+					//キー名が空の場合は配列として配列用の処理に分岐
+					else {
+						//子が存在する場合はオブジェクト配列として扱う
+						if (parentjson->lower != nullptr) {
+							//再帰処理を行い子ツリーを取得する
+							grandchild = this->ConvertJSON(key, parentjson->lower);
+							//子ツリーをこの階層のツリーに連結しいていく
+							child.push_back(std::make_pair(key, grandchild));
+							//再帰処理にて取得した子ツリーを次の処理に備えて初期化する
+							grandchild.clear();
+						}
+						//子がいない場合は配列としてツリーに連結していく
+						else {
+							//子ノードを作る
+							grandchild.put(key, value);
+							//子ノードを配列としてこの階層のツリーに連結していく
+							child.push_back(std::make_pair(key, grandchild));
+							//子ノードを次の処理に備えて初期化する
+							grandchild.clear();
+						}
+					}
 				}
-				//親キーと子ツリーを連結する
-				parent.add_child(parentkey, child);
+				//作成したJSONツリーを返却する
+				return child;
 			}
-			//作成したJSONツリーを返却する
-			return parent;
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
+			}
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
+			}
 		}
+
 
 		/*概要：JSONをチェイン構造文字列に変換する関数
 		引数：ptree pt：JSONをツリー構造にしたもの
@@ -111,7 +150,7 @@ namespace process{
 		CellDataChain::cellchain^ JSONString(ptree pt, string key, CellDataChain::cellchain^ parent) {
 			CellDataChain ChainCtrl;			//データチェインクラスをインスタンス化
 			string childkey = "";				//子供のキーを格納するための文字列
-			CellDataChain::cellchain^ brother = gcnew CellDataChain::cellchain();		//兄弟を連結するための構造体
+			CellDataChain::cellchain^ brother = nullptr;		//兄弟を連結するための構造体
 			//初回ループ時の処理（初回はキー名がわからない、構造体が存在していないために作る）
 			if (key == "") {
 				auto itr = pt.begin();		//親キーを取得するためのイテレーターを宣言
@@ -129,7 +168,7 @@ namespace process{
 				if (boost::optional<string>str = info.get_optional <string>(childkey)) {
 					//配列の要素がオブジェクトかただの配列かで処理を分岐
 					if (info.begin() != info.end()) {
-						brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
+						brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(str.get()).c_str()), brother);
 						//配列オブジェクトを構造体にチェインする関数を呼び出す
 						brother->lower = this->ArrayJSONobject(info, brother, childkey);
 						brother->lower->upper = brother;
@@ -172,7 +211,7 @@ namespace process{
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		CellDataChain::cellchain^ ArrayJSONobject(const ptree& info, CellDataChain::cellchain^ brother,string key) {
-			CellDataChain::cellchain^ arrayparent = gcnew CellDataChain::cellchain();	//配列の要素を連結するための構造体を宣言
+			CellDataChain::cellchain^ arrayparent = nullptr;	//配列の要素を連結するための構造体を宣言
 			CellDataChain ChainCtrl;				//データチェインを操作するためにクラスをインスタンス化
 			//引数に受け取った構造体の子として配列要素の構造体を連結する
 		//	arrayparent = ChainCtrl.ChainChild(gcnew String(key.c_str()), "", brother);

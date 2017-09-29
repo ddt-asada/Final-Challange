@@ -230,10 +230,13 @@ namespace JSONGUI {
 		this->textBoxValue->Text = this->TableElem->value;
 		//親の数をカウントする
 		this->ParentIndex = this->CountParent(this->TableElem);
-		//親を列挙したものを描画する関数を呼び出す
-		this->infoTableGenerate(this->TableElem, this->pictureBoxParent, *this->ParentIndex);
-		//ピクチャボックスを前面に押し出す
-		this->pictureBoxParent->BringToFront();
+		//親がいない場合は画像の描画を行わない
+		if (*this->ParentIndex > 0) {
+			//親を列挙したものを描画する関数を呼び出す
+			this->infoTableGenerate(this->TableElem, this->pictureBoxParent, *this->ParentIndex);
+			//ピクチャボックスを前面に押し出す
+			this->pictureBoxParent->BringToFront();
+		}
 		return;
 	}
 
@@ -384,8 +387,8 @@ private: System::Void PictureBoxParentMouseClick(System::Object^  sender, System
 		 Int32 GetPoint(MouseEventArgs^ e) {
 			 //取得した座標を格納するための変数
 			 Int32 point = 0;
-			 //座標を計算して取得する
-			 point = (*this->RctWidth * *this->ParentIndex - e->Location.X)/ *this->RctWidth;
+			 //座標を計算して取得する、端数が切り捨てられるため最後に+1して補正する
+			 point = ((*this->RctWidth * *this->ParentIndex - e->Location.X)/ *this->RctWidth) +1;
 			 //取得した座標を返却する
 			 return point;
 }

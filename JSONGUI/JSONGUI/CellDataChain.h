@@ -40,7 +40,7 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
-			if (target->key == nullptr && target->value == nullptr) {
+			if (target == nullptr) {
 				return chain;
 			}
 			//連結対象に親がいるかを調べる
@@ -87,7 +87,7 @@ public:
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
 			//対象が空の場合は連結用の構造体をそのまま返す
-			if (target->key == nullptr && target->value == nullptr) {
+			if (target == nullptr) {
 				return chain;
 			}
 			//連結対象に子がいるかを調べる
@@ -127,13 +127,16 @@ public:
 	 cellchain^：連結対象の構造体
 	 戻り値：cellchain^：連結後の構造体
 	 作成日：2017.9．20
-	 作成者：K.Asada*/
+	 作成者：K.Asada
+	 更新内容：長男に兄を追加するときには親もつなぎ変えるように変更
+	 更新日：2017.9.28
+	 更新者：K.Asada*/
 	cellchain^ ChainElderBrother(System::String^ key, System::String^ value, cellchain^ target) {
 		try {
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
-			if (target->key == nullptr && target->value == nullptr) {
+			if (target == nullptr) {
 				return chain;
 			}
 			//連結対象に兄がいるかを調べる
@@ -145,6 +148,12 @@ public:
 			}//兄がいない場合
 			else
 			{
+				//連結用の構造体の親を対象の親につなぎ変える
+				chain->upper = target->upper;
+				//親の子として連結用のこうぞうたいを連結する
+				chain->upper->lower = chain;
+				//対象の親へにチェインを削除する
+				target->upper = nullptr;
 				//連結用の構造体の兄が存在しないことを格納する
 				chain->prev = nullptr;
 			}
@@ -179,7 +188,7 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
-			if (target->key == nullptr && target->value == nullptr) {
+			if (target == nullptr) {
 				return chain;
 			}
 			//連結対象に弟がいるかを調べる
@@ -290,34 +299,35 @@ public:
 		：cellchain^ parent：要素が含まれた構造体
 	戻り値：要素の構造体
 	作成日：2017.9.25
-	作成者：K.Asada*/
+	作成者：K.Asada
+	更新内容：取得対象の構造体が存在していないときはnullptrを返すように変更
+	更新日：2017.9.27
+	更新者：K.Asada*/
 	cellchain^ GetColumnChain(System::Int32 rowindex, System::Int32 colindex, cellchain^ parent) {
-		int i = 1;
 		//取得した構造体を格納するための返却用の構造体
 		cellchain^ colchain = gcnew cellchain();
 		//親要素から取得対象の行の構造体を取得する
 		colchain = GetRowChain(rowindex, parent);
 		//列座標が1以下であれば親要素の構造体を返却する
-		if(colindex >= 1){
+		if(colindex >= 1 || colchain == nullptr){
 			//行の要素（子）が存在していれば対象の構造体を探す
 			if (colchain->lower != nullptr) {
 				//子を取得
 				colchain = colchain->lower;
-			}//存在していなければ子要素を作る
-			 //子がいなければ子を作る
+			}//存在していなければnullptrを格納
 			else {
-				colchain = this->ChainChild("", "", colchain);
+				colchain = nullptr;
 			}
 			//取得対象の構造体まで移動する
-			for (; i < colindex; i++) {
+			for (int i = 1; i < colindex; i++) {
 				//取得対象の構造体が存在していなければ中断する
-				if (colchain->next != nullptr) {
+				if (colchain != nullptr && colchain->next != nullptr) {
 					//弟が存在していれば弟に移動する
 					colchain = colchain->next;
 				}
-				//存在していなければ弟を作る
+				//存在していなければnullptrを格納
 				else {
-					colchain = this->ChainYoungBrother("", "", colchain);
+					colchain = nullptr;
 				}
 			}
 		}
@@ -329,39 +339,42 @@ public:
 		：cellchain^ parent：親の構造体
 	戻り値：cellchain^ rowchain：取得対象の構造体
 	作成日：2017.9.25
-	作成者：K.Asada*/
+	作成者：K.Asada
+	更新内容：取得対象の構造体が存在していないときはnullptrを返すように変更
+	更新日：2017.9.27
+	更新者：K.Asada*/
 	cellchain^ GetRowChain(System::Int32 rowindex, cellchain^ parent) {
 		//返却用の構造体を宣言する
-		cellchain^ rowchain = gcnew cellchain();
-		//走査用の変数
-		int i = 0;
+		cellchain^ rowchain = parent;
 		//取得対象の構造体の位置まで移動する
-		for (; i < rowindex; i++) {
-			//移動先がなくなったときは中断する
-			if (parent->next != nullptr) {
-				parent = parent->next;
+		for (int i = 0; i < rowindex; i++) {
+			//移動先がなくなったときは構造体を取得できなかったとしてnullptrを取得
+			if (rowchain->next != nullptr) {
+				//弟の構造体に移動する
+				rowchain = rowchain->next;
 			}
-			else {
+			else {//ない場合はnullptrを取得してループを抜ける
+				rowchain = nullptr;
+				//ループを抜ける
 				break;
 			}
-		}
-		//対象の位置まで移動できていれば
-		if (i != rowindex) {
-			//新たに弟として構造体を連結する
-			rowchain = this->ChainYoungBrother("", "", parent);
-		}
-		else {
-			//取得対象の構造体を取得する
-			rowchain = parent;
 		}
 		//取得した構造体を返却する
 		return rowchain;
 	}
 
 	cellchain^ FirstChain(cellchain^ chain) {
-		for (; chain->prev != nullptr; chain = chain->prev) {
+		try {
+			for (; chain->prev != nullptr; chain = chain->prev) {
+			}
+			return chain;
 		}
-		return chain;
+		catch (System::NullReferenceException^ e) {
+			System::Console::WriteLine(e);
+		}
+		catch (System::ArgumentNullException^ e) {
+			System::Console::WriteLine(e);
+		}
 	}
 
 	/*概要：対象の構造体の親の構造体を取得するための関数
@@ -391,5 +404,79 @@ public:
 		}
 		//取得した構造体を返却する
 		return parent;
+	}
+
+	/*概要：指定した箇所に構造体を挿入する関数
+	引数：Int32 rowindex：挿入する行座標
+		：Int32 columnindex：列座標
+		：String^ setdata：挿入する構造体にセットする文字列
+		：cellchain^ elem：挿入対象の構造体
+	戻り値：なし
+	作成日：2017.9.27
+	作成者：K.Asada*/
+	System::Void SetChainCell(System::Int32 rowindex, System::Int32 columnindex, System::String^ setdata, cellchain^ elem) {
+		cellchain^ scan = elem;			//対象の構造体を取得する
+		//対象の行の構造体へ移動する
+		for (int i = 0; i < rowindex; i++) {
+			//次の行の構造体が存在していれば
+			if (scan->next != nullptr) {
+				//次の構造体を取得する
+				scan = scan->next;
+			}//ない場合は新規で空文字の入った構造体を連結する
+			else {
+				scan = this->ChainYoungBrother("", "", scan);
+			}
+		}
+		//対象の構造体に行の先頭に続く要素があるかを調べる
+		if (scan->lower != nullptr) {
+			//要素の先頭の構造体を取得する
+			scan = scan->lower;
+		}//ない場合は新規で空文字の入った構造体を連結する
+		else {
+			scan = this->ChainChild("", "", scan);
+		}
+		//行の要素の構造体を移動して対象の挿入対象の構造体を取得する
+		for (int i = 1; i < columnindex; i++) {
+			//次の構造体があるかを調べる
+			if (scan->next != nullptr) {
+				//次の構造体を取得する
+				scan = scan->next;
+			}//ない場合は新規で空文字の入った構造体を連結して取得する
+			else {
+				scan = this->ChainYoungBrother("", "", scan);
+			}
+		}
+		//挿入対象の構造体がオブジェクトを示していれば
+		if (scan->lower != nullptr) {
+			//対象の構造体のキー名に文字列を挿入する
+			scan->key = setdata;
+		}
+		else {
+			//対象の構造体の値に文字列を挿入する
+			scan->value = setdata;
+		}
+		return;
+	}
+
+	/*概要：対象の構造体の一番弟の構造体を取得する関数
+	引数；対象の構造体
+	戻り値：対象の一番弟の構造体
+	作成日：2017.9.27
+	作成者：K.Asada*/
+	cellchain^ GetYoungChain(cellchain^ scan) {
+		try {
+			//対象の一番弟まで移動する
+			for (; scan->next != nullptr; scan = scan->next) {
+
+			}
+			//取得した弟を返す
+			return scan;
+		}
+		catch (System::NullReferenceException^ e) {
+			System::Console::WriteLine(e);
+		}
+		catch (System::ArgumentNullException^ e) {
+			System::Console::WriteLine(e);
+		}
 	}
 };

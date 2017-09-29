@@ -69,15 +69,16 @@ namespace process {
 		戻り値：なし
 		作成日：2017.9.21
 		作成者：K.Asada*/
-		Void Convertrun(String^ jsonpath) {
+		Void Convertrun(String^ jsonpath, CellDataChain::cellchain^ jsonelem) {
 			ptree json;		//文字列から作成したJSONツリーを格納するためのツリー
 			std::string path;	//ファイルパスをstring型に変換したものを格納するための文字列
 			//ファイルパスをstring型に変換する
 			this->MarshalString(jsonpath, path);
+			this->MarshalString(jsonelem->key, path);
 			//文字列からJSONツリーを作成する
-			json = this->ConvertJSON(path, nullptr);
+			json = this->ConvertJSON(path, jsonelem);
 			//作成したJSONツリーをファイルに出力する
-			write_json(path, json);
+			write_json(std::cout, json);
 		}
 
 		/*概要：ファイルから文字列を取得するための関数

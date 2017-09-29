@@ -2,7 +2,7 @@
 
 #include "OptionForm.h"			//設定画面クラスのヘッダ
 #include "TableInformation.h"	//表画像関係の関数をまとめたクラスのヘッダ
-#include "MoreDetailForm.h"		//詳細画面クラスのヘッダ
+#include "SelectForm.h"
 #include "Processing.h"			//内部処理クラスのヘッダ
 #include "MoreInfoForm.h"
 
@@ -547,7 +547,7 @@ private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^
 	//文字列構造体を渡す
 	proc->Tablechain = this->TableElem;
 	//JSONに変換する関数を呼び出す
-	//proc->JSONRUN();
+	proc->Convertrun("aaa", this->TableElem);
 }
 private: System::Void TableJoinClick(System::Object^  sender, System::EventArgs^  e) {
 }
@@ -673,10 +673,7 @@ private: System::Void PictureBoxListCurrClick(System::Object^  sender, System::E
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void TextBoxListClick(System::Object^  sender, System::EventArgs^  e) {
-	//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
-	MoreDetailForm^ more = gcnew MoreDetailForm();
-	//新規ダイアログで表示する
-	more->ShowDialog();
+
 }
 
 /*概要：表画像の値編集用のテキストボックスがダブルクリックされたときのイベント
@@ -685,6 +682,7 @@ private: System::Void TextBoxListClick(System::Object^  sender, System::EventArg
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void TextBoxCellClick(System::Object^  sender, System::EventArgs^  e) {
+try{
 	//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
 	MoreInfoForm^ more = gcnew MoreInfoForm();
 	//詳細ダイアログへ渡す構造体を宣言
@@ -693,39 +691,96 @@ private: System::Void TextBoxCellClick(System::Object^  sender, System::EventArg
 	CellDataChain^ CellCtrl = gcnew CellDataChain();
 	//渡す構造体を取得する
 	child = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
-	//詳細ダイアログへ構造体を渡す
-	more->TableElem = child;
-	//新規ダイアログで表示する
-	more->ShowDialog();
-	//終わったら表画像を再描画する
-	this->ReadyPict(this->TableElem);
-	//表画像を再描画する
-	this->TableGenerate(this->pictureBoxTable);
+	//nullptrを取得した場合情報が取得できなかったとしてメッセージを表示
+	if (child == nullptr) {
+		//メッセージを表示
+		MessageBox::Show("表示すべき情報がありません");
+	}//正常に情報を取得できていた場合は詳細ダイアログを表示
+	else {
+		//詳細ダイアログへ構造体を渡す
+		more->TableElem = child;
+		//新規ダイアログで表示する
+		more->ShowDialog();
+		//終わったら表画像を再描画する
+		this->ReadyPict(this->TableElem);
+		//表画像を再描画する
+		this->TableGenerate(this->pictureBoxTable);
+	
+	}
+	return;
+	}
+		 catch (System::NullReferenceException^ e) {
+			 System::Console::WriteLine(e);
+		 }
+		 catch (System::ArgumentNullException^ e) {
+			 System::Console::WriteLine(e);
+		 }
 }
 
 /*行追加ボタンのクリックイベント、表画像に行を挿入する
 作成日：2017.9.25
-作成者：K.Asada*/
+作成者：K.Asada
+更新内容：行を挿入する方向を選択させる機能を追加
+更新日：2017.9.28
+更新者：K.Asada*/
 private: System::Void AddRowButtonClick(System::Object^  sender, System::EventArgs^  e) {
-	//行を挿入する関数を呼び出す
-	this->RowAdd(*this->RowIndex, *this->Column);
-	//行を追加したため表を再描画したいので準備を行う
-	this->ReadyPict(this->TableElem);
-	//行を挿入した後の表画像を再描画する関数を呼び出す
-	this->TableGenerate(this->pictureBoxTable);
+	//選択画面フォームをインスタンス化
+	SelectForm^ sele = gcnew SelectForm();
+	String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
+	//選択画面のボタンに表示する文字を渡す
+	sele->ElderButton->Text = "上";
+	//選択画面のボタンに表示する文字を渡す
+	sele->YoungButton->Text = "下";
+	//選択画面を表示する
+	sele->ShowDialog();
+	//選択されたボタンの名前を取得する
+	select = sele->selectbutton;
+	//キャンセルボタン以外なら追加処理を実行
+	if (select != "CancelButton") {
+		//行を挿入する関数を呼び出す
+		this->RowAdd(*this->RowIndex, select);
+		//行を追加したため表を再描画したいので準備を行う
+		this->ReadyPict(this->TableElem);
+		//行を挿入した後の表画像を再描画する関数を呼び出す
+		this->TableGenerate(this->pictureBoxTable);
+	}//キャンセルボタンなら追加処理を中断する
+	else {
+		//中断する旨を画面上に出力する
+		MessageBox::Show("操作が中断されました");
+	}
 	return;
 }
 
 /*列追加ボタンのクリックイベント、表に列を挿入する
 作成日：2017.9.25
+作成者：K.Asada
+更新内容：列を追加する方向の選択をさせる機能を追加
+更新日：2017.9.28
 作成者：K.Asada*/
 private: System::Void AddColumnButtonClick(System::Object^  sender, System::EventArgs^  e) {
-	//列を挿入する関数を呼び出す
-	this->ColumnAdd(*this->Row, *this->ColumnIndex);
-	//列を追加したため表を再描画したいので準備を行う
-	this->ReadyPict(this->TableElem);
-	//列を挿入した後の表を再描画
-	this->TableGenerate(this->pictureBoxTable);
+	//選択画面フォームをインスタンス化
+	SelectForm^ sele = gcnew SelectForm();
+	String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
+	//選択画面のボタンに表示する文字を渡す
+	sele->ElderButton->Text = "左";
+	//選択画面のボタンに表示する文字を渡す
+	sele->YoungButton->Text = "右";
+	//選択画面を表示する
+	sele->ShowDialog();
+	//選択されたボタンの名前を取得する
+	select = sele->selectbutton;
+	//キャンセル以外なら処理を実行する
+	if (select != "CancelButton") {
+		//列を挿入する関数を呼び出す
+		this->ColumnAdd(*this->Row, *this->ColumnIndex, select);
+		//列を追加したため表を再描画したいので準備を行う
+		this->ReadyPict(this->TableElem);
+		//列を挿入した後の表を再描画
+		this->TableGenerate(this->pictureBoxTable);
+	}//キャンセルボタンが押されていたら処理を中断する
+	else {
+		MessageBox::Show("操作が中断されました");
+	}
 	return;
 }
 
@@ -733,27 +788,24 @@ private: System::Void AddColumnButtonClick(System::Object^  sender, System::Even
 作成日：2017.9.25
 作成者：K.Asada*/
 private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
-	//チェイン構造操作クラスをインスタンス化
-	CellDataChain^ CellCtrl = gcnew CellDataChain();
-	//エンターキーが押されたときのイベント
-	if (e->KeyCode == Keys::Enter) {
-		//挿入対象の構造体を取得するための構造体
-		CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
-		//挿入対象のセルの構造体を取得する
-		elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
-		//対象の構造体のキー名と値のどちらに挿入するかを判定するために分岐を行う
-		if (elem->lower != nullptr) {
-			//対象のセルにキー名を格納する
-			elem->key = this->textBoxCell->Text;
+
+	try {	//チェイン構造操作クラスをインスタンス化
+		CellDataChain^ CellCtrl = gcnew CellDataChain();
+		//エンターキーが押されたときのイベント
+		if (e->KeyCode == Keys::Enter) {
+			//対象の位置の構造体に文字列を挿入する関数を呼び出す
+			CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, this->textBoxCell->Text, this->TableElem->lower);
+			//セルの再描画を行う
+			this->ReTableGenerate(this->pictureBoxTable);
+			//テキストボックスを表示しないようにする
+			this->pictureBoxTable->Controls->Remove(this->textBoxCell);
 		}
-		else {
-			//対象のセルに値を格納する
-			elem->value = this->textBoxCell->Text;
-		}
-		//セルの再描画を行う
-		this->ReTableGenerate(this->pictureBoxTable);
-		//テキストボックスを表示しないようにする
-		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+	}
+	catch (System::NullReferenceException^ e) {
+		System::Console::WriteLine(e);
+	}
+	catch (System::ArgumentNullException^ e) {
+		System::Console::WriteLine(e);
 	}
 }
 
@@ -775,6 +827,7 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 作成日：2017.9.25
 作成者：K.Asada*/
  private:Void Expansion() {
+	 try{
 	 //チェイン構造操作クラスをインスタンス化
 	 CellDataChain^ CellCtrl = gcnew CellDataChain();
 	 //表画像を表示するためのクラスをインスタンス化
@@ -783,11 +836,26 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 	 CellDataChain::cellchain^ detailtable = gcnew CellDataChain::cellchain();
 	 //構造体を取得する
 	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
-	 //新規に開くダイアログの初期値として構造体を設定
-	 more->TableElem = detailtable;
-	 more->ShowDialog();
-	 this->ReTableGenerate(this->pictureBoxTable);
+	 //もしnullptrを取得していれば表示すべき情報がないとしてメッセージを表示する
+	 if (detailtable == nullptr) {
+		 MessageBox::Show("展開すべき情報がありません");
+	 }
+	 else {//正常に情報を取得できていた場合は詳細ダイアログを開く
+		 //新規に開くダイアログの初期値として構造体を設定
+		 more->TableElem = detailtable;
+		 //ダイアログを開く
+		 more->ShowDialog();
+		 //情報が書き換えられている可能性があるため表全体を再描画
+		 this->ReTableGenerate(this->pictureBoxTable);
+	 }
 	 return;
+	 }
+	 catch (System::NullReferenceException^ e) {
+		 System::Console::WriteLine(e);
+	 }
+	 catch (System::ArgumentNullException^ e) {
+		 System::Console::WriteLine(e);
+	 }
 }
 
 
