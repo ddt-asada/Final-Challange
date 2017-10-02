@@ -60,11 +60,11 @@ namespace process {
 		Void DBrun(String^ DBquery) {
 			string result = "";		//DBから取得したJSON文字列を格納するための文字列
 			string query = "";		//DBへ渡すクエリを格納する文字列
-			JSONDBManager db;				//DBとの通信を行うクラスをインスタンス化
+		//	JSONDBManager db;				//DBとの通信を行うクラスをインスタンス化
 			//メイン画面より受け取ったクエリの型変換を行う
 			this->MarshalString(DBquery, query);
 			//DBからJSON文字列を取得する
-			result = db.GetDBResult(query);
+		//	result = db.GetDBResult(query);
 			//文字列処理関数を呼び出す
 			this->DBString(result);
 			//戻り値なし
@@ -95,22 +95,19 @@ namespace process {
 		作成日：207.9.21
 		作成者：K.Asada*/
 		std::string LoadJSON(String^ jsonpath) {
-			//ファイル読み込みエラーを送出する例外処理
-			try {
-				//読み込んんだJSONを格納するための文字列
-				std::string json = "";
-				//ストリームリーダーよりUTF-8に指定してファイルを読み込む
-				System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(jsonpath, System::Text::Encoding::GetEncoding("utf-8"));
-				//読み込んだJSONをstringに変換する
-				this->MarshalString(sr->ReadToEnd(), json);
-				//読み込んだJSONを返す
-				return json;
+			std::string path = "";		//String^型からstring型へ変換したファイルパスを格納する文字列
+			//型変換を行う
+			this->MarshalString(jsonpath, path);
+			//ファイルを読み込む準備
+			std::ifstream ifs(path);
+			//ファイルの読み込みに失敗した時の例外処理
+			if (ifs.fail()) {
+				//例外を送出する
+				throw gcnew Exception("ファイル読み込みエラー");
 			}
-			//ファイルの読み込みに失敗したらcatch
-			catch (System::IO::FileNotFoundException^ e) {
-				//ファイルの読み込みエラー内容をコンソールに出力
-				Console::WriteLine(e);
-			}
+			//ファイルよりJSONを取得する
+			std::string json((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+			return json;
 		}
 	};
 }

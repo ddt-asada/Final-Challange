@@ -23,8 +23,8 @@ namespace JSONGUI {
 	作成日：2017.9.20
 	作成者：K.Asada*/
 	public ref class JSONGUIForm
-		: public TableInformation
-	//	: public System::Windows::Forms::Form
+	//	: public TableInformation
+		: public System::Windows::Forms::Form
 	{
 	public:
 		JSONGUIForm(void)
@@ -171,9 +171,6 @@ namespace JSONGUI {
 			this->tabPage->Controls->Add(this->buttonOption);
 			this->tabPage->Controls->Add(this->textBoxRow);
 			this->tabPage->Controls->Add(this->textBoxCol);
-			this->tabPage->Controls->Add(this->textBoxCell);
-			this->tabPage->Controls->Add(this->pictureBoxCurrent);
-			this->tabPage->Controls->Add(this->pictureBoxTable);
 			this->tabPage->Location = System::Drawing::Point(8, 39);
 			this->tabPage->Name = L"tabPage";
 			this->tabPage->Padding = System::Windows::Forms::Padding(3);
@@ -212,7 +209,7 @@ namespace JSONGUI {
 			this->buttonNewTable->TabIndex = 16;
 			this->buttonNewTable->Text = L"新規";
 			this->buttonNewTable->UseVisualStyleBackColor = true;
-			this->buttonNewTable->Click += gcnew System::EventHandler(this, &JSONGUIForm::ButtonCewTableClick);
+			this->buttonNewTable->Click += gcnew System::EventHandler(this, &JSONGUIForm::ButtonNewTableClick);
 			// 
 			// buttonDeleteColumn
 			// 
@@ -521,7 +518,7 @@ private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  
 		//表画像を生成する関数を呼び出す
 		this->TableGenerate(this->pictureBoxTable);
 		//コントロールへピクチャボックスを追加する
-		this->Controls->Add(this->pictureBoxTable);
+		this->tabPage->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれていることがあるので前面に押し出す
 		this->pictureBoxTable->BringToFront();
 	}
@@ -563,16 +560,19 @@ private: System::Void FormClosing(System::Object^  sender, System::Windows::Form
 引数：なし
 戻り値：なし
 作成日：2017.9.20
-作成者：K.Asada*/
+作成者：K.Asada
+更新日：2017.10.2
+更新者：K.Asada
+更新内容：削除するコントロールが間違っていたので修正*/
 private: Void TableInit() {
 	//基底クラスの初期化関数を呼び出す
 	this->InfoInit();
-	//表画像をコントロールから除外する
-	this->Controls->Remove(this->pictureBoxTable);
 	//選択箇所をハイライトする画像をコントロールから除外する
-	this->Controls->Remove(this->pictureBoxCurrent);
+	this->pictureBoxTable->Controls->Remove(this->pictureBoxCurrent);
 	//表画像上のテキストボックスをコントロールから除外する
-	this->Controls->Remove(this->textBoxCell);
+	this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+	//表画像をコントロールから除外する
+	this->tabPage->Controls->Remove(this->pictureBoxTable);
 	//行数が入力されたテキストボックスを初期化する
 	this->textBoxRow->Text = Constants->INITIAL_ROW_STRING;
 	//列数が入力されたテキストボックスを初期化する
@@ -603,7 +603,10 @@ private: System::Void TableCancelClick(System::Object^  sender, System::EventArg
 引数：
 戻り値：なし
 作成日：2017.9.21
-作成者：K.Asada*/
+作成者：K.Asada
+更新日：2017.10.2
+更新者：K.Asada
+更新内容：生成した表画像の追加先となるコントロールが間違っていたので修正*/
 private: System::Void ButtonConnectClick(System::Object^  sender, System::EventArgs^  e) {
 	//処理中のエラーを捕捉するための例外処理
 	try {
@@ -633,7 +636,10 @@ private: System::Void ButtonConnectClick(System::Object^  sender, System::EventA
 引数：
 戻り値：なし
 作成日：2017.9.21
-作成者：K.Asada*/
+作成者：K.Asada
+更新日：2017.10.2
+更新者：K.Asada
+更新内容：生成した表画像の追加先となるコントロールが間違っていたので修正*/
 private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  e) {
 	//処理中のエラーを捕捉するための例外処理
 	try {
@@ -648,7 +654,7 @@ private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  
 		//表画像を生成する関数を呼び出す
 		this->TableGenerate(this->pictureBoxTable);
 		//コントロールへピクチャボックスを追加する
-		this->Controls->Add(this->pictureBoxTable);
+		this->tabPage->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれないように前面に移動させる
 		this->pictureBoxTable->BringToFront();
 	}
@@ -1101,7 +1107,10 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 		 引数：cellchain^ tablechain：表画像に変換する予定の構造体
 		 戻り値：なし
 		 作成日：2017.9.25
-		 作成者：K.Asada*/
+		 作成者：K.Asada
+		 更新日：2017.10.2
+		 更新者：K.Asada
+		 更新内容：行数と列数のどちらかが0であればエラーを送出するように変更*/
 		 Void ReadyPict(CellDataChain::cellchain^ tablechain) {
 			 //入力情報が正しいかどうかを捕捉するための例外処理
 			 try {
@@ -1124,6 +1133,10 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 				 else {
 					 //現在表示している表の行数としてテキストボックスに格納する
 					 this->textBoxCol->Text = Convert::ToString(*this->Column);
+				 }
+				 //行数と列数のいずれかが0であれば表として成り立たないのでエラーを投げる
+				 if (*this->Row <= 0 || *this->Column <= 0) {
+					 throw(gcnew System::FormatException());
 				 }
 				 return;
 			 }
@@ -1203,18 +1216,19 @@ private: System::Void DeleteRowButtonClick(System::Object^  sender, System::Even
 
 /*概要：新規ボタンのクリックイベント、新規に表画像を作成する
 作成日：2017.9.30
-作成者：K.Asada*/
-private: System::Void ButtonCewTableClick(System::Object^  sender, System::EventArgs^  e) {
+作成者：K.Asada
+更新日：2017.10.2
+更新者：K.Asada
+更新内容：生成後の表画像のコントロール追加先が間違っていたので修正*/
+private: System::Void ButtonNewTableClick(System::Object^  sender, System::EventArgs^  e) {
 	//全ての例外でメイン画面側で警告を出したいので例外処理
 	try {
 		MoreInfoForm^ more = gcnew MoreInfoForm();			//詳細情報編集クラスをインスタンス化
 		CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体操作クラスをインスタンス化
 		//新規でもっとも親となる空の構造体を一つ作成してメンバに格納
 		this->TableElem = CellCtrl->ChainParent(Constants->EMPTY_STRING, Constants->EMPTY_STRING, nullptr);
-		//表画像の行数をテキストボックスより取得する
-		this->Row = Convert::ToInt32(this->textBoxRow->Text);
-		//表画像の列数をテキストボックスより取得する
-		this->Column = Convert::ToInt32(this->textBoxCol->Text);
+		//列数と行数を取得する関数を呼び出す
+		this->ReadyPict(this->TableElem);
 		//先ほど生成した空の構造体の詳細情報を入力させるために詳細画面へ渡す
 		more->TableElem = this->TableElem;
 		//詳細画面を開いて編集を行う
@@ -1222,7 +1236,7 @@ private: System::Void ButtonCewTableClick(System::Object^  sender, System::Event
 		//表画像の描画を行う
 		this->TableGenerate(this->pictureBoxTable);
 		//コントロールにピクチャボックスを追加する
-		this->Controls->Add(this->pictureBoxTable);
+		this->tabPage->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれていることがあるので前面に押し出す
 		this->pictureBoxTable->BringToFront();
 		return;

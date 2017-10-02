@@ -28,8 +28,6 @@ namespace TableInformation {
 		ConstantString^ Constants = gcnew ConstantString();	//定数クラスのインスタンス化
 		Int32^ Row = Constants->ZERO;						//表の行数
 		Int32^ Column = Constants->ZERO;					//表の列数
-		Int32^ rowcount = Constants->ZERO;					//表の行数をカウントするための変数
-		Int32^ colcount = Constants->ZERO;					//表の列数をカウントするための変数
 		Int32^ RowIndex = Constants->ZERO;					//クリックされた表のタテ座標
 		Int32^ ColumnIndex = Constants->ZERO;				//クリックされた表のヨコ座標
 		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
@@ -490,7 +488,10 @@ namespace TableInformation {
 			：cellchain^ elem：描画したセルの中に表示する文字列が格納された構造体
 		戻り値：なし
 		作成日：2017.9.27
-		作成者：K.Asada*/
+		作成者：K.Asada
+		更新日：2017.10.2
+		更新者：K.Asada
+		更新内容：キー名が空の時は配列であることをわかりやすくするために描画する内容を変更*/
 		Void DrawFigure(System::Drawing::Rectangle^ rct, Graphics^ gr, CellDataChain::cellchain^ elem) {
 			//描画時のエラーを捕捉
 			try {
@@ -504,8 +505,14 @@ namespace TableInformation {
 				if (elem != nullptr && elem->lower != nullptr) {
 					//オブジェクトであることを明示するために色付けを行う
 					gr->FillRectangle(br, *rct);
-					//オブジェクトの場合はキー名を描画する
-					gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
+					//キー名が空文字であるときは配列となる旨を表示する
+					if (elem->key == "") {
+						gr->DrawString(Constants->ARRAY_STRING, myFont, Brushes::Black, *rct);
+					}
+					else {
+						//オブジェクトの場合はキー名を描画する
+						gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
+					}
 				}//子がいない構造体である場合はデータとして扱う
 				else if (elem != nullptr) {
 					//データの場合は値を描画する

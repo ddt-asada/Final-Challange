@@ -20,7 +20,6 @@ public:
 
 	//デフォルトコンストラクタ
 	CellDataChain() {
-
 	}
 
 	int getcount = 0;
