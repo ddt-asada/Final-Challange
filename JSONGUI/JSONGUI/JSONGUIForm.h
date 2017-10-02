@@ -106,6 +106,8 @@ namespace JSONGUI {
 		{
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage = (gcnew System::Windows::Forms::TabPage());
+			this->radioButtonValue = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButtonKey = (gcnew System::Windows::Forms::RadioButton());
 			this->labelRow = (gcnew System::Windows::Forms::Label());
 			this->labelColumn = (gcnew System::Windows::Forms::Label());
 			this->buttonNewTable = (gcnew System::Windows::Forms::Button());
@@ -136,8 +138,6 @@ namespace JSONGUI {
 			this->pictureBoxListCurr = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxList = (gcnew System::Windows::Forms::PictureBox());
 			this->saveFileDialog1 = (gcnew System::Windows::Forms::SaveFileDialog());
-			this->radioButtonKey = (gcnew System::Windows::Forms::RadioButton());
-			this->radioButtonValue = (gcnew System::Windows::Forms::RadioButton());
 			this->tabControl1->SuspendLayout();
 			this->tabPage->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCurrent))->BeginInit();
@@ -184,6 +184,28 @@ namespace JSONGUI {
 			this->tabPage->TabIndex = 0;
 			this->tabPage->Text = L"テーブル";
 			this->tabPage->UseVisualStyleBackColor = true;
+			// 
+			// radioButtonValue
+			// 
+			this->radioButtonValue->AutoSize = true;
+			this->radioButtonValue->Location = System::Drawing::Point(421, 80);
+			this->radioButtonValue->Name = L"radioButtonValue";
+			this->radioButtonValue->Size = System::Drawing::Size(168, 28);
+			this->radioButtonValue->TabIndex = 18;
+			this->radioButtonValue->TabStop = true;
+			this->radioButtonValue->Text = L"値編集モード";
+			this->radioButtonValue->UseVisualStyleBackColor = true;
+			// 
+			// radioButtonKey
+			// 
+			this->radioButtonKey->AutoSize = true;
+			this->radioButtonKey->Location = System::Drawing::Point(207, 80);
+			this->radioButtonKey->Name = L"radioButtonKey";
+			this->radioButtonKey->Size = System::Drawing::Size(208, 28);
+			this->radioButtonKey->TabIndex = 18;
+			this->radioButtonKey->TabStop = true;
+			this->radioButtonKey->Text = L"キー名編集モード";
+			this->radioButtonKey->UseVisualStyleBackColor = true;
 			// 
 			// labelRow
 			// 
@@ -319,6 +341,7 @@ namespace JSONGUI {
 			// 
 			// textBoxRow
 			// 
+			this->textBoxRow->ImeMode = System::Windows::Forms::ImeMode::NoControl;
 			this->textBoxRow->Location = System::Drawing::Point(73, 0);
 			this->textBoxRow->Name = L"textBoxRow";
 			this->textBoxRow->Size = System::Drawing::Size(100, 31);
@@ -335,6 +358,7 @@ namespace JSONGUI {
 			// 
 			// textBoxCell
 			// 
+			this->textBoxCell->ImeMode = System::Windows::Forms::ImeMode::On;
 			this->textBoxCell->Location = System::Drawing::Point(1288, 319);
 			this->textBoxCell->Multiline = true;
 			this->textBoxCell->Name = L"textBoxCell";
@@ -479,28 +503,6 @@ namespace JSONGUI {
 			this->pictureBoxList->TabStop = false;
 			this->pictureBoxList->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUIForm::PictureBoxListMouseClick);
 			// 
-			// radioButtonKey
-			// 
-			this->radioButtonKey->AutoSize = true;
-			this->radioButtonKey->Location = System::Drawing::Point(207, 80);
-			this->radioButtonKey->Name = L"radioButtonKey";
-			this->radioButtonKey->Size = System::Drawing::Size(208, 28);
-			this->radioButtonKey->TabIndex = 18;
-			this->radioButtonKey->TabStop = true;
-			this->radioButtonKey->Text = L"キー名編集モード";
-			this->radioButtonKey->UseVisualStyleBackColor = true;
-			// 
-			// radioButtonValue
-			// 
-			this->radioButtonValue->AutoSize = true;
-			this->radioButtonValue->Location = System::Drawing::Point(421, 80);
-			this->radioButtonValue->Name = L"radioButtonValue";
-			this->radioButtonValue->Size = System::Drawing::Size(168, 28);
-			this->radioButtonValue->TabIndex = 18;
-			this->radioButtonValue->TabStop = true;
-			this->radioButtonValue->Text = L"値編集モード";
-			this->radioButtonValue->UseVisualStyleBackColor = true;
-			// 
 			// JSONGUIForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -619,6 +621,8 @@ private: System::Void TableCancelClick(System::Object^  sender, System::EventArg
 	try {
 		//テーブルタブに関する情報を初期化する関数を呼び出す
 		this->TableInit();
+		//初期化されたことを表示する
+		MessageBox::Show(Constants->INITIAL_STRING);
 	}
 	//処理中のすべての例外を捕捉する
 	catch (System::Exception^ e) {
@@ -652,6 +656,8 @@ private: System::Void ButtonConnectClick(System::Object^  sender, System::EventA
 		this->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれていることがあるためピクチャボックスを前面に押し出す
 		this->pictureBoxTable->BringToFront();
+		//DBとの通信を行った結果を出力
+		MessageBox::Show(Constants->DB_STRING);
 	}
 	//エラーが発生して処理が中断されたことを表示する
 	catch (System::Exception^ e) {
@@ -685,6 +691,8 @@ private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  
 		this->tabPage->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれないように前面に移動させる
 		this->pictureBoxTable->BringToFront();
+		//JSONを読み込んだことを表示する
+		MessageBox::Show(Constants->LOAD_STRING);
 	}
 	//全てのエラーを捕捉処理が中断されたことを表示するための補足
 	catch (System::Exception^ e) {
@@ -709,11 +717,15 @@ private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^
 			outJSONpath = this->saveFileDialog1->FileName;
 		}
 		else{
+			//操作が中断された旨を表示する
+			MessageBox::Show(Constants->CANCEL_STRING);
 			//何もせずにダイアログを閉じる
 			return;
 		}
 		//JSONに変換する関数を呼び出す
 		proc->Convertrun(outJSONpath, this->TableElem);
+		//変換が完了した旨を表示する
+		MessageBox::Show(Constants->SUCCES_STRING);
 		//変換完了
 		return;
 	}
@@ -893,7 +905,7 @@ private: System::Void PictureBoxListMouseClick(System::Object^  sender, System::
 作成者：K.Asada
 更新日：2017.10.2
 更新者：K.Asada
-更新内容：キー名/値編集モードに対応したデータをテキストボックスに表示するように変更*/
+更新内容：キー名/値編集モードに対応したデータをテキストボックスに表示するように変更、テキストボックスが表示されたときにカーソルが末尾に来るように変更*/
 private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::EventArgs^  e) {
 	//テキストボックスに情報を設定する関数を呼び出す
 	this->CellTextGenerate(this->textBoxCell, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
@@ -901,6 +913,11 @@ private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::Ev
 	this->pictureBoxTable->Controls->Add(this->textBoxCell);
 	//テキストボックスが埋もれないように前面に配置する
 	this->textBoxCell->BringToFront();
+	//テキストボックスの末尾にカーソルを移動する
+	this->textBoxCell->SelectionStart = this->textBoxCell->Text->Length;
+	//カーソルを表示するためにテキストボックスにフォーカスる
+	this->textBoxCell->Focus();
+	return;
 }
 
 /*概要：リストタブの画像のハイライト部分をクリックしたときのイベント、編集用のテキストボックスを表示
@@ -975,33 +992,49 @@ try{
 作成者：K.Asada
 更新内容：行を挿入する方向を選択させる機能を追加
 更新日：2017.9.28
+更新者：K.Asada
+更新内容：文字列を定数化
+更新日：2017.10.2
 更新者：K.Asada*/
 private: System::Void AddRowButtonClick(System::Object^  sender, System::EventArgs^  e) {
-	//選択画面フォームをインスタンス化
-	SelectForm^ sele = gcnew SelectForm();
-	String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
-	//選択画面のボタンに表示する文字を渡す
-	sele->ElderButton->Text = "上";
-	//選択画面のボタンに表示する文字を渡す
-	sele->YoungButton->Text = "下";
-	//選択画面を表示する
-	sele->ShowDialog();
-	//選択されたボタンの名前を取得する
-	select = sele->selectbutton;
-	//キャンセルボタン以外なら追加処理を実行
-	if (select != "CancelButton") {
-		//行を挿入する関数を呼び出す
-		this->RowAdd(*this->RowIndex, select);
-		//行を追加したため表を再描画したいので準備を行う
-		this->ReadyPict(this->TableElem);
-		//行を挿入した後の表画像を再描画する関数を呼び出す
-		this->TableGenerate(this->pictureBoxTable);
-	}//キャンセルボタンなら追加処理を中断する
-	else {
-		//中断する旨を画面上に出力する
-		MessageBox::Show("操作が中断されました");
+	//例外をメイン画面でも捕捉するために例外処理
+	try {
+		//選択画面フォームをインスタンス化
+		SelectForm^ sele = gcnew SelectForm();
+		String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
+		//選択画面のボタンに表示する文字を渡す
+		sele->ElderButton->Text = Constants->TOP_STRING;
+		//選択画面のボタンに表示する文字を渡す
+		sele->YoungButton->Text = Constants->UNDER_STRING;
+		//選択画面を表示する
+		sele->ShowDialog();
+		//選択されたボタンの名前を取得する
+		select = sele->selectbutton;
+		//先頭より先に行を追加しようとしたときは追加しない
+		if (*this->RowIndex <= 0 && select == Constants->ELDER_BUTTON_STRING) {
+			//先頭より先には追加できない旨を表示
+			MessageBox::Show(Constants->ADD_ERROR_STRING);
+		}
+		//キャンセルボタン以外なら追加処理を実行
+		else if (select != Constants->CANCEL_BUTTON_STRING) {
+			//行を挿入する関数を呼び出す
+			this->RowAdd(*this->RowIndex, select);
+			//行を追加したため表を再描画したいので準備を行う
+			this->ReadyPict(this->TableElem);
+			//行を挿入した後の表画像を再描画する関数を呼び出す
+			this->TableGenerate(this->pictureBoxTable);
+		}//キャンセルボタンなら追加処理を中断する
+		else {
+			//中断する旨を画面上に出力する
+			MessageBox::Show(Constants->CANCEL_STRING);
+		}
+		return;
 	}
-	return;
+	//全ての例外を捕捉する
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断された旨を表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*列追加ボタンのクリックイベント、表に列を挿入する
@@ -1009,37 +1042,50 @@ private: System::Void AddRowButtonClick(System::Object^  sender, System::EventAr
 作成者：K.Asada
 更新内容：列を追加する方向の選択をさせる機能を追加
 更新日：2017.9.28
-作成者：K.Asada*/
+作成者：K.Asada
+更新内容：文字列を定数化
+更新日：2017.10.2
+更新者：K.Asada*/
 private: System::Void AddColumnButtonClick(System::Object^  sender, System::EventArgs^  e) {
-	//選択画面フォームをインスタンス化
-	SelectForm^ sele = gcnew SelectForm();
-	String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
-	//選択画面のボタンに表示する文字を渡す
-	sele->ElderButton->Text = "左";
-	//選択画面のボタンに表示する文字を渡す
-	sele->YoungButton->Text = "右";
-	//選択画面を表示する
-	sele->ShowDialog();
-	//選択されたボタンの名前を取得する
-	select = sele->selectbutton;
-	//先頭より左に列を追加しようとしているときは追加できないようにする
-	if (*this->ColumnIndex <= 0 && select == "ElderButton") {
-		//先頭より左に列を追加できない旨を表示
-		MessageBox::Show("先頭より先に列を追加できません");
+	//例外が来たときに警告を表示するためにすべての例外処理
+	try {
+		//選択画面フォームをインスタンス化
+		SelectForm^ sele = gcnew SelectForm();
+		String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
+		//選択画面のボタンに表示する文字を渡す
+		sele->ElderButton->Text = Constants->LEFT_STRING;
+		//選択画面のボタンに表示する文字を渡す
+		sele->YoungButton->Text = Constants->RIGHT_STRING;
+		//選択画面を表示する
+		sele->ShowDialog();
+		//選択されたボタンの名前を取得する
+		select = sele->selectbutton;
+		//先頭より左に列を追加しようとしているときは追加できないようにする
+		if (*this->ColumnIndex <= 0 && select == Constants->ELDER_BUTTON_STRING) {
+			//先頭より左に列を追加できない旨を表示
+			MessageBox::Show(Constants->ADD_ERROR_STRING);
+		}
+		//キャンセル以外なら処理を実行する
+		else if (select != Constants->CANCEL_BUTTON_STRING) {
+			//列数をプラスする
+			this->textBoxCol->Text = Convert::ToString(Convert::ToInt32(this->textBoxCol->Text) + 1);
+			//列を挿入する関数を呼び出す
+			this->ColumnAdd(*this->Row, *this->ColumnIndex, select);
+			//列を追加したため表を再描画したいので準備を行う
+			this->ReadyPict(this->TableElem);
+			//列を挿入した後の表を再描画
+			this->TableGenerate(this->pictureBoxTable);
+		}//キャンセルボタンが押されていたら処理を中断する
+		else {
+			MessageBox::Show(Constants->CANCEL_STRING);
+		}
+		return;
 	}
-	//キャンセル以外なら処理を実行する
-	else if (select != "CancelButton") {
-		//列を挿入する関数を呼び出す
-		this->ColumnAdd(*this->Row, *this->ColumnIndex, select);
-		//列を追加したため表を再描画したいので準備を行う
-		this->ReadyPict(this->TableElem);
-		//列を挿入した後の表を再描画
-		this->TableGenerate(this->pictureBoxTable);
-	}//キャンセルボタンが押されていたら処理を中断する
-	else {
-		MessageBox::Show("操作が中断されました");
+	//全ての例外を捕捉
+	catch (System::Exception^ e) {
+		//なんらかのエラーが起きて操作が中断された旨を表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
-	return;
 }
 
 /*概要：値編集用のテキストボックス内でエンターキーが押されたときのイベント
@@ -1267,6 +1313,8 @@ private: System::Void ButtonNewTableClick(System::Object^  sender, System::Event
 		this->TableElem = CellCtrl->ChainParent(Constants->EMPTY_STRING, Constants->EMPTY_STRING, nullptr);
 		//列数と行数を取得する関数を呼び出す
 		this->ReadyPict(this->TableElem);
+		//新規で表をJSONを生成する際に必要な情報の入力を促す
+		MessageBox::Show(Constants->NEW_STRING);
 		//先ほど生成した空の構造体の詳細情報を入力させるために詳細画面へ渡す
 		more->TableElem = this->TableElem;
 		//詳細画面を開いて編集を行う
@@ -1277,6 +1325,8 @@ private: System::Void ButtonNewTableClick(System::Object^  sender, System::Event
 		this->tabPage->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれていることがあるので前面に押し出す
 		this->pictureBoxTable->BringToFront();
+		//表が生成されたことを出力する
+		MessageBox::Show(Constants->TABLE_STRING);
 		return;
 	}
 	//全ての例外を捕捉

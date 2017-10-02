@@ -280,6 +280,9 @@ namespace TableInformation {
 		更新内容：挿入方向を指定するように変更
 		更新日：2017.9.28
 		更新者：K.Asada
+		更新日：2017.10.2
+		更新者：K.Asada
+		更新内容：内部処理を一部サブルーチン化
 		*/
 		Void RowAdd(Int32 rowindex, String^ select) {
 			try {
@@ -288,15 +291,8 @@ namespace TableInformation {
 				CellDataChain::cellchain^ parent = nullptr;
 				//挿入対象の構造体を取得する
 				parent = CellCtrl->GetRowChain(rowindex, this->TableElem->lower);
-				//行の挿入方向が上に指定されていたら
-				if (select == "ElderButton") {
-					//上方向に行を追加する
-					CellCtrl->ChainElderBrother("", "", parent);
-				}//行の挿入方向を下に指定する
-				else {
-					//下方向に行を追加する
-					CellCtrl->ChainYoungBrother("", "", parent);
-				}
+				//行を追加する関数を呼び出す
+				this->AddProcess(select, parent);
 				return;
 			}
 			catch (System::NullReferenceException^ e) {
@@ -318,6 +314,9 @@ namespace TableInformation {
 		更新者：K.Asada
 		更新内容：列を追加する方向を指定するように変更
 		更新日：2017.9.28
+		更新者：K.Asada
+		更新内容：内部処理を一部サブルーチン化
+		更新日：2017.10.2
 		更新者：K.Asada*/
 		Void ColumnAdd(Int32 row, Int32 columnindex, String^ select) {
 			try {
@@ -330,18 +329,8 @@ namespace TableInformation {
 					parent = CellCtrl->GetColumnChain(i, columnindex, this->TableElem->lower);
 					//列座標が0より下の時は行の先頭を選択しているとするための分岐
 					if (columnindex > 0) {
-						//対象を取得できた場合はどの方向に追加するかを判定する
-						if (parent != nullptr) {
-							//追加方向に左（自分より上）が指定されていたら
-							if (select == "ElderButton") {
-								//新規で兄を連結する関数を呼び出す
-								CellCtrl->ChainElderBrother("", "", parent);
-							}
-							else {
-								//対象に弟を連結する
-								CellCtrl->ChainYoungBrother("", "", parent);
-							}
-						}
+						//列を追加する関数を呼び出す
+						this->AddProcess(select, parent);
 					}//行を選択している場合は行の直下の子供を追加するようにする
 					else {
 							this->AddYoungColumn(i);
@@ -527,7 +516,10 @@ namespace TableInformation {
 		引数：Int32 rowindex：追加対象のセル
 		戻り値：なし
 		作成日：2017.9.28
-		作成者：K.Asada*/
+		作成者：K.Asada
+		更新内容：下位に構造体を追加しないように変更
+		更新日：2017.10.2
+		更新者：K.Asda*/
 		Void AddYoungColumn(Int32 rowindex) {
 			try {
 				//構造体操作クラスをインスタンス化
@@ -540,10 +532,6 @@ namespace TableInformation {
 					//対象の兄として新規で構造体を連結する
 					CellCtrl->ChainElderBrother("", "", parent->lower);
 				}//子がいない場合は子を連結する
-				else {
-					//新規で子を連結する
-					CellCtrl->ChainChild("", "", parent);
-				}
 				return;
 			}
 			catch (System::NullReferenceException^ e) {
@@ -590,6 +578,36 @@ namespace TableInformation {
 				}
 			}
 			return;
+		}
+
+		/*概要：行・列の追加関数で利用する処理関数
+		引数：String^ select：どの方向に追加するかを示す文字列
+			：cellchain^ parent：追加対象となる文字列
+		作成日：2017.10.2
+		作成者：K.Asada*/
+		System::Void AddProcess(String^ select, CellDataChain::cellchain^ parent) {
+			//NULLを指す恐れがあるので例外処理
+			try {
+				CellDataChain^ CellCtrl = gcnew CellDataChain();		//構造体操作クラスをインスタンス化
+				//構造体が取得できていなければ処理を行わない
+				if (parent != nullptr) {
+					//上位ボタンが押されていたら自分より上位に追加
+					if (select == Constants->ELDER_BUTTON_STRING) {
+						//兄として構造体を追加する
+						CellCtrl->ChainElderBrother(Constants->CHAIN_KEY_STRING, Constants->CHAIN_VALUE_STRING, parent);
+					}//下位ボタンが押されていて追加対象の構造体に弟が存在したら
+					else if (select == Constants->YOUNG_BUTTON_STRING && parent->next != nullptr) {
+						//弟として構造体を追加する
+						CellCtrl->ChainYoungBrother(Constants->CHAIN_KEY_STRING, Constants->CHAIN_VALUE_STRING, parent);
+					}
+				}
+				return;
+			}
+			//参照先がNULLであった場合捕捉
+			catch (System::NullReferenceException^ e) {
+				//エラー内容をコンソールに出力
+				Console::WriteLine(Constants->INPUT_ERROR_STRING + e);
+			}
 		}
 	};
 }

@@ -100,7 +100,6 @@ namespace process {
 			try {
 				CONSTANTS::ConstantString^ Constants = gcnew CONSTANTS::ConstantString();
 				std::string path = "";		//String^型からstring型へ変換したファイルパスを格納する文字列
-				std::string json = "";		//ファイルより取得したJSONを格納するための文字列
 				//型変換を行う
 				this->MarshalString(jsonpath, path);
 				//ファイルを読み込む準備
@@ -110,10 +109,8 @@ namespace process {
 					//例外を送出する
 					throw gcnew System::IO::FileNotFoundException(Constants->LOAD_ERROR_STRING);
 				}
-				else {
-					//ファイルよりJSONを取得する
-					std::string json((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-				}
+				//ファイルよりJSONを取得する
+				std::string json((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 				return json;
 			}
 			//ファイル読み込みエラーを捕捉
