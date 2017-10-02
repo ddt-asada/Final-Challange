@@ -112,7 +112,7 @@ namespace JSONGUI {
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoSize = true;
-			this->ClientSize = System::Drawing::Size(683, 474);
+			this->ClientSize = System::Drawing::Size(547, 191);
 			this->Controls->Add(this->CancelButton);
 			this->Controls->Add(this->YoungButton);
 			this->Controls->Add(this->ElderButton);

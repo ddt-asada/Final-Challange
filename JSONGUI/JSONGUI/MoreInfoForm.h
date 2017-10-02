@@ -84,7 +84,7 @@ namespace JSONGUI {
 			// textBoxKey
 			// 
 			this->textBoxKey->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->textBoxKey->Location = System::Drawing::Point(156, 410);
+			this->textBoxKey->Location = System::Drawing::Point(209, 250);
 			this->textBoxKey->Name = L"textBoxKey";
 			this->textBoxKey->Size = System::Drawing::Size(360, 31);
 			this->textBoxKey->TabIndex = 0;
@@ -92,7 +92,7 @@ namespace JSONGUI {
 			// textBoxValue
 			// 
 			this->textBoxValue->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->textBoxValue->Location = System::Drawing::Point(156, 500);
+			this->textBoxValue->Location = System::Drawing::Point(209, 337);
 			this->textBoxValue->Name = L"textBoxValue";
 			this->textBoxValue->Size = System::Drawing::Size(360, 31);
 			this->textBoxValue->TabIndex = 1;
@@ -121,7 +121,7 @@ namespace JSONGUI {
 			// buttonCancel
 			// 
 			this->buttonCancel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->buttonCancel->Location = System::Drawing::Point(573, 581);
+			this->buttonCancel->Location = System::Drawing::Point(658, 397);
 			this->buttonCancel->Name = L"buttonCancel";
 			this->buttonCancel->Size = System::Drawing::Size(110, 105);
 			this->buttonCancel->TabIndex = 4;
@@ -165,7 +165,7 @@ namespace JSONGUI {
 			// buttonOK
 			// 
 			this->buttonOK->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-			this->buttonOK->Location = System::Drawing::Point(465, 581);
+			this->buttonOK->Location = System::Drawing::Point(550, 397);
 			this->buttonOK->Name = L"buttonOK";
 			this->buttonOK->Size = System::Drawing::Size(102, 105);
 			this->buttonOK->TabIndex = 8;
@@ -177,7 +177,7 @@ namespace JSONGUI {
 			// 
 			this->label1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(55, 410);
+			this->label1->Location = System::Drawing::Point(108, 250);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(74, 24);
 			this->label1->TabIndex = 9;
@@ -187,7 +187,7 @@ namespace JSONGUI {
 			// 
 			this->label2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(83, 500);
+			this->label2->Location = System::Drawing::Point(148, 340);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(34, 24);
 			this->label2->TabIndex = 10;
@@ -197,15 +197,11 @@ namespace JSONGUI {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(838, 698);
+			this->ClientSize = System::Drawing::Size(815, 514);
 			this->Controls->Add(this->label2);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->buttonOK);
-			this->Controls->Add(this->buttonChild);
-			this->Controls->Add(this->buttonElderBrother);
-			this->Controls->Add(this->buttonYoungBrother);
 			this->Controls->Add(this->buttonCancel);
-			this->Controls->Add(this->buttonParent);
 			this->Controls->Add(this->pictureBoxParent);
 			this->Controls->Add(this->textBoxValue);
 			this->Controls->Add(this->textBoxKey);

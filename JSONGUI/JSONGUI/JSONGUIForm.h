@@ -81,6 +81,13 @@ namespace JSONGUI {
 	private: System::Windows::Forms::Button^  button3;
 	private: System::Windows::Forms::Button^  button2;
 	private: System::Windows::Forms::Button^  button1;
+	private: System::Windows::Forms::Button^  buttonDeleteColumn;
+
+	private: System::Windows::Forms::Button^  buttonDeleteRow;
+	private: System::Windows::Forms::Button^  buttonNewTable;
+	private: System::Windows::Forms::SaveFileDialog^  saveFileDialog1;
+	private: System::Windows::Forms::Label^  labelRow;
+	private: System::Windows::Forms::Label^  labelColumn;
 
 	private:
 		/// <summary>
@@ -97,10 +104,14 @@ namespace JSONGUI {
 		{
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage = (gcnew System::Windows::Forms::TabPage());
+			this->labelRow = (gcnew System::Windows::Forms::Label());
+			this->labelColumn = (gcnew System::Windows::Forms::Label());
+			this->buttonNewTable = (gcnew System::Windows::Forms::Button());
+			this->buttonDeleteColumn = (gcnew System::Windows::Forms::Button());
+			this->buttonDeleteRow = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->button1 = (gcnew System::Windows::Forms::Button());
-			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->buttonTableConv = (gcnew System::Windows::Forms::Button());
 			this->buttonTableCancel = (gcnew System::Windows::Forms::Button());
 			this->buttonTableOK = (gcnew System::Windows::Forms::Button());
@@ -111,6 +122,7 @@ namespace JSONGUI {
 			this->textBoxCell = (gcnew System::Windows::Forms::TextBox());
 			this->pictureBoxCurrent = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxTable = (gcnew System::Windows::Forms::PictureBox());
+			this->buttonJoin = (gcnew System::Windows::Forms::Button());
 			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
 			this->buttonListConv = (gcnew System::Windows::Forms::Button());
 			this->buttonListCancel = (gcnew System::Windows::Forms::Button());
@@ -121,6 +133,7 @@ namespace JSONGUI {
 			this->textBoxList = (gcnew System::Windows::Forms::TextBox());
 			this->pictureBoxListCurr = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxList = (gcnew System::Windows::Forms::PictureBox());
+			this->saveFileDialog1 = (gcnew System::Windows::Forms::SaveFileDialog());
 			this->tabControl1->SuspendLayout();
 			this->tabPage->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCurrent))->BeginInit();
@@ -133,7 +146,6 @@ namespace JSONGUI {
 			// tabControl1
 			// 
 			this->tabControl1->Controls->Add(this->tabPage);
-			this->tabControl1->Controls->Add(this->tabPage2);
 			this->tabControl1->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->tabControl1->Location = System::Drawing::Point(0, 0);
 			this->tabControl1->Name = L"tabControl1";
@@ -144,10 +156,14 @@ namespace JSONGUI {
 			// tabPage
 			// 
 			this->tabPage->AutoScroll = true;
+			this->tabPage->Controls->Add(this->labelRow);
+			this->tabPage->Controls->Add(this->labelColumn);
+			this->tabPage->Controls->Add(this->buttonNewTable);
+			this->tabPage->Controls->Add(this->buttonDeleteColumn);
+			this->tabPage->Controls->Add(this->buttonDeleteRow);
 			this->tabPage->Controls->Add(this->button3);
 			this->tabPage->Controls->Add(this->button2);
 			this->tabPage->Controls->Add(this->button1);
-			this->tabPage->Controls->Add(this->buttonJoin);
 			this->tabPage->Controls->Add(this->buttonTableConv);
 			this->tabPage->Controls->Add(this->buttonTableCancel);
 			this->tabPage->Controls->Add(this->buttonTableOK);
@@ -166,11 +182,63 @@ namespace JSONGUI {
 			this->tabPage->Text = L"テーブル";
 			this->tabPage->UseVisualStyleBackColor = true;
 			// 
+			// labelRow
+			// 
+			this->labelRow->AutoSize = true;
+			this->labelRow->Font = (gcnew System::Drawing::Font(L"MS UI Gothic", 10.875F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->labelRow->Location = System::Drawing::Point(6, 6);
+			this->labelRow->Name = L"labelRow";
+			this->labelRow->Size = System::Drawing::Size(55, 29);
+			this->labelRow->TabIndex = 17;
+			this->labelRow->Text = L"タテ";
+			// 
+			// labelColumn
+			// 
+			this->labelColumn->AutoSize = true;
+			this->labelColumn->Font = (gcnew System::Drawing::Font(L"MS UI Gothic", 10.875F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->labelColumn->Location = System::Drawing::Point(10, 45);
+			this->labelColumn->Name = L"labelColumn";
+			this->labelColumn->Size = System::Drawing::Size(51, 29);
+			this->labelColumn->TabIndex = 17;
+			this->labelColumn->Text = L"ヨコ";
+			// 
+			// buttonNewTable
+			// 
+			this->buttonNewTable->Location = System::Drawing::Point(794, 6);
+			this->buttonNewTable->Name = L"buttonNewTable";
+			this->buttonNewTable->Size = System::Drawing::Size(95, 68);
+			this->buttonNewTable->TabIndex = 16;
+			this->buttonNewTable->Text = L"新規";
+			this->buttonNewTable->UseVisualStyleBackColor = true;
+			this->buttonNewTable->Click += gcnew System::EventHandler(this, &JSONGUIForm::ButtonCewTableClick);
+			// 
+			// buttonDeleteColumn
+			// 
+			this->buttonDeleteColumn->Location = System::Drawing::Point(334, 6);
+			this->buttonDeleteColumn->Name = L"buttonDeleteColumn";
+			this->buttonDeleteColumn->Size = System::Drawing::Size(122, 68);
+			this->buttonDeleteColumn->TabIndex = 15;
+			this->buttonDeleteColumn->Text = L"列削除";
+			this->buttonDeleteColumn->UseVisualStyleBackColor = true;
+			this->buttonDeleteColumn->Click += gcnew System::EventHandler(this, &JSONGUIForm::DeleteColumnButtonClick);
+			// 
+			// buttonDeleteRow
+			// 
+			this->buttonDeleteRow->Location = System::Drawing::Point(202, 6);
+			this->buttonDeleteRow->Name = L"buttonDeleteRow";
+			this->buttonDeleteRow->Size = System::Drawing::Size(126, 68);
+			this->buttonDeleteRow->TabIndex = 14;
+			this->buttonDeleteRow->Text = L"行削除";
+			this->buttonDeleteRow->UseVisualStyleBackColor = true;
+			this->buttonDeleteRow->Click += gcnew System::EventHandler(this, &JSONGUIForm::DeleteRowButtonClick);
+			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(386, 6);
+			this->button3->Location = System::Drawing::Point(689, 6);
 			this->button3->Name = L"button3";
-			this->button3->Size = System::Drawing::Size(115, 68);
+			this->button3->Size = System::Drawing::Size(99, 68);
 			this->button3->TabIndex = 13;
 			this->button3->Text = L"展開";
 			this->button3->UseVisualStyleBackColor = true;
@@ -178,9 +246,9 @@ namespace JSONGUI {
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(147, 6);
+			this->button2->Location = System::Drawing::Point(462, 6);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(123, 68);
+			this->button2->Size = System::Drawing::Size(111, 68);
 			this->button2->TabIndex = 12;
 			this->button2->Text = L"行追加";
 			this->button2->UseVisualStyleBackColor = true;
@@ -188,7 +256,7 @@ namespace JSONGUI {
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(276, 6);
+			this->button1->Location = System::Drawing::Point(579, 6);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(104, 68);
 			this->button1->TabIndex = 11;
@@ -196,21 +264,11 @@ namespace JSONGUI {
 			this->button1->UseVisualStyleBackColor = true;
 			this->button1->Click += gcnew System::EventHandler(this, &JSONGUIForm::AddColumnButtonClick);
 			// 
-			// buttonJoin
-			// 
-			this->buttonJoin->Location = System::Drawing::Point(507, 6);
-			this->buttonJoin->Name = L"buttonJoin";
-			this->buttonJoin->Size = System::Drawing::Size(167, 68);
-			this->buttonJoin->TabIndex = 10;
-			this->buttonJoin->Text = L"結合/解除";
-			this->buttonJoin->UseVisualStyleBackColor = true;
-			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONGUIForm::TableJoinClick);
-			// 
 			// buttonTableConv
 			// 
-			this->buttonTableConv->Location = System::Drawing::Point(1292, 6);
+			this->buttonTableConv->Location = System::Drawing::Point(1209, 6);
 			this->buttonTableConv->Name = L"buttonTableConv";
-			this->buttonTableConv->Size = System::Drawing::Size(146, 68);
+			this->buttonTableConv->Size = System::Drawing::Size(98, 68);
 			this->buttonTableConv->TabIndex = 9;
 			this->buttonTableConv->Text = L"変換";
 			this->buttonTableConv->UseVisualStyleBackColor = true;
@@ -218,9 +276,9 @@ namespace JSONGUI {
 			// 
 			// buttonTableCancel
 			// 
-			this->buttonTableCancel->Location = System::Drawing::Point(1140, 6);
+			this->buttonTableCancel->Location = System::Drawing::Point(1313, 6);
 			this->buttonTableCancel->Name = L"buttonTableCancel";
-			this->buttonTableCancel->Size = System::Drawing::Size(146, 68);
+			this->buttonTableCancel->Size = System::Drawing::Size(117, 68);
 			this->buttonTableCancel->TabIndex = 8;
 			this->buttonTableCancel->Text = L"キャンセル";
 			this->buttonTableCancel->UseVisualStyleBackColor = true;
@@ -228,19 +286,19 @@ namespace JSONGUI {
 			// 
 			// buttonTableOK
 			// 
-			this->buttonTableOK->Location = System::Drawing::Point(988, 6);
+			this->buttonTableOK->Location = System::Drawing::Point(1101, 6);
 			this->buttonTableOK->Name = L"buttonTableOK";
-			this->buttonTableOK->Size = System::Drawing::Size(146, 68);
+			this->buttonTableOK->Size = System::Drawing::Size(102, 68);
 			this->buttonTableOK->TabIndex = 7;
-			this->buttonTableOK->Text = L"OK";
+			this->buttonTableOK->Text = L"読込";
 			this->buttonTableOK->UseVisualStyleBackColor = true;
 			this->buttonTableOK->Click += gcnew System::EventHandler(this, &JSONGUIForm::TableOKClick);
 			// 
 			// buttonConnect
 			// 
-			this->buttonConnect->Location = System::Drawing::Point(844, 6);
+			this->buttonConnect->Location = System::Drawing::Point(996, 6);
 			this->buttonConnect->Name = L"buttonConnect";
-			this->buttonConnect->Size = System::Drawing::Size(138, 68);
+			this->buttonConnect->Size = System::Drawing::Size(99, 68);
 			this->buttonConnect->TabIndex = 6;
 			this->buttonConnect->Text = L"通信";
 			this->buttonConnect->UseVisualStyleBackColor = true;
@@ -248,17 +306,17 @@ namespace JSONGUI {
 			// 
 			// buttonOption
 			// 
-			this->buttonOption->Location = System::Drawing::Point(680, 6);
+			this->buttonOption->Location = System::Drawing::Point(895, 6);
 			this->buttonOption->Name = L"buttonOption";
-			this->buttonOption->Size = System::Drawing::Size(158, 68);
+			this->buttonOption->Size = System::Drawing::Size(95, 68);
 			this->buttonOption->TabIndex = 5;
 			this->buttonOption->Text = L"設定";
 			this->buttonOption->UseVisualStyleBackColor = true;
-			this->buttonOption->Click += gcnew System::EventHandler(this, &JSONGUIForm::buttonOption_Click);
+			this->buttonOption->Click += gcnew System::EventHandler(this, &JSONGUIForm::ButtonOptionClick);
 			// 
 			// textBoxRow
 			// 
-			this->textBoxRow->Location = System::Drawing::Point(6, 6);
+			this->textBoxRow->Location = System::Drawing::Point(73, 0);
 			this->textBoxRow->Name = L"textBoxRow";
 			this->textBoxRow->Size = System::Drawing::Size(100, 31);
 			this->textBoxRow->TabIndex = 4;
@@ -266,7 +324,7 @@ namespace JSONGUI {
 			// 
 			// textBoxCol
 			// 
-			this->textBoxCol->Location = System::Drawing::Point(6, 43);
+			this->textBoxCol->Location = System::Drawing::Point(73, 43);
 			this->textBoxCol->Name = L"textBoxCol";
 			this->textBoxCol->Size = System::Drawing::Size(100, 31);
 			this->textBoxCol->TabIndex = 3;
@@ -274,7 +332,7 @@ namespace JSONGUI {
 			// 
 			// textBoxCell
 			// 
-			this->textBoxCell->Location = System::Drawing::Point(1246, 316);
+			this->textBoxCell->Location = System::Drawing::Point(1288, 319);
 			this->textBoxCell->Multiline = true;
 			this->textBoxCell->Name = L"textBoxCell";
 			this->textBoxCell->Size = System::Drawing::Size(140, 31);
@@ -285,7 +343,7 @@ namespace JSONGUI {
 			// pictureBoxCurrent
 			// 
 			this->pictureBoxCurrent->BackgroundImageLayout = System::Windows::Forms::ImageLayout::None;
-			this->pictureBoxCurrent->Location = System::Drawing::Point(1265, 590);
+			this->pictureBoxCurrent->Location = System::Drawing::Point(1289, 356);
 			this->pictureBoxCurrent->Name = L"pictureBoxCurrent";
 			this->pictureBoxCurrent->Size = System::Drawing::Size(83, 102);
 			this->pictureBoxCurrent->TabIndex = 1;
@@ -295,13 +353,23 @@ namespace JSONGUI {
 			// pictureBoxTable
 			// 
 			this->pictureBoxTable->BackColor = System::Drawing::Color::White;
-			this->pictureBoxTable->Location = System::Drawing::Point(38, 377);
+			this->pictureBoxTable->Location = System::Drawing::Point(6, 187);
 			this->pictureBoxTable->Name = L"pictureBoxTable";
 			this->pictureBoxTable->Size = System::Drawing::Size(647, 424);
 			this->pictureBoxTable->SizeMode = System::Windows::Forms::PictureBoxSizeMode::AutoSize;
 			this->pictureBoxTable->TabIndex = 0;
 			this->pictureBoxTable->TabStop = false;
 			this->pictureBoxTable->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUIForm::PictureBoxTableMouseClick);
+			// 
+			// buttonJoin
+			// 
+			this->buttonJoin->Location = System::Drawing::Point(823, 6);
+			this->buttonJoin->Name = L"buttonJoin";
+			this->buttonJoin->Size = System::Drawing::Size(133, 68);
+			this->buttonJoin->TabIndex = 10;
+			this->buttonJoin->Text = L"結合/解除";
+			this->buttonJoin->UseVisualStyleBackColor = true;
+			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONGUIForm::TableJoinClick);
 			// 
 			// tabPage2
 			// 
@@ -432,17 +500,32 @@ namespace JSONGUI {
 		}
 #pragma endregion
 
-/*概要：メイン画面ロード時の初期化イベント*/
+/*概要：メイン画面ロード時の初期化イベント、再帰にも使うので分岐する
+作成日：2017.9.30
+作成者：K.ASada*/
 private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  e) {
+	//展開動作のために再帰してきたときに分岐させる
 	if (this->TableElem != nullptr) {
+		//展開先にてキャンセルボタンは不要なので削除する
+		this->tabPage->Controls->Remove(this->buttonTableCancel);
+		//展開先にてOKボタンは不要なので削除する
+		this->tabPage->Controls->Remove(this->buttonTableOK);
+		//展開先にて通信ボタンは不要なので削除する
+		this->tabPage->Controls->Remove(this->buttonConnect);
+		//展開先にて設定ボタンは不要なので削除する
+		this->tabPage->Controls->Remove(this->buttonOption);
+		//展開先にて新規ボタンは不要なので削除する
+		this->tabPage->Controls->Remove(this->buttonNewTable);
 		//表画像を生成するための準備関数を呼び出す
 		this->ReadyPict(this->TableElem);
 		//表画像を生成する関数を呼び出す
 		this->TableGenerate(this->pictureBoxTable);
 		//コントロールへピクチャボックスを追加する
 		this->Controls->Add(this->pictureBoxTable);
+		//表画像が埋もれていることがあるので前面に押し出す
 		this->pictureBoxTable->BringToFront();
 	}
+	return;
 }
 
 /*概要：テーブルタブの設定ボタンクリック時のイベント、設定画面を開く
@@ -451,9 +534,16 @@ private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  
 戻り値：なし
 作成日：2017.9.20
 作成者：K.Asada*/
-private: System::Void buttonOption_Click(System::Object^  sender, System::EventArgs^  e) {
-	//設定画面を開く関数を呼び出す
-	this->ShowOptionForm();
+private: System::Void ButtonOptionClick(System::Object^  sender, System::EventArgs^  e) {
+	//処理中に発生したすべてのエラーをキャッチする
+	try {
+		//設定画面を開く関数を呼び出す
+		this->ShowOptionForm();
+	}
+	catch (System::Exception^ e) {
+		//エラーが発生して処理が中断されたことを知らせる
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：プログラム終了時のイベント、終了するどうかの確認を行う。
@@ -483,6 +573,12 @@ private: Void TableInit() {
 	this->Controls->Remove(this->pictureBoxCurrent);
 	//表画像上のテキストボックスをコントロールから除外する
 	this->Controls->Remove(this->textBoxCell);
+	//行数が入力されたテキストボックスを初期化する
+	this->textBoxRow->Text = Constants->INITIAL_ROW_STRING;
+	//列数が入力されたテキストボックスを初期化する
+	this->textBoxCol->Text = Constants->INITIAL_COLUMN_STRING;
+	//初期化完了
+	return;
 }
 
 /*概要：テーブルタブのキャンセルボタンクリック時のイベント、テーブルタブに関する情報を初期化する関数を呼び出す
@@ -491,8 +587,16 @@ private: Void TableInit() {
 作成日：2017.9.20
 作成者：K.Asada*/
 private: System::Void TableCancelClick(System::Object^  sender, System::EventArgs^  e) {
-	//テーブルタブに関する情報を初期化する関数を呼び出す
-	this->TableInit();
+	//処理中のエラーと拾うための例外処理
+	try {
+		//テーブルタブに関する情報を初期化する関数を呼び出す
+		this->TableInit();
+	}
+	//処理中のすべての例外を捕捉する
+	catch (System::Exception^ e) {
+		//何らかのエラーが発生して処理が中断されたことを知らせる
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：通信ボタンのクリックイベント、DBクエリ処理関数を呼び出す
@@ -501,19 +605,28 @@ private: System::Void TableCancelClick(System::Object^  sender, System::EventArg
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void ButtonConnectClick(System::Object^  sender, System::EventArgs^  e) {
-	//内部処理クラスをインスタンス化
-	process::Processing^ proc = gcnew process::Processing();
-	//DBの内部処理関数を呼び出す
-	proc->DBrun(this->DBQuery);
-	//取得した構造体をメンバへ格納する
-	this->TableElem = proc->Tablechain;
-	//表画像を生成するための準備関数を呼び出す
-	this->ReadyPict(this->TableElem);
-	//表画像を生成する関数を呼び出す
-	this->TableGenerate(this->pictureBoxTable);
-	//コントロールへがピクチャボックスを追加する
-	this->Controls->Add(this->pictureBoxTable);
-	this->pictureBoxTable->BringToFront();
+	//処理中のエラーを捕捉するための例外処理
+	try {
+		//内部処理クラスをインスタンス化
+		process::Processing^ proc = gcnew process::Processing();
+		//DBの内部処理関数を呼び出す
+		proc->DBrun(this->DBQuery);
+		//取得した構造体をメンバへ格納する
+		this->TableElem = proc->Tablechain;
+		//表画像を生成するための準備関数を呼び出す
+		this->ReadyPict(this->TableElem);
+		//表画像を生成する関数を呼び出す
+		this->TableGenerate(this->pictureBoxTable);
+		//コントロールへがピクチャボックスを追加する
+		this->Controls->Add(this->pictureBoxTable);
+		//表画像が埋もれていることがあるためピクチャボックスを前面に押し出す
+		this->pictureBoxTable->BringToFront();
+	}
+	//エラーが発生して処理が中断されたことを表示する
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：テーブルタブのOKボタンクリックイベント、内部処理クラスへ移行する
@@ -522,32 +635,58 @@ private: System::Void ButtonConnectClick(System::Object^  sender, System::EventA
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  e) {
-	//内部処理クラスをインスタンス化
-	process::Processing^ proc = gcnew process::Processing();
-	//JSONをチェイン構造に変換する関数を呼び出す
-	proc->Tablerun(this->JSONFilePath);
-	//構造体をメンバへ格納する
-	this->TableElem = %*proc->Tablechain;
-	//表画像を生成するための準備関数を呼び出す
-	this->ReadyPict(this->TableElem);
-	//表画像を生成する関数を呼び出す
-	this->TableGenerate(this->pictureBoxTable);
-	//コントロールへピクチャボックスを追加する
-	this->Controls->Add(this->pictureBoxTable);
-	this->pictureBoxTable->BringToFront();
+	//処理中のエラーを捕捉するための例外処理
+	try {
+		//内部処理クラスをインスタンス化
+		process::Processing^ proc = gcnew process::Processing();
+		//JSONをチェイン構造に変換する関数を呼び出す
+		proc->Tablerun(this->JSONFilePath);
+		//構造体をメンバへ格納する
+		this->TableElem = %*proc->Tablechain;
+		//表画像を生成するための準備関数を呼び出す
+		this->ReadyPict(this->TableElem);
+		//表画像を生成する関数を呼び出す
+		this->TableGenerate(this->pictureBoxTable);
+		//コントロールへピクチャボックスを追加する
+		this->Controls->Add(this->pictureBoxTable);
+		//表画像が埋もれないように前面に移動させる
+		this->pictureBoxTable->BringToFront();
+	}
+	//全てのエラーを捕捉処理が中断されたことを表示するための補足
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：テーブルタブの変換ボタンクリック時のイベント
 作成日：201.9.21
 作成者：K.Asada*/
 private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^  e) {
-	//内部処理クラスをインスタンス化
-	//コンストラクタを変更する可能性あり
-	process::Processing^ proc = gcnew process::Processing();
-	//文字列構造体を渡す
-	proc->Tablechain = this->TableElem;
-	//JSONに変換する関数を呼び出す
-	proc->Convertrun("aaa", this->TableElem);
+	//処理中の例外を捕捉してメッセージを表示するための例外処理
+	try {
+		//JSONファイルの保存先を保管する文字列
+		String^ outJSONpath = "";
+		//内部処理クラスをインスタンス化
+		process::Processing^ proc = gcnew process::Processing();
+		//JSONファイルの保存先を選択するダイアログを表示する
+		if (this->saveFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			//OKボタンが押されたらファイルの出力先を保管する
+			outJSONpath = this->saveFileDialog1->FileName;
+		}
+		else{
+			//何もせずにダイアログを閉じる
+			return;
+		}
+		//JSONに変換する関数を呼び出す
+		proc->Convertrun(outJSONpath, this->TableElem);
+		//変換完了
+		return;
+	}
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 private: System::Void TableJoinClick(System::Object^  sender, System::EventArgs^  e) {
 }
@@ -565,7 +704,7 @@ private: Void ListInit() {
 	//配列数テキストタブを初期化する
 	this->textBoxListRow->Clear();
 	//表画像の値編集用テキストボックスを初期化する
-	this->textBoxList->Clear();
+	this->textBoxList->Text = Constants->INITIAL_ROW_STRING;
 	//テキストボックスを除去する
 	this->Controls->Remove(this->textBoxList);
 	//基底クラスの初期化関数を呼び出す
@@ -578,20 +717,28 @@ private: Void ListInit() {
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void ListOKClick(System::Object^  sender, System::EventArgs^  e) {
-	//内部処理クラスをインスタンス化
-	process::Processing^ proc = gcnew process::Processing();
-	//内部処理関数を呼び出す
-	proc->Listrun(this->JSONFilePath);
-	//取得した構造体をメンバへ格納する
-	this->TableElem = %*proc->Tablechain;
-	//表画像を生成するための準備関数を呼び出す
-	this->ReadyPict(this->TableElem);
-	//表画像生成関数を呼び出す
-	this->TableGenerate(this->pictureBoxList);
-	//作成した画像をコントロールへ追加する
-	this->Controls->Add(this->pictureBoxList);
-	//コントロールに追加したピクチャボックスを前面に押し出す
-	this->pictureBoxList->BringToFront();
+	//処理中のエラー捕捉するための例外処理
+	try {
+		//内部処理クラスをインスタンス化
+		process::Processing^ proc = gcnew process::Processing();
+		//内部処理関数を呼び出す
+		proc->Listrun(this->JSONFilePath);
+		//取得した構造体をメンバへ格納する
+		this->TableElem = %*proc->Tablechain;
+		//表画像を生成するための準備関数を呼び出す
+		this->ReadyPict(this->TableElem);
+		//表画像生成関数を呼び出す
+		this->TableGenerate(this->pictureBoxList);
+		//作成した画像をコントロールへ追加する
+		this->Controls->Add(this->pictureBoxList);
+		//表画像が埋もれていることがあるためピクチャボックスを前面に押し出す
+		this->pictureBoxList->BringToFront();
+	}
+	//例外を捕捉したら処理が中断された旨を表示する
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：リストタブのキャンセルボタンクリックイベント、初期化関数を呼び出す
@@ -600,21 +747,81 @@ private: System::Void ListOKClick(System::Object^  sender, System::EventArgs^  e
 作成日：2017.9.21
 作成者：K.Asada*/
 private: System::Void ListCancelClilck(System::Object^  sender, System::EventArgs^  e) {
-	//初期化関数を呼び出す
-	this->ListInit();
+	//処理中のエラーを拾うための例外処理
+	try {
+		//初期化関数を呼び出す
+		this->ListInit();
+		//初期化完了
+		return;
+	}
+	//全てのエラーを捕捉して警告を出すための例外
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+
 }
 private: System::Void ListConvClick(System::Object^  sender, System::EventArgs^  e) {
+	//処理中の例外を捕捉してメッセージを表示するための例外処理
+	try {
+		//内部処理クラスをインスタンス化
+		process::Processing^ proc = gcnew process::Processing();
+		//文字列構造体を渡す
+		proc->Tablechain = this->TableElem;
+		//JSONに変換する関数を呼び出す
+		proc->Convertrun("aaa", this->TableElem);
+		//変換完了
+		return;
+	}
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 private: System::Void ListConnectClick(System::Object^  sender, System::EventArgs^  e) {
+	//処理中のエラーを捕捉するための例外処理
+	try {
+		//内部処理クラスをインスタンス化
+		process::Processing^ proc = gcnew process::Processing();
+		//DBの内部処理関数を呼び出す
+		proc->DBrun(this->DBQuery);
+		//取得した構造体をメンバへ格納する
+		this->TableElem = proc->Tablechain;
+		//表画像を生成するための準備関数を呼び出す
+		this->ReadyPict(this->TableElem);
+		//表画像を生成する関数を呼び出す
+		this->TableGenerate(this->pictureBoxList);
+		//コントロールへがピクチャボックスを追加する
+		this->Controls->Add(this->pictureBoxList);
+		//表画像が埋もれていることがあるためピクチャボックスを前面に押し出す
+		this->pictureBoxList->BringToFront();
+	}
+	//エラーが発生して処理が中断されたことを表示する
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 private: System::Void ListOptionClick(System::Object^  sender, System::EventArgs^  e) {
+	//処理中に発生したすべてのエラーをキャッチする
+	try {
+		//設定画面を開く関数を呼び出す
+		this->ShowOptionForm();
+	}
+	catch (System::Exception^ e) {
+		//エラーが発生して処理が中断されたことを知らせる
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*表画像上をクリックしたときのイベント、選択状態にする関数を呼び出す
 引数：
 戻り値：なし
 作成日：2017.9.21
-作成者：K.Asada*/
+作成者：K.Asada
+更新内容：既に選択状態になっている場所以外をクリックしたときにテキストボックスが表示されていたら消えるように変更
+更新日：2017.9.30
+更新者：K.Asada*/
 private: System::Void PictureBoxTableMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 	//選択状態を保持するためにクリックした表画像上の座標をメンバへ保存する関数を呼び出す
 	this->GetCellPoint(e);
@@ -624,6 +831,8 @@ private: System::Void PictureBoxTableMouseClick(System::Object^  sender, System:
 	this->pictureBoxTable->Controls->Add(this->pictureBoxCurrent);
 	//画像を前面に押し出す
 	this->pictureBoxCurrent->BringToFront();
+	//テキストボックスを削除する
+	this->pictureBoxTable->Controls->Remove(this->textBoxCell);
 }
 
 /*概要：リストタブの表画像上をクリックしたときのイベント、選択状態にする関数を呼び出す
@@ -637,7 +846,10 @@ private: System::Void PictureBoxListMouseClick(System::Object^  sender, System::
 	//選択箇所がわかりやすいようにハイライトする関数を呼び出す
 	this->SelecteCell(this->pictureBoxListCurr);
 	//ハイライト画像をコントロールへ追加する
-	this->Controls->Add(this->pictureBoxListCurr);
+	this->pictureBoxList->Controls->Add(this->pictureBoxListCurr);
+	//埋もれていることがあるため前面に押し出す
+	this->pictureBoxListCurr->BringToFront();
+	return;
 }
 
 /*概要：表画像のハイライトされている箇所をクリックしたときのイベント、テキストボックスを配置して編集可能状態にする
@@ -662,7 +874,7 @@ private: System::Void PictureBoxListCurrClick(System::Object^  sender, System::E
 	//テキストボックスを配置するための情報を設定する関数を呼び出す
 	this->CellTextGenerate(this->textBoxList);
 	//情報が設定されたテキストボックスをコントロールに追加して表示する
-	this->Controls->Add(this->textBoxList);
+	this->pictureBoxListCurr->Controls->Add(this->textBoxList);
 	//テキストボックスを前面に押し出す
 	this->textBoxList->BringToFront();
 }
@@ -691,12 +903,15 @@ try{
 	CellDataChain^ CellCtrl = gcnew CellDataChain();
 	//渡す構造体を取得する
 	child = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
-	//nullptrを取得した場合情報が取得できなかったとしてメッセージを表示
+	//nullptrを取得した場合対象の位置に新規で構造体を作成して連結する
 	if (child == nullptr) {
 		//メッセージを表示
-		MessageBox::Show("表示すべき情報がありません");
+		//対象の位置の構造体に文字列を挿入する関数を呼び出す
+		child = CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, "", this->TableElem);
+		//child = this->TableElem->lower;
+	//	MessageBox::Show("表示すべき情報がありません");
 	}//正常に情報を取得できていた場合は詳細ダイアログを表示
-	else {
+	//else {
 		//詳細ダイアログへ構造体を渡す
 		more->TableElem = child;
 		//新規ダイアログで表示する
@@ -706,7 +921,7 @@ try{
 		//表画像を再描画する
 		this->TableGenerate(this->pictureBoxTable);
 	
-	}
+//	}
 	return;
 	}
 		 catch (System::NullReferenceException^ e) {
@@ -769,8 +984,13 @@ private: System::Void AddColumnButtonClick(System::Object^  sender, System::Even
 	sele->ShowDialog();
 	//選択されたボタンの名前を取得する
 	select = sele->selectbutton;
+	//先頭より左に列を追加しようとしているときは追加できないようにする
+	if (*this->ColumnIndex <= 0 && select == "ElderButton") {
+		//先頭より左に列を追加できない旨を表示
+		MessageBox::Show("先頭より先に列を追加できません");
+	}
 	//キャンセル以外なら処理を実行する
-	if (select != "CancelButton") {
+	else if (select != "CancelButton") {
 		//列を挿入する関数を呼び出す
 		this->ColumnAdd(*this->Row, *this->ColumnIndex, select);
 		//列を追加したため表を再描画したいので準備を行う
@@ -786,7 +1006,10 @@ private: System::Void AddColumnButtonClick(System::Object^  sender, System::Even
 
 /*概要：値編集用のテキストボックス内でエンターキーが押されたときのイベント
 作成日：2017.9.25
-作成者：K.Asada*/
+作成者：K.Asada
+更新内容：エンターキーが押されたときにテキストボックスが消えるように変更
+更新日：2017.9.30
+更新者：K.Asada*/
 private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
 
 	try {	//チェイン構造操作クラスをインスタンス化
@@ -794,7 +1017,7 @@ private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows:
 		//エンターキーが押されたときのイベント
 		if (e->KeyCode == Keys::Enter) {
 			//対象の位置の構造体に文字列を挿入する関数を呼び出す
-			CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, this->textBoxCell->Text, this->TableElem->lower);
+			CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, this->textBoxCell->Text, this->TableElem);
 			//セルの再描画を行う
 			this->ReTableGenerate(this->pictureBoxTable);
 			//テキストボックスを表示しないようにする
@@ -815,10 +1038,17 @@ private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows:
 作成日：2017.9.25
 作成者：K.Asada*/
 private: System::Void ButtonExpansionClick(System::Object^  sender, System::EventArgs^  e) {
-	//展開した画像を生成して新規ダイアログに表示する関数を呼び出す
-	this->Expansion();
-
-	return;
+	//処理中のエラーを拾うための例外処理
+	try {
+		//展開した画像を生成して新規ダイアログに表示する関数を呼び出す
+		this->Expansion();
+		return;
+	}
+	//全てのエラーを捕捉してエラーメッセージを表示するための補足
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：親キーについてJSONを展開した表画像を生成する関数
@@ -827,6 +1057,7 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 作成日：2017.9.25
 作成者：K.Asada*/
  private:Void Expansion() {
+	 //構造体の走査中に発生したnullptrの例外処理
 	 try{
 	 //チェイン構造操作クラスをインスタンス化
 	 CellDataChain^ CellCtrl = gcnew CellDataChain();
@@ -838,22 +1069,29 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
 	 //もしnullptrを取得していれば表示すべき情報がないとしてメッセージを表示する
 	 if (detailtable == nullptr) {
-		 MessageBox::Show("展開すべき情報がありません");
+		 //展開すべき情報がないことを表示する
+		 MessageBox::Show(Constants->EXPANSION_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK);
 	 }
 	 else {//正常に情報を取得できていた場合は詳細ダイアログを開く
 		 //新規に開くダイアログの初期値として構造体を設定
 		 more->TableElem = detailtable;
 		 //ダイアログを開く
 		 more->ShowDialog();
-		 //情報が書き換えられている可能性があるため表全体を再描画
-		 this->ReTableGenerate(this->pictureBoxTable);
+		 //終わったら表画像を再描画する
+		 this->ReadyPict(this->TableElem);
+		 //表画像を再描画する
+		 this->TableGenerate(this->pictureBoxTable);
 	 }
 	 return;
 	 }
+	 //nullが参照されたらエラー内容をコンソールに出力する
 	 catch (System::NullReferenceException^ e) {
+		 //null関係のエラーをコンソールに表示する
 		 System::Console::WriteLine(e);
 	 }
+	 //nullが参照されたらエラー内容をコンソールに表示する
 	 catch (System::ArgumentNullException^ e) {
+		 //null関係のエラーをコンソールに表示する
 		 System::Console::WriteLine(e);
 	 }
 }
@@ -865,31 +1103,135 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 		 作成日：2017.9.25
 		 作成者：K.Asada*/
 		 Void ReadyPict(CellDataChain::cellchain^ tablechain) {
-			 //渡した構造体をもとに行数と列数を割り出す関数を呼び出す
-			 this->CountRow(tablechain->lower);
-			 //画面上のテキストボックスの値との比較を行う
-			 if (*this->Row < Convert::ToInt32(this->textBoxRow->Text)) {
-				 //大きい方を採用する
-				 this->Row = Convert::ToInt32(this->textBoxRow->Text);
+			 //入力情報が正しいかどうかを捕捉するための例外処理
+			 try {
+				 //渡した構造体をもとに行数と列数を割り出す関数を呼び出す
+				 this->CountRow(tablechain->lower);
+				 //画面上のテキストボックスの値との比較を行う
+				 if (*this->Row < Convert::ToInt32(this->textBoxRow->Text)) {
+					 //大きい方を採用する
+					 this->Row = Convert::ToInt32(this->textBoxRow->Text);
+				 }
+				 else {
+					 //現在表示している表の行数としてテキストボックスに格納する
+					 this->textBoxRow->Text = Convert::ToString(*this->Row);
+				 }
+				 //画面上のテキストボックスの値との比較を行う
+				 if (*this->Column < Convert::ToInt32(this->textBoxCol->Text)) {
+					 //大きい方を採用する
+					 this->Column = Convert::ToInt32(this->textBoxCol->Text);
+				 }
+				 else {
+					 //現在表示している表の行数としてテキストボックスに格納する
+					 this->textBoxCol->Text = Convert::ToString(*this->Column);
+				 }
+				 return;
 			 }
-			 else {
-				 //現在表示している表の行数としてテキストボックスに格納する
-				 this->textBoxRow->Text = Convert::ToString(*this->Row);
+			 //テキストボックスの入力内容が正しくなかったときに捕捉
+			 catch (System::FormatException^ e) {
+				 //入力内容がおかしい旨をコンソールに表示する
+				 System::Console::WriteLine(Constants->INPUT_ERROR_STRING + e);
 			 }
-			 //画面上のテキストボックスの値との比較を行う
-			 if (*this->Column < Convert::ToInt32(this->textBoxCol->Text)) {
-				 //大きい方を採用する
-				 this->Column = Convert::ToInt32(this->textBoxCol->Text);
-			 }
-			 else {
-				 //現在表示している表の行数としてテキストボックスに格納する
-				 this->textBoxCol->Text = Convert::ToString(*this->Column);
-			 }
-			 //結合状態を保持する
-			 for (int i = 0; i < *this->Row; i++) {
-				 this->JoinIndex->Add(Constants->ZERO);
-			 }
-			 return;
 		 }
+
+/*概要：列削除ボタンのクリックイベント
+作成日2017.9.29
+作成者：K.Asada
+更新内容：先頭の列は削除できないように分岐を追加
+更新日：2017.9.30
+作成者：K.Asada*/
+private: System::Void DeleteColumnButtonClick(System::Object^  sender, System::EventArgs^  e) {
+	//全ての例外を捕捉したらメイン画面側で警告を表示するための例外処理
+	try {
+		//削除対象が先頭の列の場合は親を削除することになるので削除しない
+		if (*this->ColumnIndex > 0) {
+			//指定した列を削除する関数を呼び出す
+			this->ColumnDelete(*this->Row, *this->ColumnIndex);
+			//列数を減らす
+			this->textBoxCol->Text = Convert::ToString(Convert::ToInt32(this->textBoxCol->Text) - 1);
+			//表の内容が変更されているため再描画する準備を行う
+			this->ReadyPict(this->TableElem);
+			//表全体を再描画する
+			this->TableGenerate(this->pictureBoxTable);
+		}
+		//先頭列は削除しない
+		else {
+			//削除できない旨を伝える
+			MessageBox::Show("先頭の列は削除できません");
+		}
+		return;
+	}
+	//全ての例外を捕捉する
+	catch (System::Exception^ e) {
+		//メイン画面で警告を表示する、エラー内容はコンソールに表示
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+}
+
+/*概要：行削除ボタンのクリックイベント
+作成日：2017.9.29
+作成者：K.Asada
+更新内容：1行しかないときは削除できないように変更
+更新日：2017.9.30
+更新者：K.Asada*/
+private: System::Void DeleteRowButtonClick(System::Object^  sender, System::EventArgs^  e) {
+	//全ての例外に対してメイン画面で警告を表示するように例外処理
+	try {
+		//行が1行以上の時のみ削除に移る
+		if (*this->Row > 1) {
+			//指定した行を削除する関数を呼び出す
+			this->RowDelete(*this->RowIndex);
+			//行数を減らす
+			this->textBoxRow->Text = Convert::ToString(Convert::ToInt32(this->textBoxRow->Text) - 1);
+			//表の内容が変更されているため再描画する準備を行う
+			this->ReadyPict(this->TableElem);
+			//表全体を再描画する
+			this->TableGenerate(this->pictureBoxTable);
+		}
+		//1行しかないときは削除できない旨を表示
+		else {
+			MessageBox::Show("これ以上行の削除はできません");
+		}
+		return;
+	}
+	//全ての例外を捕捉
+	catch (System::Exception^ e) {
+		//エラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+}
+
+/*概要：新規ボタンのクリックイベント、新規に表画像を作成する
+作成日：2017.9.30
+作成者：K.Asada*/
+private: System::Void ButtonCewTableClick(System::Object^  sender, System::EventArgs^  e) {
+	//全ての例外でメイン画面側で警告を出したいので例外処理
+	try {
+		MoreInfoForm^ more = gcnew MoreInfoForm();			//詳細情報編集クラスをインスタンス化
+		CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体操作クラスをインスタンス化
+		//新規でもっとも親となる空の構造体を一つ作成してメンバに格納
+		this->TableElem = CellCtrl->ChainParent(Constants->EMPTY_STRING, Constants->EMPTY_STRING, nullptr);
+		//表画像の行数をテキストボックスより取得する
+		this->Row = Convert::ToInt32(this->textBoxRow->Text);
+		//表画像の列数をテキストボックスより取得する
+		this->Column = Convert::ToInt32(this->textBoxCol->Text);
+		//先ほど生成した空の構造体の詳細情報を入力させるために詳細画面へ渡す
+		more->TableElem = this->TableElem;
+		//詳細画面を開いて編集を行う
+		more->ShowDialog();
+		//表画像の描画を行う
+		this->TableGenerate(this->pictureBoxTable);
+		//コントロールにピクチャボックスを追加する
+		this->Controls->Add(this->pictureBoxTable);
+		//表画像が埋もれていることがあるので前面に押し出す
+		this->pictureBoxTable->BringToFront();
+		return;
+	}
+	//全ての例外を捕捉
+	catch (System::Exception^ e) {
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+}
 };
 }

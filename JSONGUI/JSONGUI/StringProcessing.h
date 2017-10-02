@@ -62,11 +62,16 @@ namespace process{
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		Void DBString(string dbresult) {
-			ptree pt;		//JSONを格納するためのツリーを宣言
+			ptree pt;			//JSONを格納するためのツリーを宣言
+			stringstream ss;	//DBとの通信結果を格納するためのストリーム
+			//ツリーに読み込むために文字列ストリームに格納
+			ss << dbresult;
 			//DBより取得したJSON文字列をJSONツリーに変換
-			read_json(dbresult, pt);
+			read_json(ss, pt);
 			//JSONをチェイン構造に変換する関数を呼び出す
 			this->Tablechain = this->JSONString(pt, "", nullptr);
+			//処理を終了する
+			return;
 		}
 
 		/*概要：文字列からJSONへの変換を行う関数
@@ -182,8 +187,8 @@ namespace process{
 				//子が配列以外であれば
 				}
 				else if (boost::optional<string>str = childtree.get <string>(childkey)) {
-					//この文字列がこの場合は再帰せずに弟にデータを連結していく
-					if (str.get() != "") {
+					//子がいなければ再帰せずに弟にデータを連結していく
+					if ((childtree.get_child(childkey)).empty()) {
 						//子要素のキーを取り出す
 						childkey = child.first;
 						//弟にデータを連結する関数を呼び出す

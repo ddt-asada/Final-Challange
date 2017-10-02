@@ -47,6 +47,8 @@ namespace option {
 	private: System::Windows::Forms::Button^  buttonOptionOK;
 	private: System::Windows::Forms::Button^  buttonLoadFile;
 	private: System::Windows::Forms::OpenFileDialog^  openFileDialog;
+	private: System::Windows::Forms::Label^  label1;
+	private: System::Windows::Forms::Label^  label2;
 
 	private:
 		/// <summary>
@@ -67,11 +69,13 @@ namespace option {
 			this->buttonOptionOK = (gcnew System::Windows::Forms::Button());
 			this->buttonLoadFile = (gcnew System::Windows::Forms::Button());
 			this->openFileDialog = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->label1 = (gcnew System::Windows::Forms::Label());
+			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// textBoxPath
 			// 
-			this->textBoxPath->Location = System::Drawing::Point(125, 88);
+			this->textBoxPath->Location = System::Drawing::Point(208, 102);
 			this->textBoxPath->Multiline = true;
 			this->textBoxPath->Name = L"textBoxPath";
 			this->textBoxPath->Size = System::Drawing::Size(927, 53);
@@ -79,7 +83,7 @@ namespace option {
 			// 
 			// textBoxDBQuery
 			// 
-			this->textBoxDBQuery->Location = System::Drawing::Point(125, 235);
+			this->textBoxDBQuery->Location = System::Drawing::Point(208, 223);
 			this->textBoxDBQuery->Multiline = true;
 			this->textBoxDBQuery->Name = L"textBoxDBQuery";
 			this->textBoxDBQuery->Size = System::Drawing::Size(927, 53);
@@ -87,7 +91,7 @@ namespace option {
 			// 
 			// buttonOptionCancel
 			// 
-			this->buttonOptionCancel->Location = System::Drawing::Point(1074, 767);
+			this->buttonOptionCancel->Location = System::Drawing::Point(1237, 347);
 			this->buttonOptionCancel->Name = L"buttonOptionCancel";
 			this->buttonOptionCancel->Size = System::Drawing::Size(191, 71);
 			this->buttonOptionCancel->TabIndex = 2;
@@ -97,7 +101,7 @@ namespace option {
 			// 
 			// buttonOptionOK
 			// 
-			this->buttonOptionOK->Location = System::Drawing::Point(1271, 767);
+			this->buttonOptionOK->Location = System::Drawing::Point(1062, 347);
 			this->buttonOptionOK->Name = L"buttonOptionOK";
 			this->buttonOptionOK->Size = System::Drawing::Size(157, 71);
 			this->buttonOptionOK->TabIndex = 3;
@@ -107,7 +111,7 @@ namespace option {
 			// 
 			// buttonLoadFile
 			// 
-			this->buttonLoadFile->Location = System::Drawing::Point(1074, 88);
+			this->buttonLoadFile->Location = System::Drawing::Point(1157, 102);
 			this->buttonLoadFile->Name = L"buttonLoadFile";
 			this->buttonLoadFile->Size = System::Drawing::Size(145, 53);
 			this->buttonLoadFile->TabIndex = 4;
@@ -120,11 +124,35 @@ namespace option {
 			this->openFileDialog->FileName = L"openFileDialog";
 			this->openFileDialog->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &OptionForm::FileDialogOK);
 			// 
+			// label1
+			// 
+			this->label1->AutoSize = true;
+			this->label1->Font = (gcnew System::Drawing::Font(L"MS UI Gothic", 10.875F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label1->Location = System::Drawing::Point(93, 233);
+			this->label1->Name = L"label1";
+			this->label1->Size = System::Drawing::Size(109, 29);
+			this->label1->TabIndex = 5;
+			this->label1->Text = L"DBƒNƒGƒŠ";
+			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Font = (gcnew System::Drawing::Font(L"MS UI Gothic", 10.875F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(128)));
+			this->label2->Location = System::Drawing::Point(50, 112);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(152, 29);
+			this->label2->TabIndex = 5;
+			this->label2->Text = L"“Ç‚Ýž‚Ýæ";
+			// 
 			// OptionForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1440, 850);
+			this->ClientSize = System::Drawing::Size(1440, 438);
+			this->Controls->Add(this->label2);
+			this->Controls->Add(this->label1);
 			this->Controls->Add(this->buttonLoadFile);
 			this->Controls->Add(this->buttonOptionOK);
 			this->Controls->Add(this->buttonOptionCancel);

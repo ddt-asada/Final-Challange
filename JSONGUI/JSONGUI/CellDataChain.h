@@ -130,6 +130,9 @@ public:
 	 作成者：K.Asada
 	 更新内容：長男に兄を追加するときには親もつなぎ変えるように変更
 	 更新日：2017.9.28
+	 更新者：K.Asada
+	 更新内容：繋ぎ変える対象がおかしくバグが出ていたので修正
+	 更新日：2017.9.30
 	 更新者：K.Asada*/
 	cellchain^ ChainElderBrother(System::String^ key, System::String^ value, cellchain^ target) {
 		try {
@@ -145,6 +148,8 @@ public:
 				target->prev->next = chain;
 				//連結用の構造体の兄として元の兄を連結する
 				chain->prev = target->prev;
+				//親がいないことを格納する
+				chain->upper = nullptr;
 			}//兄がいない場合
 			else
 			{
@@ -161,8 +166,6 @@ public:
 			target->prev = chain;
 			//連結用の構造体の弟として対象の構造体を連結
 			chain->next = target;
-			//親がいないことを格納する
-			chain->upper = nullptr;
 			//子がいないことを格納する
 			chain->lower = nullptr;
 			//対象の兄に新たな構造体を連結をした構造体を返す
@@ -226,23 +229,16 @@ public:
 	引数：cellchain^ declchain：削除対象の構造体
 	戻り値：なし
 	作成日：2017.9.22
-	作成者：K.Asada*/
-	System::Void ChainDelete(cellchain^ delchain) {
+	作成者：K.Asada
+	更新日2017.9.29
+	更新者：K.Asada
+	更新内容：関数名を変更、指定された箇所の子要素も親が存在しなくなるため削除するように変更、対象に親がいたときの処理方法も変更*/
+	System::Void DeleteChain(cellchain^ delchain) {
 		try {
-			//削除対象の構造体に親と子が両方存在していたら親と子を連結させる
-			if (delchain->upper != nullptr && delchain->lower != nullptr) {
-				//親の子として子を連結する
-				delchain->upper->lower = delchain->lower;
-				//子の親として親を連結する
-				delchain->lower->upper = delchain->upper;
-			}//親しか存在しないときは親の子への参照を外す
-			else if (delchain->upper != nullptr) {
-				//親の子への参照を外す
-				delchain->upper->lower = nullptr;
-			}//子しか存在しないときは子の親への参照を外す
-			else if (delchain->lower != nullptr) {
-				//子の親への参照を外す
-				delchain->lower->upper = nullptr;
+			//削除対象に子がいるかを調べる
+			if (delchain->lower != nullptr) {
+				//子がいる場合は親に当たる構造体が削除されるため必要なくなるので削除する
+				this->DeleteYounger(delchain->lower);
 			}
 			//削除対象の構造体に兄と弟両方が存在していたら兄と弟を連結させる
 			if (delchain->next != nullptr && delchain->prev != nullptr) {
@@ -254,14 +250,86 @@ public:
 			else if (delchain->prev != nullptr) {
 				//兄の弟への参照を外す
 				delchain->prev->next = nullptr;
-			}//弟しか存在しないときは参照を外す
+			}//弟しか存在しないときは元の構造体に親がいるかを調べる
 			else if (delchain->next != nullptr) {
-				//弟の兄への参照を外す
-				delchain->next->prev = nullptr;
+				//親がいる場合は親の参照を変える
+				if (delchain->upper != nullptr) {
+					//親がいる場合は弟に引き継ぐ
+					delchain->upper->lower = delchain->next;
+					//弟に親を渡す
+					delchain->next->upper = delchain->upper;
+				}
+					//弟の兄への参照を外す
+					delchain->next->prev = nullptr;
+			}//兄弟がおらずに親のみが存在する場合
+			else if (delchain->upper != nullptr) {
+				//親の子を削除する
+				delchain->upper->lower = nullptr;
 			}
 			//親子、兄弟から参照が外れた構造体を削除する
+			delchain = nullptr;
 			delete delchain;
+			return;
 		}
+		catch (System::NullReferenceException^ e) {
+			System::Console::WriteLine(e);
+		}
+		catch (System::ArgumentNullException^ e) {
+			System::Console::WriteLine(e);
+		}
+	}
+	
+	/*概要：対象の構造体より若い構造体（子、弟）をすべて削除する関数
+	引数：cellchain^ parent：削除対象の構造体
+	戻り値：なし
+	作成日：2017.9.29
+	作成者：K.Asada*/
+	System::Void DeleteYounger(cellchain^ parent) {
+		//構造体をつなぎ変えるときにNULLを指す恐れがあるので例外処理
+		try {
+			//対象に子がいるかを調べる
+			if (parent->lower != nullptr) {
+				//子がいるときは再帰してさらに削除していく
+				this->DeleteYounger(parent->lower);
+			}
+			//対象に弟がいる場合はすべて削除する
+			if (parent->next != nullptr) {
+				//弟がなくなるまで走査する
+				for (; parent->next != nullptr;) {
+					//再帰して弟を削除する
+					this->DeleteChain(parent->next);
+				}
+			}
+			if (parent->next != nullptr && parent->prev != nullptr) {
+				//兄の弟として弟を連結する
+				parent->prev->next = parent->next;
+				//弟の兄として兄を連結する
+				parent->next->prev = parent->prev;
+			}//兄しか存在しないときは参照をはずす
+			else if (parent->prev != nullptr) {
+				//兄の弟への参照を外す
+				parent->prev->next = nullptr;
+			}//弟しか存在しないときは元の構造体に親がいるかを調べる
+			else if (parent->next != nullptr) {
+				//親がいる場合は親の参照を変える
+				if (parent->upper != nullptr) {
+					//親がいる場合は弟に引き継ぐ
+					parent->upper->lower = parent->next;
+					//弟に親を渡す
+					parent->next = parent->upper;
+				}
+				//弟の兄への参照を外す
+				parent->next->prev = nullptr;
+			}//兄弟がおらずに親のみが存在する場合
+			else if (parent->upper != nullptr) {
+				//親の子を削除する
+				parent->upper->lower = nullptr;
+			}
+			//周りとの参照、子が全て削除されたら対象を必要ないとして削除する
+			parent = nullptr;
+			delete parent;
+		}
+		//NULL関係の例外を捕捉
 		catch (System::NullReferenceException^ e) {
 			System::Console::WriteLine(e);
 		}
@@ -309,7 +377,7 @@ public:
 		//親要素から取得対象の行の構造体を取得する
 		colchain = GetRowChain(rowindex, parent);
 		//列座標が1以下であれば親要素の構造体を返却する
-		if(colindex >= 1 || colchain == nullptr){
+		if(colindex >= 1 && colchain != nullptr){
 			//行の要素（子）が存在していれば対象の構造体を探す
 			if (colchain->lower != nullptr) {
 				//子を取得
@@ -349,7 +417,7 @@ public:
 		//取得対象の構造体の位置まで移動する
 		for (int i = 0; i < rowindex; i++) {
 			//移動先がなくなったときは構造体を取得できなかったとしてnullptrを取得
-			if (rowchain->next != nullptr) {
+			if (rowchain != nullptr && rowchain->next != nullptr) {
 				//弟の構造体に移動する
 				rowchain = rowchain->next;
 			}
@@ -413,49 +481,53 @@ public:
 		：cellchain^ elem：挿入対象の構造体
 	戻り値：なし
 	作成日：2017.9.27
-	作成者：K.Asada*/
-	System::Void SetChainCell(System::Int32 rowindex, System::Int32 columnindex, System::String^ setdata, cellchain^ elem) {
-		cellchain^ scan = elem;			//対象の構造体を取得する
-		//対象の行の構造体へ移動する
-		for (int i = 0; i < rowindex; i++) {
-			//次の行の構造体が存在していれば
-			if (scan->next != nullptr) {
-				//次の構造体を取得する
-				scan = scan->next;
-			}//ない場合は新規で空文字の入った構造体を連結する
-			else {
-				scan = this->ChainYoungBrother("", "", scan);
+	作成者：K.Asada
+	更新内容：行の先頭を編集した時に選択箇所の子が編集されるバグがあったので修正、関数を追加
+	更新日：2017.9.30
+	更新者：K.Asada*/
+	cellchain^ SetChainCell(System::Int32 rowindex, System::Int32 columnindex, System::String^ setdata, cellchain^ elem) {
+		//構造体のnull関係の例外を捕捉するための例外処理
+		try {
+			cellchain^ scan = elem;			//対象の構造体を取得する
+			//対象に子がいるかを調べる
+			scan = this->CheckChild(scan);
+			//対象の行の構造体へ移動する
+			for (int i = 0; i < rowindex; i++) {
+				//弟がいるかを判定する関数を呼び出す
+				scan = this->CheckBrother(scan);
 			}
-		}
-		//対象の構造体に行の先頭に続く要素があるかを調べる
-		if (scan->lower != nullptr) {
-			//要素の先頭の構造体を取得する
-			scan = scan->lower;
-		}//ない場合は新規で空文字の入った構造体を連結する
-		else {
-			scan = this->ChainChild("", "", scan);
-		}
-		//行の要素の構造体を移動して対象の挿入対象の構造体を取得する
-		for (int i = 1; i < columnindex; i++) {
-			//次の構造体があるかを調べる
-			if (scan->next != nullptr) {
-				//次の構造体を取得する
-				scan = scan->next;
-			}//ない場合は新規で空文字の入った構造体を連結して取得する
-			else {
-				scan = this->ChainYoungBrother("", "", scan);
+			//対象が行の先頭ならすでに行の先頭を取得しているので値の代入動作へ移動
+			if (columnindex > 0) {
+				//対象の構造体に行の先頭に続く要素があるかを調べる
+				scan = this->CheckChild(scan);
+				//行の要素の構造体を移動して対象の挿入対象の構造体を取得する
+				for (int i = 1; i < columnindex; i++) {
+					//次の構造体があるかを調べる
+					scan = this->CheckBrother(scan);
+				}
 			}
+			//挿入対象の構造体がオブジェクトを示していれば
+			if (scan->lower != nullptr) {
+				//対象の構造体のキー名に文字列を挿入する
+				scan->key = setdata;
+			}
+			else {
+				//対象の構造体の値に文字列を挿入する
+				scan->value = setdata;
+			}
+			//作成した構造体を返却する
+			return scan;
 		}
-		//挿入対象の構造体がオブジェクトを示していれば
-		if (scan->lower != nullptr) {
-			//対象の構造体のキー名に文字列を挿入する
-			scan->key = setdata;
+		//null参照例外を捕捉
+		catch (System::NullReferenceException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
 		}
-		else {
-			//対象の構造体の値に文字列を挿入する
-			scan->value = setdata;
+		//null引数例外を捕捉
+		catch (System::ArgumentNullException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
 		}
-		return;
 	}
 
 	/*概要：対象の構造体の一番弟の構造体を取得する関数
@@ -472,10 +544,79 @@ public:
 			//取得した弟を返す
 			return scan;
 		}
+		//null参照例外を捕捉
 		catch (System::NullReferenceException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
 			System::Console::WriteLine(e);
 		}
+		//null引数例外を捕捉
 		catch (System::ArgumentNullException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+	}
+
+	/*概要：対象の構造体に子がいるかを確認する関数
+	引数：cellchain^ family：対象の構造体
+	戻り値：cellchain^ family：対象の子供
+	作成日：2017.9.30
+	作成者：K.Asada*/
+	cellchain^ CheckChild(cellchain^ family) {
+		//構造体でのnull関係の例外処理
+		try {
+			//子がいるかを調べなければ作る
+			if (family->lower != nullptr) {
+				//子がいる場合はそのまま子を返す
+				family = family->lower;
+			}
+			//子がいない場合は作る
+			else {
+				//子供として空の構造体を連結する
+				family = this->ChainChild("", "", family);
+			}
+			//取得した子供を返す
+			return family;
+		}
+		//null参照例外を捕捉
+		catch (System::NullReferenceException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+		//null引数例外を捕捉
+		catch (System::ArgumentNullException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+	}
+
+	/*概要：対象に弟がいるかを調べる関数
+	引数：cellchain^ family：対象の構造体
+	戻り値：cellchain^ family：対象の弟
+	作成日：2017.9.30
+	作成者：K.Asada*/
+	cellchain^ CheckBrother(cellchain^ family) {
+		//構造体でのnull関係の例外を捕捉するための例外処理
+		try {
+			//弟がいるかを調べ、なければ作る
+			if (family->next != nullptr) {
+				//そのまま弟を取得する
+				family = family->next;
+			}
+			//いなければ弟を作る
+			else {
+				family = ChainYoungBrother("", "", family);
+			}
+			//対象の弟を返却する
+			return family;
+		}
+		//null参照例外を捕捉
+		catch (System::NullReferenceException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+		//null引数例外を捕捉
+		catch (System::ArgumentNullException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
 			System::Console::WriteLine(e);
 		}
 	}
