@@ -366,6 +366,7 @@ namespace JSONGUI {
 			this->textBoxCell->TabIndex = 2;
 			this->textBoxCell->DoubleClick += gcnew System::EventHandler(this, &JSONGUIForm::TextBoxCellClick);
 			this->textBoxCell->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &JSONGUIForm::TextBoxCellEnter);
+			this->textBoxCell->Leave += gcnew System::EventHandler(this, &JSONGUIForm::textBoxCell_Leave);
 			// 
 			// pictureBoxCurrent
 			// 
@@ -531,28 +532,36 @@ namespace JSONGUI {
 作成日：2017.9.30
 作成者：K.ASada*/
 private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  e) {
-	//展開動作のために再帰してきたときに分岐させる
-	if (this->TableElem != nullptr) {
-		//展開先にてキャンセルボタンは不要なので削除する
-		this->tabPage->Controls->Remove(this->buttonTableCancel);
-		//展開先にてOKボタンは不要なので削除する
-		this->tabPage->Controls->Remove(this->buttonTableOK);
-		//展開先にて通信ボタンは不要なので削除する
-		this->tabPage->Controls->Remove(this->buttonConnect);
-		//展開先にて設定ボタンは不要なので削除する
-		this->tabPage->Controls->Remove(this->buttonOption);
-		//展開先にて新規ボタンは不要なので削除する
-		this->tabPage->Controls->Remove(this->buttonNewTable);
-		//表画像を生成するための準備関数を呼び出す
-		this->ReadyPict(this->TableElem);
-		//表画像を生成する関数を呼び出す
-		this->TableGenerate(this->pictureBoxTable);
-		//コントロールへピクチャボックスを追加する
-		this->tabPage->Controls->Add(this->pictureBoxTable);
-		//表画像が埋もれていることがあるので前面に押し出す
-		this->pictureBoxTable->BringToFront();
+	//メッセージを表示するための例外処理
+	try {
+		//展開動作のために再帰してきたときに分岐させる
+		if (this->TableElem != nullptr) {
+			//展開先にてキャンセルボタンは不要なので削除する
+			this->tabPage->Controls->Remove(this->buttonTableCancel);
+			//展開先にてOKボタンは不要なので削除する
+			this->tabPage->Controls->Remove(this->buttonTableOK);
+			//展開先にて通信ボタンは不要なので削除する
+			this->tabPage->Controls->Remove(this->buttonConnect);
+			//展開先にて設定ボタンは不要なので削除する
+			this->tabPage->Controls->Remove(this->buttonOption);
+			//展開先にて新規ボタンは不要なので削除する
+			this->tabPage->Controls->Remove(this->buttonNewTable);
+			//表画像を生成するための準備関数を呼び出す
+			this->ReadyPict(this->TableElem);
+			//表画像を生成する関数を呼び出す
+			this->TableGenerate(this->pictureBoxTable);
+			//コントロールへピクチャボックスを追加する
+			this->tabPage->Controls->Add(this->pictureBoxTable);
+			//表画像が埋もれていることがあるので前面に押し出す
+			this->pictureBoxTable->BringToFront();
+		}
+		return;
 	}
-	return;
+	//全ての例外を捕捉する
+	catch (System::Exception^ e) {
+		//処理が中断された旨を表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：テーブルタブの設定ボタンクリック時のイベント、設定画面を開く
@@ -869,16 +878,24 @@ private: System::Void ListOptionClick(System::Object^  sender, System::EventArgs
 更新日：2017.9.30
 更新者：K.Asada*/
 private: System::Void PictureBoxTableMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-	//選択状態を保持するためにクリックした表画像上の座標をメンバへ保存する関数を呼び出す
-	this->GetCellPoint(e);
-	//選択箇所がわかりやすいようにハイライトする関数を呼び出す
-	this->SelecteCell(this->pictureBoxCurrent);
-	//ハイライト画像をコントロールへ追加する
-	this->pictureBoxTable->Controls->Add(this->pictureBoxCurrent);
-	//画像を前面に押し出す
-	this->pictureBoxCurrent->BringToFront();
-	//テキストボックスを削除する
-	this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+	//メッセージを表示するための例外処理
+	try {
+		//テキストボックスを削除する
+		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+		//選択状態を保持するためにクリックした表画像上の座標をメンバへ保存する関数を呼び出す
+		this->GetCellPoint(e);
+		//選択箇所がわかりやすいようにハイライトする関数を呼び出す
+		this->SelecteCell(this->pictureBoxCurrent);
+		//ハイライト画像をコントロールへ追加する
+		this->pictureBoxTable->Controls->Add(this->pictureBoxCurrent);
+		//画像を前面に押し出す
+		this->pictureBoxCurrent->BringToFront();
+	}
+	//全ての例外を捕捉する
+	catch (System::Exception^ e) {
+		//処理が中断された旨を表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：リストタブの表画像上をクリックしたときのイベント、選択状態にする関数を呼び出す
@@ -907,17 +924,25 @@ private: System::Void PictureBoxListMouseClick(System::Object^  sender, System::
 更新者：K.Asada
 更新内容：キー名/値編集モードに対応したデータをテキストボックスに表示するように変更、テキストボックスが表示されたときにカーソルが末尾に来るように変更*/
 private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::EventArgs^  e) {
-	//テキストボックスに情報を設定する関数を呼び出す
-	this->CellTextGenerate(this->textBoxCell, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
-	//生成したテキストボックスをメイン画面のコントロールに乗せる
-	this->pictureBoxTable->Controls->Add(this->textBoxCell);
-	//テキストボックスが埋もれないように前面に配置する
-	this->textBoxCell->BringToFront();
-	//テキストボックスの末尾にカーソルを移動する
-	this->textBoxCell->SelectionStart = this->textBoxCell->Text->Length;
-	//カーソルを表示するためにテキストボックスにフォーカスる
-	this->textBoxCell->Focus();
-	return;
+	//メッセージを表示するための例外処理
+	try {
+		//テキストボックスに情報を設定する関数を呼び出す
+		this->CellTextGenerate(this->textBoxCell, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
+		//生成したテキストボックスをメイン画面のコントロールに乗せる
+		this->pictureBoxTable->Controls->Add(this->textBoxCell);
+		//テキストボックスが埋もれないように前面に配置する
+		this->textBoxCell->BringToFront();
+		//テキストボックスの末尾にカーソルを移動する
+		this->textBoxCell->SelectionStart = this->textBoxCell->Text->Length;
+		//カーソルを表示するためにテキストボックスにフォーカスる
+		this->textBoxCell->Focus();
+		return;
+	}
+	//全ての例外を捕捉する
+	catch (System::Exception^ e) {
+		//処理が中断された旨を表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 /*概要：リストタブの画像のハイライト部分をクリックしたときのイベント、編集用のテキストボックスを表示
@@ -963,20 +988,15 @@ try{
 		//メッセージを表示
 		//対象の位置の構造体に文字列を挿入する関数を呼び出す
 		child = CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, "", this->TableElem, false, false);
-		//child = this->TableElem->lower;
-	//	MessageBox::Show("表示すべき情報がありません");
 	}//正常に情報を取得できていた場合は詳細ダイアログを表示
-	//else {
-		//詳細ダイアログへ構造体を渡す
-		more->TableElem = child;
-		//新規ダイアログで表示する
-		more->ShowDialog();
-		//終わったら表画像を再描画する
-		this->ReadyPict(this->TableElem);
-		//表画像を再描画する
-		this->TableGenerate(this->pictureBoxTable);
-	
-//	}
+	//詳細ダイアログへ構造体を渡す
+	more->TableElem = child;
+	//新規ダイアログで表示する
+	more->ShowDialog();
+	//終わったら表画像を再描画する
+	this->ReadyPict(this->TableElem);
+	//表画像を再描画する
+	this->TableGenerate(this->pictureBoxTable);
 	return;
 	}
 		 catch (System::NullReferenceException^ e) {
@@ -1019,6 +1039,8 @@ private: System::Void AddRowButtonClick(System::Object^  sender, System::EventAr
 		else if (select != Constants->CANCEL_BUTTON_STRING) {
 			//行を挿入する関数を呼び出す
 			this->RowAdd(*this->RowIndex, select);
+			//行数を追加する
+			this->textBoxRow->Text = Convert::ToString(Convert::ToInt32(this->textBoxRow->Text) + 1);
 			//行を追加したため表を再描画したいので準備を行う
 			this->ReadyPict(this->TableElem);
 			//行を挿入した後の表画像を再描画する関数を呼び出す
@@ -1099,19 +1121,11 @@ private: System::Void AddColumnButtonClick(System::Object^  sender, System::Even
 更新内容：キー名/値編集モードに対応した文字列を編集するように変更*/
 private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
 
-	try {	//チェイン構造操作クラスをインスタンス化
-		CellDataChain^ CellCtrl = gcnew CellDataChain();
+	try {	
 		//エンターキーが押されたときのイベント
 		if (e->KeyCode == Keys::Enter) {
-			Int32 rowindex = *this->RowIndex;		//編集する構造体を指定するために座標を取得
-			Int32 colindex = *this->ColumnIndex;	//編集する構造体を指定するために座標を取得
-			String^ data = this->textBoxCell->Text;	//構造体んい渡すための文字列をテキストボックスより取得
-			//対象の位置の構造体に文字列を挿入する関数を呼び出す
-			CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
-			//セルの再描画を行う
-			this->ReTableGenerate(this->pictureBoxTable);
-			//テキストボックスを表示しないようにする
-			this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+			//Focusleaveイベントを発生させるためにアクティブを無にする
+			this->ActiveControl = nullptr;
 		}
 	}
 	catch (System::NullReferenceException^ e) {
@@ -1228,6 +1242,7 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 			 catch (System::FormatException^ e) {
 				 //入力内容がおかしい旨をコンソールに表示する
 				 System::Console::WriteLine(Constants->INPUT_ERROR_STRING + e);
+				 throw e;
 			 }
 		 }
 
@@ -1332,6 +1347,27 @@ private: System::Void ButtonNewTableClick(System::Object^  sender, System::Event
 	//全ての例外を捕捉
 	catch (System::Exception^ e) {
 		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+}
+private: System::Void textBoxCell_Leave(System::Object^  sender, System::EventArgs^  e) {
+	//メッセージを表示するための例外処理
+	try {
+		//チェイン構造操作クラスをインスタンス化
+		CellDataChain^ CellCtrl = gcnew CellDataChain();
+		Int32 rowindex = *this->RowIndex;		//編集する構造体を指定するために座標を取得
+		Int32 colindex = *this->ColumnIndex;	//編集する構造体を指定するために座標を取得
+		String^ data = this->textBoxCell->Text;	//構造体んい渡すための文字列をテキストボックスより取得
+		//対象の位置の構造体に文字列を挿入する関数を呼び出す
+		CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
+		//セルの再描画を行う
+		this->ReTableGenerate(this->pictureBoxTable);
+		//テキストボックスを表示から外す
+		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+	}
+	//全ての例外を捕捉する
+	catch (System::Exception^ e) {
+		//処理が中断された旨を表示する
 		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 }

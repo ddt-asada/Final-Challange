@@ -226,18 +226,31 @@ namespace TableInformation {
 		作成日：2017.9.20
 		作成者：K.Asada*/
 		Void InfoInit() {
-			this->Row = Constants->ZERO;				//行数を初期化する
-			this->Column = Constants->ZERO;				//列数を初期化する
-			this->RowIndex = Constants->ZERO;			//行座標を初期化する
-			this->ColumnIndex = Constants->ZERO;		//列座標を初期化する
-			this->RctWidth = 200;						//セル一つ当たりの幅を初期化する
-			this->RctHeight = 100;						//セル一つ当たりの高さを初期化する
-			this->JSONFilePath = Constants->EMPTY_STRING;//読み込み先のファイルパスを初期化する
-			this->DBQuery = Constants->EMPTY_STRING;	//DBへ投げるクエリを初期化する
-			CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体操作クラスをインスタンス化
-			//構造体を削除する
-			CellCtrl->DeleteChain(this->TableElem);
-			return;
+			//構造体の削除時にNULLを指すかもしれないので例外処理
+			try {
+				this->Row = Constants->ZERO;				//行数を初期化する
+				this->Column = Constants->ZERO;				//列数を初期化する
+				this->RowIndex = Constants->ZERO;			//行座標を初期化する
+				this->ColumnIndex = Constants->ZERO;		//列座標を初期化する
+				this->RctWidth = 200;						//セル一つ当たりの幅を初期化する
+				this->RctHeight = 100;						//セル一つ当たりの高さを初期化する
+				this->JSONFilePath = Constants->EMPTY_STRING;//読み込み先のファイルパスを初期化する
+				this->DBQuery = Constants->EMPTY_STRING;	//DBへ投げるクエリを初期化する
+				CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体操作クラスをインスタンス化
+				//構造体を削除する
+				CellCtrl->DeleteChain(this->TableElem);
+				return;
+			}
+			//NULL関係の例外を捕捉
+			catch (System::NullReferenceException^ e) {
+				//コンソールにエラー内容を表示
+				System::Console::WriteLine(e);
+			}
+			//NULL関係の例外を捕捉
+			catch (System::ArgumentNullException^ e) {
+				//コンソールにエラー内容を表示
+				System::Console::WriteLine(e);
+			}
 		}
 
 		/*概要：設定画面を開くための関数
@@ -548,14 +561,23 @@ namespace TableInformation {
 		作成日：2017.9.29
 		作成者：K.Asada*/
 		Void RowDelete(Int32 rowindex) {
-			CellDataChain::cellchain^ parent = nullptr;			//対象の構造体を格納するための空の構造体
-			CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体を操作するクラスをインスタンス化
-			//対象の構造体を取得する
-			parent = CellCtrl->GetRowChain(rowindex, this->TableElem->lower);
-			//対象の構造体を削除する
-			CellCtrl->DeleteChain(parent);
-			*this->Row -= 1;
-			return;
+			//構造体でNULLを指すかもしれないので例外処理
+			try {
+				CellDataChain::cellchain^ parent = nullptr;			//対象の構造体を格納するための空の構造体
+				CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体を操作するクラスをインスタンス化
+				//対象の構造体を取得する
+				parent = CellCtrl->GetRowChain(rowindex, this->TableElem->lower);
+				//対象の構造体を削除する
+				CellCtrl->DeleteChain(parent);
+				*this->Row -= 1;
+				return;
+			}
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
+			}
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
+			}
 		}
 
 		/*概要：指定した列の構造体を削除する関数
@@ -565,19 +587,28 @@ namespace TableInformation {
 		作成日：2017.9.29
 		作成者：K.Asada*/
 		Void ColumnDelete(Int32 row, Int32 columnindex) {
-			CellDataChain::cellchain^ parent = nullptr;		//削除対象の構造体を格納するための空の構造体
-			CellDataChain^ CellCtrl = gcnew CellDataChain();//構造体を操作するクラスをインスタンス化
-			//対象をすべて削除するまで走査する
-			for (int i = 0; i < row; i++) {
-				//削除対象を取得する
-				parent = CellCtrl->GetColumnChain(i, columnindex, this->TableElem->lower);
-				//対象が取得できたか
-				if (parent != nullptr) {
-					//対象が取得できた場合は削除する
-					CellCtrl->DeleteChain(parent);
+			//構造体でNULLを指すかもしれないので例外処理
+			try {
+				CellDataChain::cellchain^ parent = nullptr;		//削除対象の構造体を格納するための空の構造体
+				CellDataChain^ CellCtrl = gcnew CellDataChain();//構造体を操作するクラスをインスタンス化
+				//対象をすべて削除するまで走査する
+				for (int i = 0; i < row; i++) {
+					//削除対象を取得する
+					parent = CellCtrl->GetColumnChain(i, columnindex, this->TableElem->lower);
+					//対象が取得できたか
+					if (parent != nullptr) {
+						//対象が取得できた場合は削除する
+						CellCtrl->DeleteChain(parent);
+					}
 				}
+				return;
 			}
-			return;
+			catch (System::NullReferenceException^ e) {
+				System::Console::WriteLine(e);
+			}
+			catch (System::ArgumentNullException^ e) {
+				System::Console::WriteLine(e);
+			}
 		}
 
 		/*概要：行・列の追加関数で利用する処理関数

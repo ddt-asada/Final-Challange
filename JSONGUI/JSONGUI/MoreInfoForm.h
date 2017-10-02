@@ -220,20 +220,28 @@ namespace JSONGUI {
 	作成日：2017.9.25
 	作成者：K.Asada*/
 	private: System::Void MoreInfoForm_Load(System::Object^  sender, System::EventArgs^  e) {
-		//キー名をテキストボックスに格納する
-		this->textBoxKey->Text = this->TableElem->key;
-		//値をテキストボックスに格納する
-		this->textBoxValue->Text = this->TableElem->value;
-		//親の数をカウントする
-		this->ParentIndex = this->CountParent(this->TableElem);
-		//親がいない場合は画像の描画を行わない
-		if (*this->ParentIndex > 0) {
-			//親を列挙したものを描画する関数を呼び出す
-			this->infoTableGenerate(this->TableElem, this->pictureBoxParent, *this->ParentIndex);
-			//ピクチャボックスを前面に押し出す
-			this->pictureBoxParent->BringToFront();
+		try {
+			//キー名をテキストボックスに格納する
+			this->textBoxKey->Text = this->TableElem->key;
+			//値をテキストボックスに格納する
+			this->textBoxValue->Text = this->TableElem->value;
+			//親の数をカウントする
+			this->ParentIndex = this->CountParent(this->TableElem);
+			//親がいない場合は画像の描画を行わない
+			if (*this->ParentIndex > 0) {
+				//親を列挙したものを描画する関数を呼び出す
+				this->infoTableGenerate(this->TableElem, this->pictureBoxParent, *this->ParentIndex);
+				//ピクチャボックスを前面に押し出す
+				this->pictureBoxParent->BringToFront();
+			}
+			return;
 		}
-		return;
+		 catch (System::NullReferenceException^ e) {
+			 System::Console::WriteLine(e);
+		 }
+		 catch (System::ArgumentNullException^ e) {
+			 System::Console::WriteLine(e);
+		 }
 	}
 
 	/*概要：親を追加するときなど、詳細ダイアログをもう一度開くときの関数
@@ -242,17 +250,25 @@ namespace JSONGUI {
 	作成日：2017.9.26
 	作成者：K.Asada*/
 			 Void ParentInfo(CellDataChain::cellchain^ parent) {
-				 //詳細ダイアログをインスタンス化
-				 MoreInfoForm^ more = gcnew MoreInfoForm();
-				 //詳細を確認したい構造体を渡す
-				 more->TableElem = parent;
-				 //詳細ダイアログを開く
-				 more->ShowDialog();
-				 //親の数を再カウントする
-				 this->ParentIndex = this->CountParent(this->TableElem);
-				 //親を列挙したものを再描画する関数を呼び出す
-				 this->infoTableGenerate(this->TableElem, this->pictureBoxParent, *this->ParentIndex);
-				 return;
+				 try {
+					 //詳細ダイアログをインスタンス化
+					 MoreInfoForm^ more = gcnew MoreInfoForm();
+					 //詳細を確認したい構造体を渡す
+					 more->TableElem = parent;
+					 //詳細ダイアログを開く
+					 more->ShowDialog();
+					 //親の数を再カウントする
+					 this->ParentIndex = this->CountParent(this->TableElem);
+					 //親を列挙したものを再描画する関数を呼び出す
+					 this->infoTableGenerate(this->TableElem, this->pictureBoxParent, *this->ParentIndex);
+					 return;
+				 }
+				 catch (System::NullReferenceException^ e) {
+					 System::Console::WriteLine(e);
+				 }
+				 catch (System::ArgumentNullException^ e) {
+					 System::Console::WriteLine(e);
+				 }
 			 }
 
 	/*概要：構造体の親の数をカウントする関数
@@ -261,21 +277,30 @@ namespace JSONGUI {
 	作成日：2017.9.26
 	作成者：K.Asada*/
 			 Int32 CountParent(CellDataChain::cellchain^ child) {
-				 //構造体を操作するためのクラスをインスタンス化
-				 CellDataChain^ CellCtrl = gcnew CellDataChain();
-				 //返却用の変数を宣言
-				 Int32 parentcount = 0;
-				 //親がなくなるまで走査して親の数をカウント
-				 for (;;parentcount++) {
-					 //親を取得していく
-					 child = CellCtrl->GetParent(child, 1);
-					 //親が取得できていなければ終了
-					 if (child == nullptr) {
-						 break;
+				 try {
+					 //構造体を操作するためのクラスをインスタンス化
+					 CellDataChain^ CellCtrl = gcnew CellDataChain();
+					 //返却用の変数を宣言
+					 Int32 parentcount = 0;
+					 //親がなくなるまで走査して親の数をカウント
+					 for (;; parentcount++) {
+						 //親を取得していく
+						 child = CellCtrl->GetParent(child, 1);
+						 //親が取得できていなければ終了
+						 if (child == nullptr) {
+							 break;
+						 }
 					 }
+					 //カウントした親を返す
+					 return parentcount;
 				 }
-				 //カウントした親を返す
-				 return parentcount;
+				 catch (System::NullReferenceException^ e) {
+					 System::Console::WriteLine(e);
+				 }
+				 catch (System::ArgumentNullException^ e) {
+					 System::Console::WriteLine(e);
+				 }
+
 	}
 
 /*概要：OKボタンのクリックイベント
