@@ -23,8 +23,8 @@ namespace JSONGUI {
 	作成日：2017.9.20
 	作成者：K.Asada*/
 	public ref class JSONGUIForm
-	//	: public TableInformation
-		: public System::Windows::Forms::Form
+		: public TableInformation
+//		: public System::Windows::Forms::Form
 	{
 	public:
 		JSONGUIForm(void)
@@ -88,6 +88,8 @@ namespace JSONGUI {
 	private: System::Windows::Forms::SaveFileDialog^  saveFileDialog1;
 	private: System::Windows::Forms::Label^  labelRow;
 	private: System::Windows::Forms::Label^  labelColumn;
+	private: System::Windows::Forms::RadioButton^  radioButtonValue;
+	private: System::Windows::Forms::RadioButton^  radioButtonKey;
 
 	private:
 		/// <summary>
@@ -134,6 +136,8 @@ namespace JSONGUI {
 			this->pictureBoxListCurr = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxList = (gcnew System::Windows::Forms::PictureBox());
 			this->saveFileDialog1 = (gcnew System::Windows::Forms::SaveFileDialog());
+			this->radioButtonKey = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButtonValue = (gcnew System::Windows::Forms::RadioButton());
 			this->tabControl1->SuspendLayout();
 			this->tabPage->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCurrent))->BeginInit();
@@ -156,6 +160,8 @@ namespace JSONGUI {
 			// tabPage
 			// 
 			this->tabPage->AutoScroll = true;
+			this->tabPage->Controls->Add(this->radioButtonValue);
+			this->tabPage->Controls->Add(this->radioButtonKey);
 			this->tabPage->Controls->Add(this->labelRow);
 			this->tabPage->Controls->Add(this->labelColumn);
 			this->tabPage->Controls->Add(this->buttonNewTable);
@@ -472,6 +478,28 @@ namespace JSONGUI {
 			this->pictureBoxList->TabIndex = 11;
 			this->pictureBoxList->TabStop = false;
 			this->pictureBoxList->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUIForm::PictureBoxListMouseClick);
+			// 
+			// radioButtonKey
+			// 
+			this->radioButtonKey->AutoSize = true;
+			this->radioButtonKey->Location = System::Drawing::Point(207, 80);
+			this->radioButtonKey->Name = L"radioButtonKey";
+			this->radioButtonKey->Size = System::Drawing::Size(208, 28);
+			this->radioButtonKey->TabIndex = 18;
+			this->radioButtonKey->TabStop = true;
+			this->radioButtonKey->Text = L"キー名編集モード";
+			this->radioButtonKey->UseVisualStyleBackColor = true;
+			// 
+			// radioButtonValue
+			// 
+			this->radioButtonValue->AutoSize = true;
+			this->radioButtonValue->Location = System::Drawing::Point(421, 80);
+			this->radioButtonValue->Name = L"radioButtonValue";
+			this->radioButtonValue->Size = System::Drawing::Size(168, 28);
+			this->radioButtonValue->TabIndex = 18;
+			this->radioButtonValue->TabStop = true;
+			this->radioButtonValue->Text = L"値編集モード";
+			this->radioButtonValue->UseVisualStyleBackColor = true;
 			// 
 			// JSONGUIForm
 			// 
@@ -862,12 +890,16 @@ private: System::Void PictureBoxListMouseClick(System::Object^  sender, System::
 引数：
 戻り値：なし
 作成日：2017.9.20
-作成者：K.Asada*/
+作成者：K.Asada
+更新日：2017.10.2
+更新者：K.Asada
+更新内容：キー名/値編集モードに対応したデータをテキストボックスに表示するように変更*/
 private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::EventArgs^  e) {
 	//テキストボックスに情報を設定する関数を呼び出す
-	this->CellTextGenerate(this->textBoxCell);
+	this->CellTextGenerate(this->textBoxCell, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
 	//生成したテキストボックスをメイン画面のコントロールに乗せる
 	this->pictureBoxTable->Controls->Add(this->textBoxCell);
+	//テキストボックスが埋もれないように前面に配置する
 	this->textBoxCell->BringToFront();
 }
 
@@ -878,7 +910,7 @@ private: System::Void PictureBoxCurrentClick(System::Object^  sender, System::Ev
 作成者：K.Asada*/
 private: System::Void PictureBoxListCurrClick(System::Object^  sender, System::EventArgs^  e) {
 	//テキストボックスを配置するための情報を設定する関数を呼び出す
-	this->CellTextGenerate(this->textBoxList);
+	this->CellTextGenerate(this->textBoxList, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
 	//情報が設定されたテキストボックスをコントロールに追加して表示する
 	this->pictureBoxListCurr->Controls->Add(this->textBoxList);
 	//テキストボックスを前面に押し出す
@@ -913,7 +945,7 @@ try{
 	if (child == nullptr) {
 		//メッセージを表示
 		//対象の位置の構造体に文字列を挿入する関数を呼び出す
-		child = CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, "", this->TableElem);
+		child = CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, "", this->TableElem, false, false);
 		//child = this->TableElem->lower;
 	//	MessageBox::Show("表示すべき情報がありません");
 	}//正常に情報を取得できていた場合は詳細ダイアログを表示
@@ -1015,15 +1047,21 @@ private: System::Void AddColumnButtonClick(System::Object^  sender, System::Even
 作成者：K.Asada
 更新内容：エンターキーが押されたときにテキストボックスが消えるように変更
 更新日：2017.9.30
-更新者：K.Asada*/
+更新者：K.Asada
+更新日：2017.10.2
+更新者：K.Asada
+更新内容：キー名/値編集モードに対応した文字列を編集するように変更*/
 private: System::Void TextBoxCellEnter(System::Object^  sender, System::Windows::Forms::KeyEventArgs^  e) {
 
 	try {	//チェイン構造操作クラスをインスタンス化
 		CellDataChain^ CellCtrl = gcnew CellDataChain();
 		//エンターキーが押されたときのイベント
 		if (e->KeyCode == Keys::Enter) {
+			Int32 rowindex = *this->RowIndex;		//編集する構造体を指定するために座標を取得
+			Int32 colindex = *this->ColumnIndex;	//編集する構造体を指定するために座標を取得
+			String^ data = this->textBoxCell->Text;	//構造体んい渡すための文字列をテキストボックスより取得
 			//対象の位置の構造体に文字列を挿入する関数を呼び出す
-			CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, this->textBoxCell->Text, this->TableElem);
+			CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
 			//セルの再描画を行う
 			this->ReTableGenerate(this->pictureBoxTable);
 			//テキストボックスを表示しないようにする

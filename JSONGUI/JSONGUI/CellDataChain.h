@@ -484,7 +484,7 @@ public:
 	更新内容：行の先頭を編集した時に選択箇所の子が編集されるバグがあったので修正、関数を追加
 	更新日：2017.9.30
 	更新者：K.Asada*/
-	cellchain^ SetChainCell(System::Int32 rowindex, System::Int32 columnindex, System::String^ setdata, cellchain^ elem) {
+	cellchain^ SetChainCell(System::Int32 rowindex, System::Int32 columnindex, System::String^ setdata, cellchain^ elem, System::Boolean editkey, System::Boolean editvalue) {
 		//構造体のnull関係の例外を捕捉するための例外処理
 		try {
 			cellchain^ scan = elem;			//対象の構造体を取得する
@@ -505,15 +505,8 @@ public:
 					scan = this->CheckBrother(scan);
 				}
 			}
-			//挿入対象の構造体がオブジェクトを示していれば
-			if (scan->lower != nullptr) {
-				//対象の構造体のキー名に文字列を挿入する
-				scan->key = setdata;
-			}
-			else {
-				//対象の構造体の値に文字列を挿入する
-				scan->value = setdata;
-			}
+			//構造体の状態を判別して対応した場所に文字列を格納する関数を呼び出す
+			this->SetCellData(setdata, scan, editkey, editvalue);
 			//作成した構造体を返却する
 			return scan;
 		}
@@ -619,4 +612,68 @@ public:
 			System::Console::WriteLine(e);
 		}
 	}
+
+	/*概要：対象の状態を判別して対象の構造体の値またはキー名に文字列を代入する関数
+	引数：String^ setdata：構造体に代入する文字列
+		：cellchain^ scan：対象の構造体
+		：Boolean editkey：キー名を編集するかどうかの判定
+		：Boolean editvalue：値を編集するかどうかの判定
+	戻り値：なし
+	作成日：2017.10.2
+	作成者：K.Asada*/
+	System::Void SetCellData(System::String^ setdata, cellchain^ scan, System::Boolean editkey, System::Boolean editvalue){
+		//キー編集モードであれば
+		if (editkey) {
+			//対象の構造体のキー名に文字列を代入する
+			scan->key = setdata;
+		}//値編集モードであれば
+		else if (editvalue) {
+			//対象の構造体の値に文字列を代入する
+			scan->value = setdata;
+		}//編集モードが指定されておらず対象の構造体に子が存在していれば
+		else if (scan->lower != nullptr) {
+			//通常通りキー名に文字列を代入する
+			scan->key = setdata;
+		}//編集モードが指定されておらず対象の構造体に子がいなければ
+		else {
+			//値に文字列を代入する
+			scan->value = setdata;
+		}
+		//編集を終える
+		return;
+	}
+
+	/*概要：対象の状態を判別してキー名または値のどちらかを返却する関数
+	引数：cellchain^ cell：対象の構造体
+		：Boolean getkey：キー名を取得するかどうかの判定
+		：Boolean getvalue：値を取得するかどうかの判定
+	戻り値：対象から取得した文字列
+	作成日：2017.10.2
+	作成者：K.Asada*/
+	System::String^ GetCellString(cellchain^ cell, System::Boolean getkey, System::Boolean getvalue) {
+		System::String^ data = "";			//返却用の文字列を格納するための文字列
+		//対象の構造体が存在していなければ
+		if (cell == nullptr) {
+			//空文字を返却する
+			data = "";
+		}//キー名取得状態であれば
+		else if (getkey) {
+			//キー名を取得する
+			data = cell->key;
+		}//値取得状態であれば
+		else if (getvalue) {
+			//値を取得する
+			data = cell->value;
+		}//どちらでもなく構造体に子が存在していれば
+		else if (cell->lower != nullptr) {
+			//通常通りキー名を取得する
+			data = cell->key;
+		}//どちらでもなく構造体に子が存在していなければ
+		else {
+			data = cell->value;
+		}
+		//取得した文字列を返却する
+		return data;
+	}
+
 };

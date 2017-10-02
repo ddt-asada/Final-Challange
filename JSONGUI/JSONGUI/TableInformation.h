@@ -187,10 +187,14 @@ namespace TableInformation {
 		作成者：K.Asada
 		更新日：2017.9.29
 		更新者：K.Asada
-		更新内容：結合状態の判定を削除*/
-		TextBox^ CellTextGenerate(TextBox^ cell) {
+		更新内容：結合状態の判定を削除
+		更新日：2017.10.2
+		更新者：K.Asada
+		更新内容：キー名/値編集モードに対応するように判定を追加*/
+		TextBox^ CellTextGenerate(TextBox^ cell, Boolean getkey, Boolean getvalue) {
 			//nullptrを指したときの例外処理
 			try {
+				String^ data = "";			//構造体より取得した文字列を格納する文字列
 				//座標を選択中のセルの左上に合わせる
 				cell->Location = System::Drawing::Point(*this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
 				//サイズをセル一つ当たりの大きさに合わせる
@@ -201,19 +205,10 @@ namespace TableInformation {
 				CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
 				//対象の構造体を取得する
 				elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
-				//構造体がオブジェクトかどうかを判定する
-				if (elem != nullptr && elem->lower != nullptr) {
-					//テキストボックスに対象の構造体のキー名を載せる
-					cell->Text = elem->key;
-				}
-				else if (elem != nullptr) {
-					//データの場合は値を載せる
-					cell->Text = elem->value;
-				}
-				else {
-					//構造体が取得できていない場合は空文字を挿入する
-					cell->Text = Constants->EMPTY_STRING;
-				}
+				//対象の構造体の状態を判別して文字列を取得する関数を呼び出す
+				data = CellCtrl->GetCellString(elem, getkey, getvalue);
+				//テキストボックスに取得した文字列を格納する
+				cell->Text = data;
 				//加工を終えたテキストボックスを返す
 				return cell;
 			}
@@ -495,29 +490,30 @@ namespace TableInformation {
 		Void DrawFigure(System::Drawing::Rectangle^ rct, Graphics^ gr, CellDataChain::cellchain^ elem) {
 			//描画時のエラーを捕捉
 			try {
+				String^ celldata = "";		//表画像に描画する文字列
+				CellDataChain^ CellCtrl = gcnew CellDataChain();		//構造体操作クラスをインスタンス化
 				//描画する文字列のフォントを宣言
 				System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
 				//描画対象の構造体がオブジェクトであったときに色付けを行うためのブラシを宣言
 				Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Blue));
 				//セルの外枠を描画する
 				gr->DrawRectangle(Pens::Black, *rct);
+				//構造体より描画対象の文字列を取得
+				celldata = CellCtrl->GetCellString(elem, false, false);
 				//対象の構造体に子が存在している場合はオブジェクトとして扱う
 				if (elem != nullptr && elem->lower != nullptr) {
 					//オブジェクトであることを明示するために色付けを行う
 					gr->FillRectangle(br, *rct);
-					//キー名が空文字であるときは配列となる旨を表示する
-					if (elem->key == "") {
-						gr->DrawString(Constants->ARRAY_STRING, myFont, Brushes::Black, *rct);
-					}
-					else {
-						//オブジェクトの場合はキー名を描画する
-						gr->DrawString(elem->key, myFont, Brushes::Black, *rct);
-					}
-				}//子がいない構造体である場合はデータとして扱う
-				else if (elem != nullptr) {
-					//データの場合は値を描画する
-					gr->DrawString(elem->value, myFont, Brushes::Black, *rct);
-				}//構造体を取得していなかったときは何も描画しない
+				}
+				//取得した文字列がからであり、構造体に子が存在する場合は配列である旨を描画
+				if (elem != nullptr && celldata == Constants->EMPTY_STRING && elem->lower != nullptr) {
+					//配列と描画する
+					gr->DrawString(Constants->ARRAY_STRING, myFont, Brushes::Black, *rct);
+				}//それ以外の時は取得した文字列をそのまま描画する
+				else{
+					//取得した文字列を描画する
+					gr->DrawString(celldata, myFont, Brushes::Black, *rct);
+				}
 				return;
 			}
 			//描画対象が不正の時に例外を捕捉

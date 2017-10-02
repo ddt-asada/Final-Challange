@@ -3,6 +3,7 @@
 #include "CellDataChain.h"	//自作のデータチェインクラスのヘッダ
 #include "StringProcessing.h"	//文字列処理クラスのヘッダ
 #include "JSONDBManager.h"
+#include "ConstantString.h"
 
 //内部処理関係の名前空間
 namespace process {
@@ -95,19 +96,31 @@ namespace process {
 		作成日：207.9.21
 		作成者：K.Asada*/
 		std::string LoadJSON(String^ jsonpath) {
-			std::string path = "";		//String^型からstring型へ変換したファイルパスを格納する文字列
-			//型変換を行う
-			this->MarshalString(jsonpath, path);
-			//ファイルを読み込む準備
-			std::ifstream ifs(path);
-			//ファイルの読み込みに失敗した時の例外処理
-			if (ifs.fail()) {
-				//例外を送出する
-				throw gcnew Exception("ファイル読み込みエラー");
+			//ファイル読み込み関係の例外を捕捉
+			try {
+				CONSTANTS::ConstantString^ Constants = gcnew CONSTANTS::ConstantString();
+				std::string path = "";		//String^型からstring型へ変換したファイルパスを格納する文字列
+				std::string json = "";		//ファイルより取得したJSONを格納するための文字列
+				//型変換を行う
+				this->MarshalString(jsonpath, path);
+				//ファイルを読み込む準備
+				std::ifstream ifs(path);
+				//ファイルの読み込みに失敗した時の例外処理
+				if (ifs.fail()) {
+					//例外を送出する
+					throw gcnew System::IO::FileNotFoundException(Constants->LOAD_ERROR_STRING);
+				}
+				else {
+					//ファイルよりJSONを取得する
+					std::string json((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+				}
+				return json;
 			}
-			//ファイルよりJSONを取得する
-			std::string json((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-			return json;
+			//ファイル読み込みエラーを捕捉
+			catch (System::IO::FileNotFoundException^ e) {
+				//コンソールに詳細内容を表示
+				Console::WriteLine(e);
+			}
 		}
 	};
 }

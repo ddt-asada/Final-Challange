@@ -26,6 +26,8 @@ namespace CONSTANTS {
 		System::String^ DRAW_ERROR_STRING = "描画対象が不正です。\n";
 		//描画するセルの大きさがオーバーフロウしたときのメッセージ
 		System::String^ RECT_ERROR_STRING = "描画するセルが大きすぎます。\n";
+		//ファイル読み込みエラー発生時に表示するメッセージ
+		System::String^ LOAD_ERROR_STRING = "ファイル読み込みエラー。\n";
 		//キー名が空の時に描画する配列であることを示す文字列
 		System::String^ ARRAY_STRING = "配列";
 		//汎用エラー文字列
