@@ -14,6 +14,8 @@ namespace CONSTANTS {
 		System::String^ EMPTY_STRING = "";
 		//0を示す文字列
 		System::String^ ZERO_STRING = "0";
+		//作成したJSONファイルの保存先を選択するときに表示するメッセージ
+		System::String^ OUT_PATH_MESSAGE = "JSONファイルの保存先を選択してください。\n";
 		//ファイルパスが入力されていないときに表示するメッセージ
 		System::String^ NOT_PATH_MESSAGE = "ファイルパスが入力されていません。\n";
 		//クエリが入力されていないときに表示するメッセージ
@@ -48,6 +50,8 @@ namespace CONSTANTS {
 		System::String^ INITIAL_STRING = "初期化されました。";
 		//行・列を追加するときに先頭より先には追加できないことを表示するメッセージ
 		System::String^ ADD_ERROR_STRING = "先頭より先には追加できません。";
+		//行・列を削除するときに先頭より先は削除できないことを表示するメッセージ
+		System::String^ DELETE_ERROR_STRING = "先頭より先は削除できません。";
 		//キー名が空の時に描画する配列であることを示す文字列
 		System::String^ ARRAY_STRING = "配列";
 		//右を示す文字列
@@ -76,5 +80,15 @@ namespace CONSTANTS {
 		System::String^ INITIAL_COLUMN_STRING = "0";
 		//0を示す変数
 		System::Int32 ZERO = 0;
+		//メイン画面にて表画像を置く位置
+		System::Drawing::Point TABLE_LOCATION = System::Drawing::Point(10, 100);
+		//表画像の選択箇所をハイライトするときの色
+		System::Drawing::Brush^ SELECT_COLOR = gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(100, System::Drawing::Color::Yellow));
+		//表画像の背景色
+		System::Drawing::Brush^ BACK_COLOR = gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(255, System::Drawing::Color::White));
+		//表画像の描画対象がオブジェクトであることを示す色
+		System::Drawing::Brush^ OBJECT_COLOR = gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(100, System::Drawing::Color::Blue));
+		//表画像上に文字を描画するときのフォント設定
+		System::Drawing::Font^ TABLE_FONT = gcnew System::Drawing::Font(System::Drawing::FontFamily::GenericSansSerif, 14, System::Drawing::FontStyle::Bold);
 	};
 }

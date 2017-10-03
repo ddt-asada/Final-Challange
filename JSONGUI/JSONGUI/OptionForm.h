@@ -122,7 +122,6 @@ namespace option {
 			// openFileDialog
 			// 
 			this->openFileDialog->FileName = L"openFileDialog";
-			this->openFileDialog->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &OptionForm::FileDialogOK);
 			// 
 			// label1
 			// 
@@ -188,23 +187,17 @@ namespace option {
 	引数：Sender
 		：EventArgs
 	作成日：2017.9.20
-	作成者：K.Asada*/
+	作成者：K.Asada
+	更新内容：キャンセルボタンではなくOKボタンのイベントを拾うように変更
+	更新日：2017.10.3
+	更新者：K.Asada*/
 	private: System::Void LoadButtonClick(System::Object^  sender, System::EventArgs^  e) {
-		//新規ダイアログを開き、キャンセルボタンが押されたときの動作を設定しておく
-		if (this->openFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel) {
-			//何もせずにダイアログを閉じる
-			return;
+		//ファイル選択ダイアログでOKボタンが押されたらファイルパスをテキストボックスへ保管する
+		if (this->openFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			//テキストボックスへファイルパスを補完する
+			this->textBoxPath->Text = this->openFileDialog->FileName;
 		}
-}
-
-	/*概要：JSONファイル読み込みダイアログ上でOKボタンがクリックされたときにそのファイルパスをテキストボックスに格納する
-	引数：
-	戻り値：
-	作成日：2017.9.20
-	作成者：K.Asada */
-	private: System::Void FileDialogOK(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
-		//OKボタンが押されたときはテキストボックスにファイルパスを格納する
-		this->textBoxPath->Text = this->openFileDialog->FileName;
+		return;
 }
 
 	/*概要：OKボタンがクリックされたときのイベント、テキストボックスの値をメンバの文字列に格納する

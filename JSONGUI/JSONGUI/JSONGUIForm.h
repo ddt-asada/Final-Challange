@@ -392,16 +392,6 @@ namespace JSONGUI {
 			this->pictureBoxTable->TabStop = false;
 			this->pictureBoxTable->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUIForm::PictureBoxTableMouseClick);
 			// 
-			// buttonJoin
-			// 
-			this->buttonJoin->Location = System::Drawing::Point(823, 6);
-			this->buttonJoin->Name = L"buttonJoin";
-			this->buttonJoin->Size = System::Drawing::Size(133, 68);
-			this->buttonJoin->TabIndex = 10;
-			this->buttonJoin->Text = L"結合/解除";
-			this->buttonJoin->UseVisualStyleBackColor = true;
-			this->buttonJoin->Click += gcnew System::EventHandler(this, &JSONGUIForm::TableJoinClick);
-			// 
 			// tabPage2
 			// 
 			this->tabPage2->Controls->Add(this->buttonListConv);
@@ -685,7 +675,7 @@ private: System::Void ButtonConnectClick(System::Object^  sender, System::EventA
 		//表画像を生成する関数を呼び出す
 		this->TableGenerate(this->pictureBoxTable);
 		//コントロールへがピクチャボックスを追加する
-		this->Controls->Add(this->pictureBoxTable);
+		this->tabPage->Controls->Add(this->pictureBoxTable);
 		//表画像が埋もれていることがあるためピクチャボックスを前面に押し出す
 		this->pictureBoxTable->BringToFront();
 		//DBとの通信を行った結果を出力
@@ -740,9 +730,11 @@ private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^
 	//処理中の例外を捕捉してメッセージを表示するための例外処理
 	try {
 		//JSONファイルの保存先を保管する文字列
-		String^ outJSONpath = "";
+		String^ outJSONpath = Constants->EMPTY_STRING;
 		//内部処理クラスをインスタンス化
 		process::Processing^ proc = gcnew process::Processing();
+		//保存先を選択させるメッセージを表示する
+		MessageBox::Show(Constants->OUT_PATH_MESSAGE);
 		//JSONファイルの保存先を選択するダイアログを表示する
 		if (this->saveFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
 			//OKボタンが押されたらファイルの出力先を保管する
@@ -765,8 +757,6 @@ private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^
 		//なんらかのエラーが発生して処理が中断されたことを表示する
 		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
-}
-private: System::Void TableJoinClick(System::Object^  sender, System::EventArgs^  e) {
 }
 
 /*概要：箇条書き関係の情報を初期化する関数
@@ -903,8 +893,8 @@ private: System::Void ListOptionClick(System::Object^  sender, System::EventArgs
 private: System::Void PictureBoxTableMouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 	//メッセージを表示するための例外処理
 	try {
-		//テキストボックスを削除する
-		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
+		//テキストボックスからフォーカスを外し、イベントを発生させる
+		this->ActiveControl = nullptr;
 		//選択状態を保持するためにクリックした表画像上の座標をメンバへ保存する関数を呼び出す
 		this->GetCellPoint(e);
 		//選択箇所がわかりやすいようにハイライトする関数を呼び出す
@@ -1052,7 +1042,7 @@ private: System::Void AddRowButtonClick(System::Object^  sender, System::EventAr
 	try {
 		//選択画面フォームをインスタンス化
 		SelectForm^ sele = gcnew SelectForm();
-		String^ select = "";		//選択画面にて選択したボタンの名前を取得するための文字列
+		String^ select = Constants->EMPTY_STRING;		//選択画面にて選択したボタンの名前を取得するための文字列
 		//選択画面のボタンに表示する文字を渡す
 		sele->ElderButton->Text = Constants->TOP_STRING;
 		//選択画面のボタンに表示する文字を渡す
@@ -1305,7 +1295,7 @@ private: System::Void DeleteColumnButtonClick(System::Object^  sender, System::E
 		//先頭列は削除しない
 		else {
 			//削除できない旨を伝える
-			MessageBox::Show("先頭の列は削除できません");
+			MessageBox::Show(Constants->DELETE_ERROR_STRING);
 		}
 		return;
 	}
@@ -1338,7 +1328,7 @@ private: System::Void DeleteRowButtonClick(System::Object^  sender, System::Even
 		}
 		//1行しかないときは削除できない旨を表示
 		else {
-			MessageBox::Show("これ以上行の削除はできません");
+			MessageBox::Show(Constants->DELETE_ERROR_STRING);
 		}
 		return;
 	}
@@ -1361,7 +1351,7 @@ private: System::Void ButtonNewTableClick(System::Object^  sender, System::Event
 		MoreInfoForm^ more = gcnew MoreInfoForm();			//詳細情報編集クラスをインスタンス化
 		CellDataChain^ CellCtrl = gcnew CellDataChain();	//構造体操作クラスをインスタンス化
 		//新規でもっとも親となる空の構造体を一つ作成してメンバに格納
-		this->TableElem = CellCtrl->ChainParent(Constants->EMPTY_STRING, Constants->EMPTY_STRING, nullptr);
+		this->TableElem = CellCtrl->ChainParent(Constants->CHAIN_KEY_STRING, Constants->CHAIN_VALUE_STRING, nullptr);
 		//列数と行数を取得する関数を呼び出す
 		this->ReadyPict(this->TableElem);
 		//新規で表をJSONを生成する際に必要な情報の入力を促す

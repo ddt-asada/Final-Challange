@@ -177,7 +177,7 @@ namespace process{
 						}
 					}
 				}
-				return %*CellCtrl->GetYoungChain(brother);
+				return %*CellCtrl->GetElderChain(brother);
 			}
 			catch (System::NullReferenceException^ e) {
 				System::Console::WriteLine(e);

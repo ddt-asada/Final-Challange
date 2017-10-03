@@ -33,7 +33,6 @@ namespace TableInformation {
 		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
 		Int32^ RctHeight = 100;								//表の格子一つ当たりの高さ
 		CellDataChain::cellchain^ TableElem = nullptr;					//表の情報が格納されたデータチェイン
-		CellDataChain::cellchain temp;
 		String^ JSONFilePath = Constants->EMPTY_STRING;		//読み込むJSONのファイルパス
 		String^ DBQuery = Constants->EMPTY_STRING;			//DBよりJSON文字列を取得するためのクエリ
 
@@ -66,7 +65,7 @@ namespace TableInformation {
 				//作成した画像をピクチャボックスへのセル
 				pict->Image = img;
 				//ピクチャボックスの位置を設定する
-				pict->Location = System::Drawing::Point(10, 100);
+				pict->Location = Constants->TABLE_LOCATION;
 				//作成の終えたビットマップ画像を返す
 				return pict;
 			}
@@ -89,8 +88,6 @@ namespace TableInformation {
 		作成者：K.Asada*/
 		PictureBox^ SelecteCell(PictureBox^ Pictselect) {
 			try {
-				//半透明色の塗りつぶし用ブラシを作成
-				Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Yellow));
 				//画像データを生成する
 				Bitmap^ img = gcnew Bitmap(*this->RctWidth + 1, *this->RctHeight + 1);
 				//描画用のグラフィッククラスをインスタンス化
@@ -100,7 +97,7 @@ namespace TableInformation {
 				//画像のサイズを設定
 				Pictselect->Size = System::Drawing::Size(*this->RctWidth, *this->RctHeight);
 				//ハイライト用の塗りつぶし画像を描画
-				gr->FillRectangle(br, 0, 0, *this->RctWidth - 1, *this->RctHeight - 1);
+				gr->FillRectangle(Constants->SELECT_COLOR, 0, 0, *this->RctWidth - 1, *this->RctHeight - 1);
 				//描画の終わった画像をピクチャボックスのコントロールに乗せる
 				Pictselect->Image = img;
 				//背景色を親の色と同化させる
@@ -154,8 +151,6 @@ namespace TableInformation {
 			try {
 				//描画の対象をすでに生成されている表画像にしてグラフィッククラスをインスタンス化
 				Graphics^ gr = Graphics::FromImage(repict->Image);
-				//塗りつぶし用のブラシを作成する
-				Brush^ br = gcnew SolidBrush(Color::FromArgb(255, Color::White));
 				//構造体操作クラスをインスタンス化
 				CellDataChain^ CellCtrl = gcnew CellDataChain();
 				//要素が格納された構造体を取得する
@@ -165,7 +160,7 @@ namespace TableInformation {
 				//描画する要素が書くのされた構造体を取得する
 				elem = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
 				//白で上書きするためにセルの大きさと同じ塗りつぶし長方形を描画
-				gr->FillRectangle(br, *rct);
+				gr->FillRectangle(Constants->BACK_COLOR, *rct);
 				//セルを描画する関数を呼び出す
 				this->DrawFigure(*rct, gr, elem);
 				//再描画の終えたピクチャボックスを返す
@@ -197,7 +192,7 @@ namespace TableInformation {
 		TextBox^ CellTextGenerate(TextBox^ cell, Boolean getkey, Boolean getvalue) {
 			//nullptrを指したときの例外処理
 			try {
-				String^ data = "";			//構造体より取得した文字列を格納する文字列
+				String^ data = Constants->EMPTY_STRING;			//構造体より取得した文字列を格納する文字列
 				//座標を選択中のセルの左上に合わせる
 				cell->Location = System::Drawing::Point(*this->RctWidth * *this->ColumnIndex, *this->RctHeight * *this->RowIndex);
 				//サイズをセル一つ当たりの大きさに合わせる
@@ -338,7 +333,7 @@ namespace TableInformation {
 			try {
 				CellDataChain^ CellCtrl = gcnew CellDataChain();
 				//表の親の構造体を格納するための構造体
-				CellDataChain::cellchain^ parent = gcnew CellDataChain::cellchain();
+				CellDataChain::cellchain^ parent = nullptr;
 				//列要素に当たる構造体を挿入するための関数
 				for (int i = 0; i < row; i++) {
 					//行ごとの追加対象の構造体を取得する
@@ -451,7 +446,7 @@ namespace TableInformation {
 				//構造体を操作するためのクラスをインスタンス化する
 				CellDataChain^ CellCtrl = gcnew CellDataChain();
 				//描画する対象の構造体を取得するための構造体
-				CellDataChain::cellchain^ elem = gcnew CellDataChain::cellchain();
+				CellDataChain::cellchain^ elem = nullptr;
 				//描画を行う空のビットマップを作成する
 				Bitmap^ img = gcnew Bitmap(*this->RctWidth * parentcount, *this->RctHeight);
 				//描画を行うためのグラフィッククラスをインスタンス化
@@ -497,27 +492,23 @@ namespace TableInformation {
 			try {
 				String^ celldata = "";		//表画像に描画する文字列
 				CellDataChain^ CellCtrl = gcnew CellDataChain();		//構造体操作クラスをインスタンス化
-				//描画する文字列のフォントを宣言
-				System::Drawing::Font^ myFont = gcnew System::Drawing::Font(FontFamily::GenericSansSerif, 14, FontStyle::Bold);
-				//描画対象の構造体がオブジェクトであったときに色付けを行うためのブラシを宣言
-				Brush^ br = gcnew SolidBrush(Color::FromArgb(100, Color::Blue));
-				//セルの外枠を描画する
-				gr->DrawRectangle(Pens::Black, *rct);
 				//構造体より描画対象の文字列を取得
 				celldata = CellCtrl->GetCellString(elem, false, false);
+				//セルの外枠を描画する
+				gr->DrawRectangle(Pens::Black, *rct);
 				//対象の構造体に子が存在している場合はオブジェクトとして扱う
 				if (elem != nullptr && elem->lower != nullptr) {
 					//オブジェクトであることを明示するために色付けを行う
-					gr->FillRectangle(br, *rct);
+					gr->FillRectangle(Constants->OBJECT_COLOR, *rct);
 				}
 				//取得した文字列がからであり、構造体に子が存在する場合は配列である旨を描画
 				if (elem != nullptr && celldata == Constants->EMPTY_STRING && elem->lower != nullptr) {
 					//配列と描画する
-					gr->DrawString(Constants->ARRAY_STRING, myFont, Brushes::Black, *rct);
+					gr->DrawString(Constants->ARRAY_STRING, Constants->TABLE_FONT, Brushes::Black, *rct);
 				}//それ以外の時は取得した文字列をそのまま描画する
 				else{
 					//取得した文字列を描画する
-					gr->DrawString(celldata, myFont, Brushes::Black, *rct);
+					gr->DrawString(celldata, Constants->TABLE_FONT, Brushes::Black, *rct);
 				}
 				return;
 			}
@@ -546,7 +537,7 @@ namespace TableInformation {
 				//対象の構造体に子がいれば
 				if (parent->lower != nullptr) {
 					//対象の兄として新規で構造体を連結する
-					CellCtrl->ChainElderBrother("", "", parent->lower);
+					CellCtrl->ChainElderBrother(Constants->CHAIN_KEY_STRING, Constants->CHAIN_VALUE_STRING, parent->lower);
 				}//子がいない場合は子を連結する
 				return;
 			}
@@ -572,7 +563,6 @@ namespace TableInformation {
 				parent = CellCtrl->GetRowChain(rowindex, this->TableElem->lower);
 				//対象の構造体を削除する
 				CellCtrl->DeleteChain(parent);
-				*this->Row -= 1;
 				return;
 			}
 			catch (System::NullReferenceException^ e) {
