@@ -1,4 +1,5 @@
 #pragma once
+#include "ConstantString.h"
 
 /*概要：JSONデータをチェイン構造にして扱うためのクラス
 作成日：2017.9.20
@@ -17,22 +18,14 @@ public:
 		ref struct cellchain^ upper;	//親へのポインタ
 		ref struct cellchain^ lower;	//子へのポインタ
 
-		ref struct cellchain()
-		{
-			this->key = nullptr;
-			this->value = nullptr;
-			this->next = nullptr;
-			this->prev = nullptr;
-			this->upper = nullptr;
-			this->lower = nullptr;
-		};
-		ref struct cellchain(cellchain% copy) {
-			this->key = copy.key;
-			this->value = copy.value;
-			this->next = copy.next;
-			this->prev = copy.prev;
-			this->upper = copy.upper;
-			this->lower = copy.lower;
+		//構造体のデフォルトコンストラクタ
+		ref struct cellchain() {
+			this->key = nullptr;		//キー名を初期化
+			this->value = nullptr;		//値を初期化
+			this->next = nullptr;		//弟へのポインタを初期化
+			this->prev = nullptr;		//兄へのポインタを初期化
+			this->upper = nullptr;		//親へのポインタを初期化
+			this->lower = nullptr;		//子へのポインタを初期化
 		}
 	};
 
@@ -58,7 +51,9 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
+			//連結対象の構造体が存在しないときは新しい構造体を返す
 			if (target == nullptr) {
+				//空文字の入った構造体を返却する
 				return chain;
 			}
 			//連結対象に親がいるかを調べる
@@ -67,20 +62,11 @@ public:
 				target->upper->lower = chain;
 				//連結用の構造体の親として元の親を連結する
 				chain->upper = target->upper;
-			}//親がいない場合
-			else
-			{
-				//連結用の構造体の親が存在しないことを格納する
-				chain->upper = nullptr;
 			}
 			//対象の親として連結用の構造体を連結
 			target->upper = chain;
 			//連結用の構造体の子として対象の構造体を連結
 			chain->lower = target;
-			//兄がいないことを格納する
-			chain->prev = nullptr;
-			//弟がいないことを格納する
-			chain->next = nullptr;
 			//対象の親に新たな構造体を連結をした構造体を返す
 			return chain;
 		}
@@ -106,6 +92,7 @@ public:
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
 			//対象が空の場合は連結用の構造体をそのまま返す
 			if (target == nullptr) {
+				//空のこうぞうたいを返却する
 				return chain;
 			}
 			//連結対象に子がいるかを調べる
@@ -115,19 +102,10 @@ public:
 				//連結用の構造体の子として元の子を連結する
 				chain->lower = target->lower;
 			}//子がいない場合
-			else
-			{
-				//連結用の構造体の子が存在しないことを格納する
-				chain->lower = nullptr;
-			}
 			//対象の子として連結用の構造体を連結
 			target->lower = chain;
 			//連結用の構造体の親として対象の構造体を連結
 			chain->upper = target;
-			//兄がいないことを格納する
-			chain->prev = nullptr;
-			//弟がいないことを格納する
-			chain->next = nullptr;
 			//対象の子に新たな構造体を連結をした構造体を返す
 			return chain;
 		}
@@ -166,8 +144,6 @@ public:
 				target->prev->next = chain;
 				//連結用の構造体の兄として元の兄を連結する
 				chain->prev = target->prev;
-				//親がいないことを格納する
-				chain->upper = nullptr;
 			}//兄がいない場合
 			else
 			{
@@ -175,17 +151,13 @@ public:
 				chain->upper = target->upper;
 				//親の子として連結用のこうぞうたいを連結する
 				chain->upper->lower = chain;
-				//対象の親へにチェインを削除する
+				//対象の親へのチェインを削除する
 				target->upper = nullptr;
-				//連結用の構造体の兄が存在しないことを格納する
-				chain->prev = nullptr;
 			}
 			//対象の兄として連結用の構造体を連結
 			target->prev = chain;
 			//連結用の構造体の弟として対象の構造体を連結
 			chain->next = target;
-			//子がいないことを格納する
-			chain->lower = nullptr;
 			//対象の兄に新たな構造体を連結をした構造体を返す
 			return chain;
 		}
@@ -209,7 +181,9 @@ public:
 			cellchain^ chain = gcnew cellchain();		//連結用の構造体を宣言
 			chain->key = key;		//連結する構造体のキー名を格納
 			chain->value = value;	//連結する構造体のキー名に対応した値を格納
+			//連結対象の構造体が存在していない場合は
 			if (target == nullptr) {
+				//新規で空文字の構造体を返却する
 				return chain;
 			}
 			//連結対象に弟がいるかを調べる
@@ -218,20 +192,11 @@ public:
 				target->next->prev = chain;
 				//連結用の構造体の弟として元の弟を連結する
 				chain->next = target->next;
-			}//弟がいない場合
-			else
-			{
-				//連結用の構造体の弟が存在しないことを格納する
-				chain->next = nullptr;
 			}
 			//対象の弟として連結用の構造体を連結
 			target->next = chain;
 			//連結用の構造体の兄として対象の構造体を連結
 			chain->prev = target;
-			//親がいないことを格納する
-			chain->upper = nullptr;
-			//子がいないことを格納する
-			chain->lower = nullptr;
 			//対象の弟に新たな構造体を連結をした構造体を返す
 			return chain;
 		}
@@ -250,7 +215,10 @@ public:
 	作成者：K.Asada
 	更新日2017.9.29
 	更新者：K.Asada
-	更新内容：関数名を変更、指定された箇所の子要素も親が存在しなくなるため削除するように変更、対象に親がいたときの処理方法も変更*/
+	更新内容：関数名を変更、指定された箇所の子要素も親が存在しなくなるため削除するように変更、対象に親がいたときの処理方法も変更
+	更新内容：構造体を削除する処理をサブルーチン化
+	更新日：2017.10.3
+	更新者：K.Asada*/
 	System::Void DeleteChain(cellchain^ delchain) {
 		try {
 			//削除対象に子がいるかを調べる
@@ -258,35 +226,59 @@ public:
 				//子がいる場合は親に当たる構造体が削除されるため必要なくなるので削除する
 				this->DeleteYounger(delchain->lower);
 			}
+			//構造体を削除する関数を呼び出す
+			this->DeleteLink(delchain);
+			return;
+		}
+		catch (System::NullReferenceException^ e) {
+			System::Console::WriteLine(e);
+		}
+		catch (System::ArgumentNullException^ e) {
+			System::Console::WriteLine(e);
+		}
+	}
+
+	/*概要：対象の構造体の兄弟、親との連結を削除して構造体を削除する関数
+	引数：cellchain^ parent：削除対象の構造体
+	戻り値：なし
+	作成日：2017.10.3
+	作成者：K.Asada*/
+	System::Void DeleteLink(cellchain^ parent) {
+		try {
 			//削除対象の構造体に兄と弟両方が存在していたら兄と弟を連結させる
-			if (delchain->next != nullptr && delchain->prev != nullptr) {
+			if (parent->next != nullptr && parent->prev != nullptr) {
 				//兄の弟として弟を連結する
-				delchain->prev->next = delchain->next;
+				parent->prev->next = parent->next;
 				//弟の兄として兄を連結する
-				delchain->next->prev = delchain->prev;
+				parent->next->prev = parent->prev;
 			}//兄しか存在しないときは参照をはずす
-			else if (delchain->prev != nullptr) {
+			else if (parent->prev != nullptr) {
 				//兄の弟への参照を外す
-				delchain->prev->next = nullptr;
+				parent->prev->next = nullptr;
 			}//弟しか存在しないときは元の構造体に親がいるかを調べる
-			else if (delchain->next != nullptr) {
+			else if (parent->next != nullptr) {
 				//親がいる場合は親の参照を変える
-				if (delchain->upper != nullptr) {
+				if (parent->upper != nullptr) {
 					//親がいる場合は弟に引き継ぐ
-					delchain->upper->lower = delchain->next;
+					parent->upper->lower = parent->next;
 					//弟に親を渡す
-					delchain->next->upper = delchain->upper;
+					parent->next->upper = parent->upper;
 				}
-					//弟の兄への参照を外す
-					delchain->next->prev = nullptr;
+				//弟の兄への参照を外す
+				parent->next->prev = nullptr;
 			}//兄弟がおらずに親のみが存在する場合
-			else if (delchain->upper != nullptr) {
+			else if (parent->upper != nullptr) {
 				//親の子を削除する
-				delchain->upper->lower = nullptr;
+				parent->upper->lower = nullptr;
 			}
-			//親子、兄弟から参照が外れた構造体を削除する
-			delchain = nullptr;
-			delete delchain;
+			//構造体のキー名を削除する
+			parent->key = nullptr;
+			//構造体の値を削除する
+			parent->value = nullptr;
+			//構造体を空にする
+			parent = nullptr;
+			//空になった構造体を削除する
+			delete parent;
 			return;
 		}
 		catch (System::NullReferenceException^ e) {
@@ -312,40 +304,12 @@ public:
 			}
 			//対象に弟がいる場合はすべて削除する
 			if (parent->next != nullptr) {
-				//弟がなくなるまで走査する
-				for (; parent->next != nullptr;) {
-					//再帰して弟を削除する
-					this->DeleteChain(parent->next);
-				}
+				//再帰して弟を削除する
+				this->DeleteYounger(parent->next);
 			}
-			if (parent->next != nullptr && parent->prev != nullptr) {
-				//兄の弟として弟を連結する
-				parent->prev->next = parent->next;
-				//弟の兄として兄を連結する
-				parent->next->prev = parent->prev;
-			}//兄しか存在しないときは参照をはずす
-			else if (parent->prev != nullptr) {
-				//兄の弟への参照を外す
-				parent->prev->next = nullptr;
-			}//弟しか存在しないときは元の構造体に親がいるかを調べる
-			else if (parent->next != nullptr) {
-				//親がいる場合は親の参照を変える
-				if (parent->upper != nullptr) {
-					//親がいる場合は弟に引き継ぐ
-					parent->upper->lower = parent->next;
-					//弟に親を渡す
-					parent->next = parent->upper;
-				}
-				//弟の兄への参照を外す
-				parent->next->prev = nullptr;
-			}//兄弟がおらずに親のみが存在する場合
-			else if (parent->upper != nullptr) {
-				//親の子を削除する
-				parent->upper->lower = nullptr;
-			}
-			//周りとの参照、子が全て削除されたら対象を必要ないとして削除する
-			parent = nullptr;
-			delete parent;
+			//構造体を削除する関数を呼び出す
+			this->DeleteLink(parent);
+			return;
 		}
 		//NULL関係の例外を捕捉
 		catch (System::NullReferenceException^ e) {
