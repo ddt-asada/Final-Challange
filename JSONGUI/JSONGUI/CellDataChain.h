@@ -320,29 +320,6 @@ public:
 		}
 	}
 
-	/*概要：対象の構造体のすべての親キーを取得して連結した構造体を作る関数
-	引数：cellchain^ child：親キーを取得したい構造体
-	戻り値：cellchain^ child：対象の親キーをすべて連結した構造体
-	作成日：2017.9.25
-	作成者：K.Asad*/
-	cellchain^ GetParents(cellchain^ child) {
-		//取得した親キーを格納するための構造体
-		cellchain^ parent = gcnew cellchain();
-		//対象の構造体の長男まで移動する
-		for (; child->prev != nullptr; child = child->prev) {
-			//兄に移動していく
-		}
-		//長男に親が存在していた場合
-		if (child->upper != nullptr) {
-			//再帰して親の親キーがないかを調べて取得
-			parent = GetParents(child->upper);
-			//取得した親キーの子として現在の構造体を連結する
-			child = ChainChild(child->key, child->value, parent);
-		}
-		//親キーを連結した構造体を返却する
-		return child;
-	}
-
 	/*概要：行の要素の構造体を取得するための関数
 	引数：Int32：rowindex：取得対象の行
 		：Int32：colindex：取得対象の座標
@@ -354,34 +331,45 @@ public:
 	更新日：2017.9.27
 	更新者：K.Asada*/
 	cellchain^ GetColumnChain(System::Int32 rowindex, System::Int32 colindex, cellchain^ parent) {
-		//取得した構造体を格納するための返却用の構造体
-		cellchain^ colchain = gcnew cellchain();
-		//親要素から取得対象の行の構造体を取得する
-		colchain = GetRowChain(rowindex, parent);
-		//列座標が1以下であれば親要素の構造体を返却する
-		if(colindex >= 1 && colchain != nullptr){
-			//行の要素（子）が存在していれば対象の構造体を探す
-			if (colchain->lower != nullptr) {
-				//子を取得
-				colchain = colchain->lower;
-			}//存在していなければnullptrを格納
-			else {
-				colchain = nullptr;
-			}
-			//取得対象の構造体まで移動する
-			for (int i = 1; i < colindex; i++) {
-				//取得対象の構造体が存在していなければ中断する
-				if (colchain != nullptr && colchain->next != nullptr) {
-					//弟が存在していれば弟に移動する
-					colchain = colchain->next;
-				}
-				//存在していなければnullptrを格納
+		try {
+			//取得した構造体を格納するための返却用の構造体
+			cellchain^ colchain = gcnew cellchain();
+			//親要素から取得対象の行の構造体を取得する
+			colchain = GetRowChain(rowindex, parent);
+			//列座標が1以下であれば親要素の構造体を返却する
+			if (colindex >= 1 && colchain != nullptr) {
+				//行の要素（子）が存在していれば対象の構造体を探す
+				if (colchain->lower != nullptr) {
+					//子を取得
+					colchain = colchain->lower;
+				}//存在していなければnullptrを格納
 				else {
 					colchain = nullptr;
 				}
+				//取得対象の構造体まで移動する
+				for (int i = 1; i < colindex; i++) {
+					//取得対象の構造体が存在していなければ中断する
+					if (colchain != nullptr && colchain->next != nullptr) {
+						//弟が存在していれば弟に移動する
+						colchain = colchain->next;
+					}
+					//存在していなければnullptrを格納
+					else {
+						//空の構造体を取得
+						colchain = nullptr;
+						//ループを抜ける
+						break;
+					}
+				}
 			}
+			return colchain;
 		}
-		return colchain;
+		catch (System::NullReferenceException^ e) {
+			System::Console::WriteLine(e);
+		}
+		catch (System::ArgumentNullException^ e) {
+			System::Console::WriteLine(e);
+		}
 	}
 
 	/*概要：行の先頭の構造体を取得するための関数
@@ -394,26 +382,39 @@ public:
 	更新日：2017.9.27
 	更新者：K.Asada*/
 	cellchain^ GetRowChain(System::Int32 rowindex, cellchain^ parent) {
-		//返却用の構造体を宣言する
-		cellchain^ rowchain = parent;
-		//取得対象の構造体の位置まで移動する
-		for (int i = 0; i < rowindex; i++) {
-			//移動先がなくなったときは構造体を取得できなかったとしてnullptrを取得
-			if (rowchain != nullptr && rowchain->next != nullptr) {
-				//弟の構造体に移動する
-				rowchain = rowchain->next;
+		try {
+			//返却用の構造体を宣言する
+			cellchain^ rowchain = parent;
+			//取得対象の構造体の位置まで移動する
+			for (int i = 0; i < rowindex; i++) {
+				//移動先がなくなったときは構造体を取得できなかったとしてnullptrを取得
+				if (rowchain != nullptr && rowchain->next != nullptr) {
+					//弟の構造体に移動する
+					rowchain = rowchain->next;
+				}
+				else {//ない場合はnullptrを取得してループを抜ける
+					rowchain = nullptr;
+					//ループを抜ける
+					break;
+				}
 			}
-			else {//ない場合はnullptrを取得してループを抜ける
-				rowchain = nullptr;
-				//ループを抜ける
-				break;
-			}
+			//取得した構造体を返却する
+			return rowchain;
 		}
-		//取得した構造体を返却する
-		return rowchain;
+		catch (System::NullReferenceException^ e) {
+			System::Console::WriteLine(e);
+		}
+		catch (System::ArgumentNullException^ e) {
+			System::Console::WriteLine(e);
+		}
 	}
 
-	cellchain^ FirstChain(cellchain^ chain) {
+	/*概要：対象の構造体の長男を取得するための関数
+	引数：cellchain^ chain：対象の構造体
+	戻り値：cellchain^ chain：対象の構造体の長男
+	作成日：2017.10.3
+	作成者：K.Asada*/
+	cellchain^ GetElderChain(cellchain^ chain) {
 		try {
 			for (; chain->prev != nullptr; chain = chain->prev) {
 			}
@@ -439,7 +440,7 @@ public:
 		//対象の親の位置まで走査する
 		for (int i = 0; i < parentindex; i++) {
 			//対象の長男まで移動する
-			parent = this->FirstChain(parent);
+			parent = this->GetElderChain(parent);
 			//対象の長男に親が存在するか
 			if (parent->upper != nullptr) {
 				//親を取得する
@@ -680,7 +681,7 @@ public:
 				}
 			}
 			//コピーの終わった構造体の長男を返却する
-			return %*this->FirstChain(paste);
+			return %*this->GetElderChain(paste);
 		}
 		catch (System::NullReferenceException^ e) {
 			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
