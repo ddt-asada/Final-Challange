@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include "CellDataChain.h"	//自作データチェインクラス
+#include "ConstantString.h"
 
 namespace process{
 
@@ -27,6 +28,7 @@ namespace process{
 		}
 
 		CellDataChain::cellchain^ Tablechain = gcnew CellDataChain::cellchain();	//JSONを文字列に変換して親子、兄弟関係のデータチェインを行うための構造体
+		CONSTANTS::ConstantString^ Constants = gcnew CONSTANTS::ConstantString();
 		
 		/*概要：JSONを表に必要な文字列に変換する関数
 		引数：string json：ファイルから読み込んだJSON文字列
@@ -35,44 +37,13 @@ namespace process{
 		作成者：K.Asada*/
 		Void TableString(string json) {
 			ptree pt;						//ツリー構造にしたJSONを格納するためのツリー
-			stringstream ss;
+			stringstream ss;				//文字列を読み込むためのストリーム
+			//文字列ストリームへ文字列を読み込ませる
 			ss << json;
 			//JSONを処理する準備として取得したJSON文字列をツリー構造にする
 			read_json(ss, pt);
 			//取得したJSON文字列をチェイン構造化する関数を呼び出す
 			this->Tablechain = this->JSONString(pt, "", nullptr);
-			return;
-		}
-
-		/*概要：箇条書き型のJSONをチェイン構造に変換する関数
-		引数：string json：ファイルより取得したJSON文字列
-		戻り値：なし
-		作成日：2017.9.21
-		作成者：K.Asada*/
-		Void ListString(string json) {
-			ptree pt;						//ツリー構造にしたJSONを格納するためのツリー
-			//JSONを処理する準備として取得したJSON文字列をツリー構造にする
-			read_json(json, pt);
-			//取得したJSON文字列をチェイン構造化する関数を呼び出す
-			this->Tablechain = this->JSONString(pt, "", nullptr);
-			return;
-		}
-
-		/*概要：DBから受け取ったJSONをチェイン構造に変換する関数
-		引数：string json：DBから取得したJSON文字列
-		戻り値：なし
-		作成日：2017.9.21
-		作成者：K.Asada*/
-		Void DBString(string dbresult) {
-			ptree pt;			//JSONを格納するためのツリーを宣言
-			stringstream ss;	//DBとの通信結果を格納するためのストリーム
-			//ツリーに読み込むために文字列ストリームに格納
-			ss << dbresult;
-			//DBより取得したJSON文字列をJSONツリーに変換
-			read_json(ss, pt);
-			//JSONをチェイン構造に変換する関数を呼び出す
-			this->Tablechain = this->JSONString(pt, "", nullptr);
-			//処理を終了する
 			return;
 		}
 
@@ -156,7 +127,7 @@ namespace process{
 		作成者：K.Asada*/
 		CellDataChain::cellchain^ JSONString(ptree pt, string key, CellDataChain::cellchain^ parent) {
 			try {
-				CellDataChain ChainCtrl;			//データチェインクラスをインスタンス化
+				CellDataChain^ CellCtrl = gcnew CellDataChain();			//データチェインクラスをインスタンス化
 				string childkey = "";				//子供のキーを格納するための文字列
 				CellDataChain::cellchain^ brother = nullptr;		//兄弟を連結するための構造体
 				//初回ループ時の処理（初回はキー名がわからない、構造体が存在していないために作る）
@@ -176,7 +147,7 @@ namespace process{
 					if (boost::optional<string>str = info.get_optional <string>(childkey)) {
 						//配列の要素がオブジェクトかただの配列かで処理を分岐
 						if (info.begin() != info.end()) {
-							brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(str.get()).c_str()), brother);
+							brother = CellCtrl->ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(str.get()).c_str()), brother);
 							//配列オブジェクトを構造体にチェインする関数を呼び出す
 							brother->lower = this->ArrayJSONobject(info, brother, childkey);
 							brother->lower->upper = brother;
@@ -195,18 +166,18 @@ namespace process{
 							//子要素のキーを取り出す
 							childkey = child.first;
 							//弟にデータを連結する関数を呼び出す
-							brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
+							brother = CellCtrl->ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
 						} //親の場合は弟にデータを連結しながら子へ再帰していく
 						else {
 							//弟にデータを連結する関数を呼び出す
-							brother = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
+							brother = CellCtrl->ChainYoungBrother(gcnew String(UTF8toSjis(childkey).c_str()), gcnew String(UTF8toSjis(childtree.get <std::string>(childkey)).c_str()), brother);
 							//子にデータを連結するために再帰処理を行う
 							brother->lower = this->JSONString(childtree, childkey, brother);
 							brother->lower->upper = brother;
 						}
 					}
 				}
-				return %*ChainCtrl.FirstChain(brother);
+				return %*CellCtrl->GetYoungChain(brother);
 			}
 			catch (System::NullReferenceException^ e) {
 				System::Console::WriteLine(e);
@@ -234,7 +205,7 @@ namespace process{
 					//弟として連結していく
 					arrayparent = ChainCtrl.ChainYoungBrother(gcnew String(UTF8toSjis(itr->first).c_str()), gcnew String(UTF8toSjis(info.get<string>(itr->first)).c_str()), arrayparent);
 				}
-				return %*ChainCtrl.FirstChain(arrayparent);
+				return %*ChainCtrl.GetElderChain(arrayparent);
 			}
 			catch (System::NullReferenceException^ e) {
 				System::Console::WriteLine(e);

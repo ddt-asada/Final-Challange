@@ -14,6 +14,10 @@ namespace CONSTANTS {
 		System::String^ EMPTY_STRING = "";
 		//0を示す文字列
 		System::String^ ZERO_STRING = "0";
+		//ファイルパスが入力されていないときに表示するメッセージ
+		System::String^ NOT_PATH_MESSAGE = "ファイルパスが入力されていません。\n";
+		//クエリが入力されていないときに表示するメッセージ
+		System::String^ NOT_QUERY_MESSAGE = "クエリが入力されていません。\n";
 		//エラーが発生した時にユーザー側に表示するメッセージ
 		System::String^ MESSAGE_STRING = "エラーが発生しました。処理を中断します。\nエラー内容はコンソールをご確認ください。";
 		//メイン画面の展開ボタンがクリックされたときに展開しなかったときに表示するメッセージ

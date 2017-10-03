@@ -3,7 +3,6 @@
 #include "CellDataChain.h"	//自作のデータチェインクラスのヘッダ
 #include "StringProcessing.h"	//文字列処理クラスのヘッダ
 #include "JSONDBManager.h"
-#include "ConstantString.h"
 
 //内部処理関係の名前空間
 namespace process {
@@ -28,8 +27,8 @@ namespace process {
 		Void Tablerun(String^ jsonpath) {
 			try {
 				//ファイルパスを受け取っていなければファイルを読み込めないので例外を投げる
-				if (jsonpath == "") {
-					throw gcnew System::IO::FileNotFoundException("ファイルパスが入力されていません\n");
+				if (jsonpath == Constants->EMPTY_STRING) {
+					throw gcnew System::IO::FileNotFoundException(Constants->NOT_PATH_MESSAGE);
 				}
 				std::string json = "";		//ファイルから読み込んだJSONを格納する文字列
 				//ファイルからJSONを読み込む
@@ -42,6 +41,8 @@ namespace process {
 			catch(System::IO::FileNotFoundException^ e){
 				//コンソールにエラー内容を表示
 				Console::WriteLine(e);
+				//メイン画面へエラーを投げる
+				throw e;
 			}
 		}
 
@@ -56,14 +57,14 @@ namespace process {
 		Void Listrun(String^ jsonpath) {
 			try {
 				//ファイルパスを受け取っていなければファイルを読み込めないので例外を投げる
-				if (jsonpath == "") {
-					throw gcnew System::IO::FileNotFoundException("ファイルパスが入力されていません\n");
+				if (jsonpath == Constants->EMPTY_STRING) {
+					throw gcnew System::IO::FileNotFoundException(Constants->NOT_PATH_MESSAGE);
 				}
 				std::string json = "";		//ファイルから読み込んだJSONを格納する文字列
 				//ファイルからJSONを読み込む
 				json = this->LoadJSON(jsonpath);
 				//文字列処理関数を呼び出す
-				this->ListString(json);
+				this->TableString(json);
 				return;
 			}
 			//ファイルパスが入力されていなければ例外を投げる
@@ -84,8 +85,8 @@ namespace process {
 		Void DBrun(String^ DBquery) {
 			try {
 				//クエリが未入力なら例外を投げる
-				if (DBquery == "") {
-					throw gcnew System::IO::FileNotFoundException("クエリが未入力です。\n");
+				if (DBquery == Constants->EMPTY_STRING) {
+					throw gcnew System::IO::FileNotFoundException(Constants->NOT_QUERY_MESSAGE);
 				}
 				string result = "";		//DBから取得したJSON文字列を格納するための文字列
 				string query = "";		//DBへ渡すクエリを格納する文字列
@@ -95,7 +96,7 @@ namespace process {
 				//DBからJSON文字列を取得する
 			//	result = db.GetDBResult(query);
 				//文字列処理関数を呼び出す
-				this->DBString(result);
+				this->TableString(result);
 				//戻り値なし
 				return;
 			}
@@ -103,6 +104,8 @@ namespace process {
 			catch (System::IO::FileNotFoundException^ e) {
 				//コンソールにエラー内容を表示
 				Console::WriteLine(e);
+				//メイン画面へ投げる
+				throw e;
 			}
 		}
 
@@ -114,9 +117,9 @@ namespace process {
 		Void Convertrun(String^ jsonpath, CellDataChain::cellchain^ jsonelem) {
 			try {
 				//保存先ファイルパスが未入力であれば例外処理
-				if (jsonpath == "") {
+				if (jsonpath == Constants->EMPTY_STRING) {
 					//例外を投げる
-					throw gcnew System::IO::FileNotFoundException("保存先ファイルパスが入力されていません。\n");
+					throw gcnew System::IO::FileNotFoundException(Constants->NOT_PATH_MESSAGE);
 				}
 				ptree json;		//文字列から作成したJSONツリーを格納するためのツリー
 				string path = "";	//ファイルパスをstring型に変換したものを格納するための文字列
@@ -133,6 +136,8 @@ namespace process {
 			catch (System::IO::FileNotFoundException^ e) {
 				//コンソールにエラー内容を表示
 				Console::WriteLine(e);
+				//メイン画面へ投げる
+				throw e;
 			}
 		}
 
@@ -144,7 +149,6 @@ namespace process {
 		std::string LoadJSON(String^ jsonpath) {
 			//ファイル読み込み関係の例外を捕捉
 			try {
-				CONSTANTS::ConstantString^ Constants = gcnew CONSTANTS::ConstantString();
 				std::string path = "";		//String^型からstring型へ変換したファイルパスを格納する文字列
 				//型変換を行う
 				this->MarshalString(jsonpath, path);
@@ -163,6 +167,8 @@ namespace process {
 			catch (System::IO::FileNotFoundException^ e) {
 				//コンソールに詳細内容を表示
 				Console::WriteLine(e);
+				//メイン画面へ投げる
+				throw e;
 			}
 		}
 	};

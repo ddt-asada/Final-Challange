@@ -1,5 +1,4 @@
 #pragma once
-#include "ConstantString.h"
 
 /*概要：JSONデータをチェイン構造にして扱うためのクラス
 作成日：2017.9.20
