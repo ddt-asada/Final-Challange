@@ -995,31 +995,39 @@ private: System::Void TextBoxListClick(System::Object^  sender, System::EventArg
 引数：
 戻り値：なし
 作成日：2017.9.21
-作成者：K.Asada*/
+作成者：K.Asada
+更新内容：キャンセルされたときには構造体を更新しないように変更
+更新日：2017.10.3
+更新者：K.Asada*/
 private: System::Void TextBoxCellClick(System::Object^  sender, System::EventArgs^  e) {
 try{
-	//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
-	MoreInfoForm^ more = gcnew MoreInfoForm();
-	//詳細ダイアログへ渡す構造体を宣言
-	CellDataChain::cellchain^ child = gcnew CellDataChain::cellchain();
+	MoreInfoForm^ more = gcnew MoreInfoForm();			//クリックしたセルの親キーを編集するための詳細画面クラスをインスタンス化
+	CellDataChain::cellchain^ child = nullptr;				//詳細ダイアログへ渡す構造体を宣言
+	CellDataChain::cellchain^ copy = nullptr;				//メンバの構造体をコピーするための構造体
 	//構造体操作クラスをインスタンス化
 	CellDataChain^ CellCtrl = gcnew CellDataChain();
-	//渡す構造体を取得する
-	child = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
+	//メンバの構造体が更新されないようにいったんコピーする
+	copy = CellCtrl->CopyChain(this->TableElem);
+	//渡す構造体をコピーから取得する
+	child = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, copy->lower);
 	//nullptrを取得した場合対象の位置に新規で構造体を作成して連結する
 	if (child == nullptr) {
-		//メッセージを表示
 		//対象の位置の構造体に文字列を挿入する関数を呼び出す
-		child = CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, "", this->TableElem, false, false);
+		child = CellCtrl->SetChainCell(*this->RowIndex, *this->ColumnIndex, Constants->EMPTY_STRING, copy, false, false);
 	}//正常に情報を取得できていた場合は詳細ダイアログを表示
 	//詳細ダイアログへ構造体を渡す
 	more->TableElem = child;
 	//新規ダイアログで表示する
 	more->ShowDialog();
-	//終わったら表画像を再描画する
-	this->ReadyPict(this->TableElem);
-	//表画像を再描画する
-	this->TableGenerate(this->pictureBoxTable);
+	//OKボタンが押されていたら確定
+	if (more->DialogResult == System::Windows::Forms::DialogResult::OK) {
+		//コピーしていた構造体をもとの構造体に代入して更新を行う
+		this->TableElem = copy;
+		//終わったら表画像を再描画する
+		this->ReadyPict(this->TableElem);
+		//表画像を再描画する
+		this->TableGenerate(this->pictureBoxTable);
+	}
 	return;
 	}
 		 catch (System::NullReferenceException^ e) {
@@ -1186,31 +1194,33 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
  private:Void Expansion() {
 	 //構造体の走査中に発生したnullptrの例外処理
 	 try{
-	 //チェイン構造操作クラスをインスタンス化
-	 CellDataChain^ CellCtrl = gcnew CellDataChain();
-	 //表画像を表示するためのクラスをインスタンス化
-	 JSONGUIForm^ more = gcnew JSONGUIForm();
-	 //表示する構造体を取得して格納するための構造体
-	 CellDataChain::cellchain^ detailtable = gcnew CellDataChain::cellchain();
-	 CellDataChain::cellchain^ test = nullptr;
-	 test = CellCtrl->CopyChain(this->TableElem);
+	 CellDataChain^ CellCtrl = gcnew CellDataChain();	 //チェイン構造操作クラスをインスタンス化
+	 JSONGUIForm^ more = gcnew JSONGUIForm();			 //表画像を表示するためのクラスをインスタンス化
+	 CellDataChain::cellchain^ detailtable = nullptr;	 //表示する構造体を取得して格納するための構造体
+	 CellDataChain::cellchain^ copy = nullptr;			//元の構造体が更新されないようにコピーするための構造体
+	 //構造体の内容を変更するのでいったんコピーを取る
+	 copy = CellCtrl->CopyChain(this->TableElem);
 	 //構造体を取得する
-	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, test->lower);
-	 //もしnullptrを取得していれば表示すべき情報がないとしてメッセージを表示する
-	 if (detailtable == nullptr) {
-		 //展開すべき情報がないことを表示する
-		 MessageBox::Show(Constants->EXPANSION_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK);
-	 }
-	 else {//正常に情報を取得できていた場合は詳細ダイアログを開く
+	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, copy->lower);
+	 //展開すべき構造体が存在していれば展開ダイアログを開く
+	 if (detailtable != nullptr) {
 		 //新規に開くダイアログの初期値として構造体を設定
 		 more->TableElem = detailtable;
 		 //ダイアログを開く
 		 more->ShowDialog();
-		 //終わったら表画像を再描画する
-		 test;
-		 this->ReadyPict(this->TableElem);
-		 //表画像を再描画する
-		 this->TableGenerate(this->pictureBoxTable);
+		 //OKボタンが押されていたら構造体の更新を行う
+		 if (more->DialogResult == System::Windows::Forms::DialogResult::OK) {
+			//構造体の更新を行う
+			 this->TableElem = copy;
+			 //終わったら表画像を再描画する
+			 this->ReadyPict(this->TableElem);
+			 //表画像を再描画する
+			 this->TableGenerate(this->pictureBoxTable);
+		 }
+	 }
+	 else {
+		 //展開すべき情報がないことを表示する
+		 MessageBox::Show(Constants->EXPANSION_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK);
 	 }
 	 return;
 	 }
@@ -1384,10 +1394,13 @@ private: System::Void textBoxCell_Leave(System::Object^  sender, System::EventAr
 		Int32 rowindex = *this->RowIndex;		//編集する構造体を指定するために座標を取得
 		Int32 colindex = *this->ColumnIndex;	//編集する構造体を指定するために座標を取得
 		String^ data = this->textBoxCell->Text;	//構造体んい渡すための文字列をテキストボックスより取得
-		//対象の位置の構造体に文字列を挿入する関数を呼び出す
-		CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
-		//セルの再描画を行う
-		this->TableGenerate(this->pictureBoxTable);
+		//テキストボックスの中身が空文字でない場合のみ更新を行う
+		if (data != Constants->EMPTY_STRING) {
+			//対象の位置の構造体に文字列を挿入する関数を呼び出す
+			CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
+			//セルの再描画を行う
+			this->TableGenerate(this->pictureBoxTable);
+		}
 		//テキストボックスを表示から外す
 		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
 	}
