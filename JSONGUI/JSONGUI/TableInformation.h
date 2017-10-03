@@ -33,6 +33,7 @@ namespace TableInformation {
 		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
 		Int32^ RctHeight = 100;								//表の格子一つ当たりの高さ
 		CellDataChain::cellchain^ TableElem = nullptr;					//表の情報が格納されたデータチェイン
+		CellDataChain::cellchain temp;
 		String^ JSONFilePath = Constants->EMPTY_STRING;		//読み込むJSONのファイルパス
 		String^ DBQuery = Constants->EMPTY_STRING;			//DBよりJSON文字列を取得するためのクエリ
 
@@ -64,6 +65,8 @@ namespace TableInformation {
 				}
 				//作成した画像をピクチャボックスへのセル
 				pict->Image = img;
+				//ピクチャボックスの位置を設定する
+				pict->Location = System::Drawing::Point(10, 100);
 				//作成の終えたビットマップ画像を返す
 				return pict;
 			}

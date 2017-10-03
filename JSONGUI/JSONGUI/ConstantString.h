@@ -15,7 +15,7 @@ namespace CONSTANTS {
 		//0を示す文字列
 		System::String^ ZERO_STRING = "0";
 		//エラーが発生した時にユーザー側に表示するメッセージ
-		System::String^ MESSAGE_STRING = "エラーが発生しました。処理を中断します。";
+		System::String^ MESSAGE_STRING = "エラーが発生しました。処理を中断します。\nエラー内容はコンソールをご確認ください。";
 		//メイン画面の展開ボタンがクリックされたときに展開しなかったときに表示するメッセージ
 		System::String^ EXPANSION_STRING = "展開すべき情報がありません。";
 		//入力内容がおかしいことを表示するメッセージ

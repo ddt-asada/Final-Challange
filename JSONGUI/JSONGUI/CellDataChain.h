@@ -16,11 +16,30 @@ public:
 		ref struct cellchain^ prev;		//兄へのポインタ
 		ref struct cellchain^ upper;	//親へのポインタ
 		ref struct cellchain^ lower;	//子へのポインタ
+
+		ref struct cellchain()
+		{
+			this->key = nullptr;
+			this->value = nullptr;
+			this->next = nullptr;
+			this->prev = nullptr;
+			this->upper = nullptr;
+			this->lower = nullptr;
+		};
+		ref struct cellchain(cellchain% copy) {
+			this->key = copy.key;
+			this->value = copy.value;
+			this->next = copy.next;
+			this->prev = copy.prev;
+			this->upper = copy.upper;
+			this->lower = copy.lower;
+		}
 	};
 
 	//デフォルトコンストラクタ
 	CellDataChain() {
 	}
+
 
 	int getcount = 0;
 
@@ -676,4 +695,37 @@ public:
 		return data;
 	}
 
+	/*概要：チェイン構造をコピーするための関数
+	引数：cellchain^ copy：コピー対象の構造体
+	戻り値：cellchain^ paste：新規にコピーした構造体
+	作成日：2017.10.3
+	作成者：K.Asada*/
+	cellchain^ CopyChain(cellchain^ copy) {
+		try {
+			cellchain^ paste = nullptr;		//コピーした構造体
+			//対象の中身がなくなるまで走査する
+			for (; copy != nullptr; copy = copy->next) {
+				//コピーしながら弟につないでいく
+				paste = this->ChainYoungBrother(copy->key, copy->value, paste);
+				//子がいれば優先して処理
+				if (copy->lower != nullptr) {
+					//子がいれば優先して処理してコピーする
+					paste->lower = this->CopyChain(copy->lower);
+					//子の親として連結
+					paste->lower->upper = paste;
+				}
+			}
+			//コピーの終わった構造体の長男を返却する
+			return %*this->FirstChain(paste);
+		}
+		catch (System::NullReferenceException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+		//null引数例外を捕捉
+		catch (System::ArgumentNullException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+	}
 };

@@ -24,7 +24,7 @@ namespace JSONGUI {
 	作成者：K.Asada*/
 	public ref class JSONGUIForm
 		: public TableInformation
-//		: public System::Windows::Forms::Form
+	//	: public System::Windows::Forms::Form
 	{
 	public:
 		JSONGUIForm(void)
@@ -90,6 +90,7 @@ namespace JSONGUI {
 	private: System::Windows::Forms::Label^  labelColumn;
 	private: System::Windows::Forms::RadioButton^  radioButtonValue;
 	private: System::Windows::Forms::RadioButton^  radioButtonKey;
+	private: System::Windows::Forms::Button^  buttonEnter;
 
 	private:
 		/// <summary>
@@ -138,6 +139,7 @@ namespace JSONGUI {
 			this->pictureBoxListCurr = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxList = (gcnew System::Windows::Forms::PictureBox());
 			this->saveFileDialog1 = (gcnew System::Windows::Forms::SaveFileDialog());
+			this->buttonEnter = (gcnew System::Windows::Forms::Button());
 			this->tabControl1->SuspendLayout();
 			this->tabPage->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCurrent))->BeginInit();
@@ -188,7 +190,7 @@ namespace JSONGUI {
 			// radioButtonValue
 			// 
 			this->radioButtonValue->AutoSize = true;
-			this->radioButtonValue->Location = System::Drawing::Point(421, 80);
+			this->radioButtonValue->Location = System::Drawing::Point(434, 80);
 			this->radioButtonValue->Name = L"radioButtonValue";
 			this->radioButtonValue->Size = System::Drawing::Size(168, 28);
 			this->radioButtonValue->TabIndex = 18;
@@ -231,7 +233,7 @@ namespace JSONGUI {
 			// 
 			// buttonNewTable
 			// 
-			this->buttonNewTable->Location = System::Drawing::Point(794, 6);
+			this->buttonNewTable->Location = System::Drawing::Point(817, 6);
 			this->buttonNewTable->Name = L"buttonNewTable";
 			this->buttonNewTable->Size = System::Drawing::Size(95, 68);
 			this->buttonNewTable->TabIndex = 16;
@@ -261,7 +263,7 @@ namespace JSONGUI {
 			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(689, 6);
+			this->button3->Location = System::Drawing::Point(712, 6);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(99, 68);
 			this->button3->TabIndex = 13;
@@ -283,7 +285,7 @@ namespace JSONGUI {
 			// 
 			this->button1->Location = System::Drawing::Point(579, 6);
 			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(104, 68);
+			this->button1->Size = System::Drawing::Size(127, 68);
 			this->button1->TabIndex = 11;
 			this->button1->Text = L"列追加";
 			this->button1->UseVisualStyleBackColor = true;
@@ -291,7 +293,7 @@ namespace JSONGUI {
 			// 
 			// buttonTableConv
 			// 
-			this->buttonTableConv->Location = System::Drawing::Point(1209, 6);
+			this->buttonTableConv->Location = System::Drawing::Point(1232, 6);
 			this->buttonTableConv->Name = L"buttonTableConv";
 			this->buttonTableConv->Size = System::Drawing::Size(98, 68);
 			this->buttonTableConv->TabIndex = 9;
@@ -301,7 +303,8 @@ namespace JSONGUI {
 			// 
 			// buttonTableCancel
 			// 
-			this->buttonTableCancel->Location = System::Drawing::Point(1313, 6);
+			this->buttonTableCancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
+			this->buttonTableCancel->Location = System::Drawing::Point(1336, 6);
 			this->buttonTableCancel->Name = L"buttonTableCancel";
 			this->buttonTableCancel->Size = System::Drawing::Size(117, 68);
 			this->buttonTableCancel->TabIndex = 8;
@@ -311,7 +314,7 @@ namespace JSONGUI {
 			// 
 			// buttonTableOK
 			// 
-			this->buttonTableOK->Location = System::Drawing::Point(1101, 6);
+			this->buttonTableOK->Location = System::Drawing::Point(1124, 6);
 			this->buttonTableOK->Name = L"buttonTableOK";
 			this->buttonTableOK->Size = System::Drawing::Size(102, 68);
 			this->buttonTableOK->TabIndex = 7;
@@ -321,7 +324,7 @@ namespace JSONGUI {
 			// 
 			// buttonConnect
 			// 
-			this->buttonConnect->Location = System::Drawing::Point(996, 6);
+			this->buttonConnect->Location = System::Drawing::Point(1019, 6);
 			this->buttonConnect->Name = L"buttonConnect";
 			this->buttonConnect->Size = System::Drawing::Size(99, 68);
 			this->buttonConnect->TabIndex = 6;
@@ -331,7 +334,7 @@ namespace JSONGUI {
 			// 
 			// buttonOption
 			// 
-			this->buttonOption->Location = System::Drawing::Point(895, 6);
+			this->buttonOption->Location = System::Drawing::Point(918, 6);
 			this->buttonOption->Name = L"buttonOption";
 			this->buttonOption->Size = System::Drawing::Size(95, 68);
 			this->buttonOption->TabIndex = 5;
@@ -504,6 +507,17 @@ namespace JSONGUI {
 			this->pictureBoxList->TabStop = false;
 			this->pictureBoxList->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &JSONGUIForm::PictureBoxListMouseClick);
 			// 
+			// buttonEnter
+			// 
+			this->buttonEnter->DialogResult = System::Windows::Forms::DialogResult::OK;
+			this->buttonEnter->Location = System::Drawing::Point(1195, 225);
+			this->buttonEnter->Name = L"buttonEnter";
+			this->buttonEnter->Size = System::Drawing::Size(100, 64);
+			this->buttonEnter->TabIndex = 19;
+			this->buttonEnter->Text = L"OK";
+			this->buttonEnter->UseVisualStyleBackColor = true;
+			this->buttonEnter->Click += gcnew System::EventHandler(this, &JSONGUIForm::ButtonEnterClick);
+			// 
 			// JSONGUIForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(13, 24);
@@ -513,6 +527,7 @@ namespace JSONGUI {
 			this->Controls->Add(this->tabControl1);
 			this->Name = L"JSONGUIForm";
 			this->Text = L"JSONGUI";
+			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &JSONGUIForm::FormClosings);
 			this->Load += gcnew System::EventHandler(this, &JSONGUIForm::JSONGUI_Load);
 			this->tabControl1->ResumeLayout(false);
 			this->tabPage->ResumeLayout(false);
@@ -536,9 +551,11 @@ private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  
 	try {
 		//展開動作のために再帰してきたときに分岐させる
 		if (this->TableElem != nullptr) {
-			//展開先にてキャンセルボタンは不要なので削除する
-			this->tabPage->Controls->Remove(this->buttonTableCancel);
-			//展開先にてOKボタンは不要なので削除する
+			//展開先に入力確定ボタンを追加する
+			this->tabPage->Controls->Add(this->buttonEnter);
+			//確定ボタンの位置を設定ボタンの位置にする
+			this->buttonEnter->Location = this->buttonOption->Location;
+			//展開先にて読込ボタンは不要なので削除する
 			this->tabPage->Controls->Remove(this->buttonTableOK);
 			//展開先にて通信ボタンは不要なので削除する
 			this->tabPage->Controls->Remove(this->buttonConnect);
@@ -546,6 +563,10 @@ private: System::Void JSONGUI_Load(System::Object^  sender, System::EventArgs^  
 			this->tabPage->Controls->Remove(this->buttonOption);
 			//展開先にて新規ボタンは不要なので削除する
 			this->tabPage->Controls->Remove(this->buttonNewTable);
+			//展開先にてキャンセルボタンのイベントを削除する
+			this->buttonTableCancel->Click -= gcnew System::EventHandler(this, &JSONGUIForm::TableCancelClick);
+			//キャンセルボタンに新たに入力キャンセルイベントを紐づける
+			this->buttonTableCancel->Click += gcnew System::EventHandler(this, &JSONGUIForm::ButtonExpansionCancel);
 			//表画像を生成するための準備関数を呼び出す
 			this->ReadyPict(this->TableElem);
 			//表画像を生成する関数を呼び出す
@@ -587,7 +608,9 @@ private: System::Void ButtonOptionClick(System::Object^  sender, System::EventAr
 戻り値：なし
 作成日：2017.9.20
 作成者：K.Asada*/
-private: System::Void FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
+private: System::Void FormClosings(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
+	//閉じるときにテキストボックスの中身を構造体に保持させるためにフォーカスを外す
+	this->ActiveControl = nullptr;
 	//閉じる前にメッセージボックスを表示して確認を行う。
 	if (System::Windows::Forms::DialogResult::Cancel == MessageBox::Show("終了しますか？", "確認", MessageBoxButtons::OKCancel, MessageBoxIcon::Question)) {
 		//プログラムを終了する。
@@ -1169,8 +1192,10 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 	 JSONGUIForm^ more = gcnew JSONGUIForm();
 	 //表示する構造体を取得して格納するための構造体
 	 CellDataChain::cellchain^ detailtable = gcnew CellDataChain::cellchain();
+	 CellDataChain::cellchain^ test = nullptr;
+	 test = CellCtrl->CopyChain(this->TableElem);
 	 //構造体を取得する
-	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, this->TableElem->lower);
+	 detailtable = CellCtrl->GetColumnChain(*this->RowIndex, *this->ColumnIndex, test->lower);
 	 //もしnullptrを取得していれば表示すべき情報がないとしてメッセージを表示する
 	 if (detailtable == nullptr) {
 		 //展開すべき情報がないことを表示する
@@ -1182,6 +1207,7 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 		 //ダイアログを開く
 		 more->ShowDialog();
 		 //終わったら表画像を再描画する
+		 test;
 		 this->ReadyPict(this->TableElem);
 		 //表画像を再描画する
 		 this->TableGenerate(this->pictureBoxTable);
@@ -1361,7 +1387,7 @@ private: System::Void textBoxCell_Leave(System::Object^  sender, System::EventAr
 		//対象の位置の構造体に文字列を挿入する関数を呼び出す
 		CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
 		//セルの再描画を行う
-		this->ReTableGenerate(this->pictureBoxTable);
+		this->TableGenerate(this->pictureBoxTable);
 		//テキストボックスを表示から外す
 		this->pictureBoxTable->Controls->Remove(this->textBoxCell);
 	}
@@ -1370,6 +1396,24 @@ private: System::Void textBoxCell_Leave(System::Object^  sender, System::EventAr
 		//処理が中断された旨を表示する
 		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
+}
+
+/*概要：展開先ダイアログにて使用する入力確定イベント
+作成日：2017.10.3
+作成者：K.Asada*/
+private: System::Void ButtonEnterClick(System::Object^  sender, System::EventArgs^  e) {
+	//開いているダイアログを閉じる
+	this->Close();
+	return;
+}
+
+/*概要：展開先ダイアログにて使用する入力キャンセルイベント
+作成日：2017.10.3
+作成者：K.Asada*/
+private: System::Void ButtonExpansionCancel(System::Object^  sender, System::EventArgs^  e) {
+	//開いているダイアログを閉じる
+	this->Close();
+	return;
 }
 };
 }
