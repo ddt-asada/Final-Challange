@@ -52,6 +52,8 @@ namespace CONSTANTS {
 		System::String^ ADD_ERROR_STRING = "先頭より先には追加できません。";
 		//行・列を削除するときに先頭より先は削除できないことを表示するメッセージ
 		System::String^ DELETE_ERROR_STRING = "先頭より先は削除できません。";
+		//削除対象が存在していないときに表示するメッセージ
+		System::String^ NOT_FOUND_ERROR = "対象が存在していません。\n";
 		//キー名が空の時に描画する配列であることを示す文字列
 		System::String^ ARRAY_STRING = "配列";
 		//右を示す文字列
@@ -69,9 +71,9 @@ namespace CONSTANTS {
 		//キャンセルボタンの名前
 		System::String^ CANCEL_BUTTON_STRING = "CancelButton";
 		//構造体を新規で作成するときの初期値となるキー名
-		System::String^ CHAIN_KEY_STRING = "";
+		System::String^ CHAIN_KEY_STRING = "key";
 		//構造体を新規で作成するときの初期値となる値
-		System::String^ CHAIN_VALUE_STRING = "";
+		System::String^ CHAIN_VALUE_STRING = "value";
 		//汎用エラー文字列
 		System::String^ ERROR_STRING = "エラー";
 		//メイン画面の行数テキストボックスの中身の初期値
@@ -80,8 +82,12 @@ namespace CONSTANTS {
 		System::String^ INITIAL_COLUMN_STRING = "0";
 		//0を示す変数
 		System::Int32 ZERO = 0;
+		//表画像上のセル一つ当たりの幅
+		System::Int32^ RCT_WIDTH = 100;
+		//表画像上のセル一つ当たりの高さ
+		System::Int32^ RCT_HEIGHT = 50;
 		//メイン画面にて表画像を置く位置
-		System::Drawing::Point TABLE_LOCATION = System::Drawing::Point(10, 100);
+		System::Drawing::Point TABLE_LOCATION = System::Drawing::Point(10, 150);
 		//表画像の選択箇所をハイライトするときの色
 		System::Drawing::Brush^ SELECT_COLOR = gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(100, System::Drawing::Color::Yellow));
 		//表画像の背景色
@@ -89,6 +95,6 @@ namespace CONSTANTS {
 		//表画像の描画対象がオブジェクトであることを示す色
 		System::Drawing::Brush^ OBJECT_COLOR = gcnew System::Drawing::SolidBrush(System::Drawing::Color::FromArgb(100, System::Drawing::Color::Blue));
 		//表画像上に文字を描画するときのフォント設定
-		System::Drawing::Font^ TABLE_FONT = gcnew System::Drawing::Font(System::Drawing::FontFamily::GenericSansSerif, 14, System::Drawing::FontStyle::Bold);
+		System::Drawing::Font^ TABLE_FONT = gcnew System::Drawing::Font(System::Drawing::FontFamily::GenericSansSerif, 14, System::Drawing::FontStyle::Regular);
 	};
 }

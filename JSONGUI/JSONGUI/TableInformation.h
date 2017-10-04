@@ -30,9 +30,9 @@ namespace TableInformation {
 		Int32^ Column = Constants->ZERO;					//表の列数
 		Int32^ RowIndex = Constants->ZERO;					//クリックされた表のタテ座標
 		Int32^ ColumnIndex = Constants->ZERO;				//クリックされた表のヨコ座標
-		Int32^ RctWidth = 200;								//表の格子一つ当たりの幅
-		Int32^ RctHeight = 100;								//表の格子一つ当たりの高さ
-		CellDataChain::cellchain^ TableElem = nullptr;					//表の情報が格納されたデータチェイン
+		Int32^ RctWidth = Constants->RCT_WIDTH;				//表の格子一つ当たりの幅
+		Int32^ RctHeight = Constants->RCT_HEIGHT;			//表の格子一つ当たりの高さ
+		CellDataChain::cellchain^ TableElem = nullptr;		//表の情報が格納されたデータチェイン
 		String^ JSONFilePath = Constants->EMPTY_STRING;		//読み込むJSONのファイルパス
 		String^ DBQuery = Constants->EMPTY_STRING;			//DBよりJSON文字列を取得するためのクエリ
 
@@ -64,8 +64,10 @@ namespace TableInformation {
 				}
 				//作成した画像をピクチャボックスへのセル
 				pict->Image = img;
+				//ピクチャボックスの描画の起点を設定する
+//				pict->Anchor = (AnchorStyles::Top | AnchorStyles::Left);
 				//ピクチャボックスの位置を設定する
-				pict->Location = Constants->TABLE_LOCATION;
+//				pict->Location = Constants->TABLE_LOCATION;
 				//作成の終えたビットマップ画像を返す
 				return pict;
 			}
