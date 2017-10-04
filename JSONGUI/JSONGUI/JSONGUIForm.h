@@ -745,6 +745,11 @@ private: System::Void TableOKClick(System::Object^  sender, System::EventArgs^  
 private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^  e) {
 	//処理中の例外を捕捉してメッセージを表示するための例外処理
 	try {
+		//変換対象の構造体が存在していなければエラーを投げる
+		if (this->TableElem == nullptr) {
+			//例外を投げる
+			throw gcnew System::FormatException(Constants->CONV_ERROR_MESSAGE);
+		}
 		//JSONファイルの保存先を保管する文字列
 		String^ outJSONpath = Constants->EMPTY_STRING;
 		//内部処理クラスをインスタンス化
@@ -768,6 +773,12 @@ private: System::Void TableConvClick(System::Object^  sender, System::EventArgs^
 		MessageBox::Show(Constants->SUCCES_STRING);
 		//変換完了
 		return;
+	}		//JSONが見つからなかったときの例外を処理する
+	catch (System::FormatException^ e) {
+		//コンソールにエラー内容を表示
+		Console::WriteLine(e);
+		//なんらかのエラーが発生して処理が中断されたことを表示する
+		MessageBox::Show(Constants->MESSAGE_STRING, Constants->ERROR_STRING, MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	catch (System::Exception^ e) {
 		//なんらかのエラーが発生して処理が中断されたことを表示する
@@ -1218,6 +1229,11 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
  private:Void Expansion() {
 	 //構造体の走査中に発生したnullptrの例外処理
 	 try{
+		 //変換対象となる構造体が存在していなければエラーを投げる
+		 if (this->TableElem == nullptr) {
+			 //対象が存在していないことを投げる
+			 throw gcnew System::FormatException(Constants->NOT_FOUND_ERROR);
+		 }
 	 CellDataChain^ CellCtrl = gcnew CellDataChain();	 //チェイン構造操作クラスをインスタンス化
 	 JSONGUIForm^ more = gcnew JSONGUIForm();			 //表画像を表示するためのクラスをインスタンス化
 	 CellDataChain::cellchain^ detailtable = nullptr;	 //表示する構造体を取得して格納するための構造体
@@ -1259,6 +1275,8 @@ private: System::Void ButtonExpansionClick(System::Object^  sender, System::Even
 		 System::Console::WriteLine(e);
 	 }//ReadyPictないで発生した例外を捕捉
 	 catch (System::FormatException^ e) {
+		//エラーをコンソールに表示する
+		System::Console::WriteLine(e);
 		 //例外をメイン画面へ再送出する
 		 throw e;
 	 }
@@ -1320,20 +1338,27 @@ private: System::Void DeleteColumnButtonClick(System::Object^  sender, System::E
 	//全ての例外を捕捉したらメイン画面側で警告を表示するための例外処理
 	try {
 		//表が存在していないときは対象が存在していないとして例外を送出
-		if (*this->Column <= 0 || *this->Row <= 0) {
+		if (*this->Column <= 0 || *this->Row <= 0 || *this->ColumnIndex < 0) {
 			//コンソールにエラー内容を表示する
 			Console::WriteLine(Constants->NOT_FOUND_ERROR);
 			//対象が存在していないとして例外を送出
 			throw gcnew System::FormatException(Constants->NOT_FOUND_ERROR);
 		}
 		//削除対象が先頭の列の場合は親を削除することになるので削除しない
-		if (*this->ColumnIndex > 0) {
+		if (*this->ColumnIndex > 0 && *this->Column > 1) {
 			//指定した列を削除する関数を呼び出す
 			this->ColumnDelete(*this->Row, *this->ColumnIndex);
 			//列数を減らす
 			this->textBoxCol->Text = Convert::ToString(Convert::ToInt32(this->textBoxCol->Text) - 1);
 			//表の内容が変更されているため再描画する準備を行う
 			this->ReadyPict(this->TableElem);
+			//インデックスと列数が同じであれば選択箇所が消えているので選択箇所をずらす
+			if (*this->Column == *this->ColumnIndex) {
+				//列数のインデックスをずらす
+				*this->ColumnIndex -= 1;
+				//選択箇所を再描画する
+				this->SelecteCell(this->pictureBoxCurrent);
+			}
 			//表全体を再描画する
 			this->CreateTablePict(this->pictureBoxTable);
 		}
@@ -1361,7 +1386,7 @@ private: System::Void DeleteRowButtonClick(System::Object^  sender, System::Even
 	//全ての例外に対してメイン画面で警告を表示するように例外処理
 	try {
 		//表が存在していないときは対象が存在していないとして例外を送出
-		if (*this->Column <= 0 || *this->Row <= 0) {
+		if (*this->Column <= 0 || *this->Row <= 0 || *this->RowIndex < 0) {
 			//コンソールにエラー内容を表示する
 			Console::WriteLine(Constants->NOT_FOUND_ERROR);
 			//対象が存在していないとして例外を送出
@@ -1375,6 +1400,13 @@ private: System::Void DeleteRowButtonClick(System::Object^  sender, System::Even
 			this->textBoxRow->Text = Convert::ToString(Convert::ToInt32(this->textBoxRow->Text) - 1);
 			//表の内容が変更されているため再描画する準備を行う
 			this->ReadyPict(this->TableElem);
+			//インデックスと行数が同じであれば選択箇所が消えているので選択箇所をずらす
+			if (*this->Row == *this->RowIndex) {
+				//行数のインデックスをずらす
+				*this->RowIndex -= 1;
+				//選択箇所を再描画する
+				this->SelecteCell(this->pictureBoxCurrent);
+			}
 			//表全体を再描画する
 			this->CreateTablePict(this->pictureBoxTable);
 		}

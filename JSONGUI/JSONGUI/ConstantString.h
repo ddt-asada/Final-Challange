@@ -38,6 +38,8 @@ namespace CONSTANTS {
 		System::String^ SUCCES_STRING = "JSONファイルの出力が完了しました。";
 		//操作を中断した時に表示するメッセージ
 		System::String^ CANCEL_STRING = "操作が中断されました";
+		//変換対象がないときに表示するメッセージ
+		System::String^ CONV_ERROR_MESSAGE = "JSONの出力に失敗しました。\n変換対象が存在していません。";
 		//JSONファイルを読み込んだことを表示するメッセージ
 		System::String^ LOAD_STRING = "JSONファイルの読み込みが完了しました。";
 		//新規で表を生成するときの案内メッセージ
@@ -51,7 +53,7 @@ namespace CONSTANTS {
 		//行・列を追加するときに先頭より先には追加できないことを表示するメッセージ
 		System::String^ ADD_ERROR_STRING = "先頭より先には追加できません。";
 		//行・列を削除するときに先頭より先は削除できないことを表示するメッセージ
-		System::String^ DELETE_ERROR_STRING = "先頭より先は削除できません。";
+		System::String^ DELETE_ERROR_STRING = "先頭は削除できません。";
 		//削除対象が存在していないときに表示するメッセージ
 		System::String^ NOT_FOUND_ERROR = "対象が存在していません。\n";
 		//キー名が空の時に描画する配列であることを示す文字列
@@ -82,10 +84,12 @@ namespace CONSTANTS {
 		System::String^ INITIAL_COLUMN_STRING = "0";
 		//0を示す変数
 		System::Int32 ZERO = 0;
+		//-1を示す変数選択座標の初期値として利用
+		System::Int32 INITIAL_INDEX = -1;
 		//表画像上のセル一つ当たりの幅
-		System::Int32^ RCT_WIDTH = 100;
+		System::Int32^ RCT_WIDTH = 150;
 		//表画像上のセル一つ当たりの高さ
-		System::Int32^ RCT_HEIGHT = 50;
+		System::Int32^ RCT_HEIGHT = 100;
 		//メイン画面にて表画像を置く位置
 		System::Drawing::Point TABLE_LOCATION = System::Drawing::Point(10, 150);
 		//表画像の選択箇所をハイライトするときの色

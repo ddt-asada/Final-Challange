@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ConstantString.h"
+
 /*概要：JSONデータをチェイン構造にして扱うためのクラス
 作成日：2017.9.20
 作成者：K.Asada
@@ -8,6 +10,8 @@
 更新内容：マネージ型クラス、構造体に変更、構造体の要素をchar*からString^型へ変更*/
 public ref class CellDataChain {
 public:
+	CONSTANTS::ConstantString^ Constants = gcnew CONSTANTS::ConstantString();
+
 	//双方向チェインデータの構造体
 	typedef ref struct cellchain {
 		System::String^ key;					//キー名
@@ -547,7 +551,7 @@ public:
 			//子がいない場合は作る
 			else {
 				//子供として空の構造体を連結する
-				family = this->ChainChild("", "", family);
+				family = this->ChainChild(Constants->CHAIN_KEY_STRING, Constants->CHAIN_VALUE_STRING, family);
 			}
 			//取得した子供を返す
 			return family;
@@ -579,7 +583,7 @@ public:
 			}
 			//いなければ弟を作る
 			else {
-				family = ChainYoungBrother("", "", family);
+				family = ChainYoungBrother(Constants->CHAIN_KEY_STRING, Constants->CHAIN_VALUE_STRING, family);
 			}
 			//対象の弟を返却する
 			return family;
@@ -681,6 +685,51 @@ public:
 			}
 			//コピーの終わった構造体の長男を返却する
 			return %*this->GetElderChain(paste);
+		}
+		catch (System::NullReferenceException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+		//null引数例外を捕捉
+		catch (System::ArgumentNullException^ e) {
+			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する
+			System::Console::WriteLine(e);
+		}
+	}
+
+	/*概要：対象が配列であるかどうかを判定するための関数
+	引数：cellchain^ brother：判定する対象の構造体
+	戻り値：Boolean arrayjudge：配列かどうかの判定
+	作成日：2017.10.4
+	作成者：K.Asada*/
+	System::Boolean CheckArray(cellchain^ brother) {
+		try {
+			cellchain^ arraychain = brother;		//対象の構造体を取得
+			System::Boolean arrayjudge = true;		//返却するための判定
+			//対象の一番弟を取得して走査の起点とする
+			arraychain = this->GetYoungChain(brother);
+			//走査対象となる兄が存在するかを調べる
+			if (arraychain->prev != nullptr) {
+				//いる場合は兄がいなくなるまで走査を行う
+				for (; arraychain->prev != nullptr; arraychain = arraychain->prev) {
+					//兄弟の中にキー名が空でないものがあれば配列でないので判定にfalseを代入
+					if (arraychain->key != Constants->EMPTY_STRING) {
+						//配列でないことを返却する
+						arrayjudge = false;
+						//ループを抜ける
+						break;
+					}
+				}
+			}//兄いないときは一人っ子なので本人を判定する
+			else {
+				//キー名が空でなければ配列ではない
+				if (arraychain->key != Constants->EMPTY_STRING) {
+					//配列でないとする
+					arrayjudge = false;
+				}
+			}
+			//判定結果を返却する
+			return arrayjudge;
 		}
 		catch (System::NullReferenceException^ e) {
 			//例外をコンソール上に表示、表にはメイン画面の例外処理で表示する

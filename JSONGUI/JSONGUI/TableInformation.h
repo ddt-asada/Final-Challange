@@ -28,8 +28,8 @@ namespace TableInformation {
 		ConstantString^ Constants = gcnew ConstantString();	//定数クラスのインスタンス化
 		Int32^ Row = Constants->ZERO;						//表の行数
 		Int32^ Column = Constants->ZERO;					//表の列数
-		Int32^ RowIndex = Constants->ZERO;					//クリックされた表のタテ座標
-		Int32^ ColumnIndex = Constants->ZERO;				//クリックされた表のヨコ座標
+		Int32^ RowIndex = Constants->INITIAL_INDEX;					//クリックされた表のタテ座標
+		Int32^ ColumnIndex = Constants->INITIAL_INDEX;				//クリックされた表のヨコ座標
 		Int32^ RctWidth = Constants->RCT_WIDTH;				//表の格子一つ当たりの幅
 		Int32^ RctHeight = Constants->RCT_HEIGHT;			//表の格子一つ当たりの高さ
 		CellDataChain::cellchain^ TableElem = nullptr;		//表の情報が格納されたデータチェイン
@@ -64,10 +64,6 @@ namespace TableInformation {
 				}
 				//作成した画像をピクチャボックスへのセル
 				pict->Image = img;
-				//ピクチャボックスの描画の起点を設定する
-//				pict->Anchor = (AnchorStyles::Top | AnchorStyles::Left);
-				//ピクチャボックスの位置を設定する
-//				pict->Location = Constants->TABLE_LOCATION;
 				//作成の終えたビットマップ画像を返す
 				return pict;
 			}
@@ -230,8 +226,8 @@ namespace TableInformation {
 			try {
 				this->Row = Constants->ZERO;				//行数を初期化する
 				this->Column = Constants->ZERO;				//列数を初期化する
-				this->RowIndex = Constants->ZERO;			//行座標を初期化する
-				this->ColumnIndex = Constants->ZERO;		//列座標を初期化する
+				this->RowIndex = Constants->INITIAL_INDEX;			//行座標を初期化する
+				this->ColumnIndex = Constants->INITIAL_INDEX;		//列座標を初期化する
 				this->RctWidth = 200;						//セル一つ当たりの幅を初期化する
 				this->RctHeight = 100;						//セル一つ当たりの高さを初期化する
 				this->JSONFilePath = Constants->EMPTY_STRING;//読み込み先のファイルパスを初期化する
@@ -492,7 +488,7 @@ namespace TableInformation {
 		Void DrawFigure(System::Drawing::Rectangle^ rct, Graphics^ gr, CellDataChain::cellchain^ elem) {
 			//描画時のエラーを捕捉
 			try {
-				String^ celldata = "";		//表画像に描画する文字列
+				String^ celldata = Constants->EMPTY_STRING;		//表画像に描画する文字列
 				CellDataChain^ CellCtrl = gcnew CellDataChain();		//構造体操作クラスをインスタンス化
 				//構造体より描画対象の文字列を取得
 				celldata = CellCtrl->GetCellString(elem, false, false);
@@ -503,8 +499,8 @@ namespace TableInformation {
 					//オブジェクトであることを明示するために色付けを行う
 					gr->FillRectangle(Constants->OBJECT_COLOR, *rct);
 				}
-				//取得した文字列がからであり、構造体に子が存在する場合は配列である旨を描画
-				if (elem != nullptr && celldata == Constants->EMPTY_STRING && elem->lower != nullptr) {
+				//配列かどうかを判定して配列であれば
+				if (elem != nullptr && elem->lower != nullptr && CellCtrl->CheckArray(elem)) {
 					//配列と描画する
 					gr->DrawString(Constants->ARRAY_STRING, Constants->TABLE_FONT, Brushes::Black, *rct);
 				}//それ以外の時は取得した文字列をそのまま描画する
