@@ -1069,7 +1069,7 @@ private: System::Void AddRowButtonClick(System::Object^  sender, System::EventAr
 	//例外をメイン画面でも捕捉するために例外処理
 	try {
 		//表が存在していないときは対象が存在していないとして例外を送出
-		if (*this->Column <= 0 || *this->Row <= 0) {
+		if (*this->Column <= 0 || *this->Row <= 0 || *this->RowIndex < 0) {
 			//コンソールにエラー内容を表示する
 			Console::WriteLine(Constants->NOT_FOUND_ERROR);
 			//対象が存在していないとして例外を送出
@@ -1128,7 +1128,7 @@ private: System::Void AddColumnButtonClick(System::Object^  sender, System::Even
 	//例外が来たときに警告を表示するためにすべての例外処理
 	try {
 		//表が存在していないときは対象が存在していないとして例外を送出
-		if (*this->Column <= 0 || *this->Row <= 0) {
+		if (*this->Column <= 0 || *this->Row <= 0 || *this->ColumnIndex < 0) {
 			//コンソールにエラー内容を表示する
 			Console::WriteLine(Constants->NOT_FOUND_ERROR);
 			//対象が存在していないとして例外を送出
@@ -1469,7 +1469,7 @@ private: System::Void textBoxCell_Leave(System::Object^  sender, System::EventAr
 		Int32 colindex = *this->ColumnIndex;	//編集する構造体を指定するために座標を取得
 		String^ data = this->textBoxCell->Text;	//構造体んい渡すための文字列をテキストボックスより取得
 		//テキストボックスの中身が空文字でない場合のみ更新を行う
-		if (data != Constants->EMPTY_STRING) {
+		if ((data != Constants->EMPTY_STRING) || (CellCtrl->GetColumnChain(rowindex, colindex, this->TableElem->lower) != nullptr && data == Constants->EMPTY_STRING))  {
 			//対象の位置の構造体に文字列を挿入する関数を呼び出す
 			CellCtrl->SetChainCell(rowindex, colindex, data, this->TableElem, this->radioButtonKey->Checked, this->radioButtonValue->Checked);
 			//セルの再描画を行う

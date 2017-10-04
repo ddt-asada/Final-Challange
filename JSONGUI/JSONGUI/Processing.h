@@ -90,11 +90,11 @@ namespace process {
 				}
 				string result = "";		//DBから取得したJSON文字列を格納するための文字列
 				string query = "";		//DBへ渡すクエリを格納する文字列
-			//	JSONDBManager db;				//DBとの通信を行うクラスをインスタンス化
+				JSONDBManager db;				//DBとの通信を行うクラスをインスタンス化
 				//メイン画面より受け取ったクエリの型変換を行う
 				this->MarshalString(DBquery, query);
 				//DBからJSON文字列を取得する
-	//			result = db.GetDBResult(query);
+				result = db.GetDBResult(query);
 				//文字列処理関数を呼び出す
 				this->TableString(result);
 				//戻り値なし

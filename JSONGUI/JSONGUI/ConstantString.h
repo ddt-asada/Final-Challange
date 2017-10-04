@@ -14,6 +14,10 @@ namespace CONSTANTS {
 		System::String^ EMPTY_STRING = "";
 		//0を示す文字列
 		System::String^ ZERO_STRING = "0";
+		//読込対象がJSONとして成り立っていなかったときに表示するメッセージ
+		System::String^ NOT_JSON_MESSAGE = "読込対象がJSONとして成り立っていません。";
+		//ptree関係の例外が発生した時の例外処理
+		System::String^ JSON_CONV_MESSAGE = "JSONの変換中にエラーが発生しました。";
 		//作成したJSONファイルの保存先を選択するときに表示するメッセージ
 		System::String^ OUT_PATH_MESSAGE = "JSONファイルの保存先を選択してください。\n";
 		//ファイルパスが入力されていないときに表示するメッセージ

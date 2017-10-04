@@ -36,15 +36,24 @@ namespace process{
 		作成日：2017.9.21
 		作成者：K.Asada*/
 		Void TableString(string json) {
-			ptree pt;						//ツリー構造にしたJSONを格納するためのツリー
-			stringstream ss;				//文字列を読み込むためのストリーム
-			//文字列ストリームへ文字列を読み込ませる
-			ss << json;
-			//JSONを処理する準備として取得したJSON文字列をツリー構造にする
-			read_json(ss, pt);
-			//取得したJSON文字列をチェイン構造化する関数を呼び出す
-			this->Tablechain = this->JSONString(pt, "", nullptr);
-			return;
+			//JSON以外のファイルが読み込まれたときの例外処理
+			try {
+				ptree pt;						//ツリー構造にしたJSONを格納するためのツリー
+				stringstream ss;				//文字列を読み込むためのストリーム
+				//文字列ストリームへ文字列を読み込ませる
+				ss << json;
+				//JSONを処理する準備として取得したJSON文字列をツリー構造にする
+				read_json(ss, pt);
+				//取得したJSON文字列をチェイン構造化する関数を呼び出す
+				this->Tablechain = this->JSONString(pt, "", nullptr);
+				return;
+			}
+			//読み込んだファイルからJSONに変換できなかったときの例外
+			catch (boost::property_tree::json_parser_error& e) {
+				//コンソールにJSONファイルでない旨を表示
+				cout << e.what();
+				Console::WriteLine(Constants->NOT_JSON_MESSAGE);
+			}
 		}
 
 		/*概要：文字列からJSONへの変換を行う関数
@@ -114,6 +123,12 @@ namespace process{
 			}
 			catch (System::ArgumentNullException^ e) {
 				System::Console::WriteLine(e);
+			}
+			//ptree関係の例外を捕捉
+			catch (boost::property_tree::ptree_error& e) {
+				//コンソールにエラー内容を表示
+				cout << e.what();
+				System::Console::WriteLine(Constants->JSON_CONV_MESSAGE);
 			}
 		}
 
@@ -185,6 +200,12 @@ namespace process{
 			catch (System::ArgumentNullException^ e) {
 				System::Console::WriteLine(e);
 			}
+			//ptree関係の例外を捕捉
+			catch (boost::property_tree::ptree_error& e) {
+				//コンソールにエラー内容を表示
+				cout << e.what();
+				System::Console::WriteLine(Constants->JSON_CONV_MESSAGE);
+			}
 		}
 
 
@@ -213,6 +234,12 @@ namespace process{
 			catch (System::ArgumentNullException^ e) {
 				System::Console::WriteLine(e);
 			}
+			//ptree関係の例外を捕捉
+			catch (boost::property_tree::ptree_error& e) {
+				//コンソールにエラー内容を表示
+				cout << e.what();
+				System::Console::WriteLine(Constants->JSON_CONV_MESSAGE);
+			}
 		}
 
 		/*概要：配列の文字列処理を行う関数
@@ -236,6 +263,12 @@ namespace process{
 			}
 			catch (System::ArgumentNullException^ e) {
 				System::Console::WriteLine(e);
+			}
+			//ptree関係の例外を捕捉
+			catch (boost::property_tree::ptree_error& e) {
+				//コンソールにエラー内容を表示
+				cout << e.what();
+				System::Console::WriteLine(Constants->JSON_CONV_MESSAGE);
 			}
 		}
 

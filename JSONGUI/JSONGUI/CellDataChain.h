@@ -711,7 +711,7 @@ public:
 			//走査対象となる兄が存在するかを調べる
 			if (arraychain->prev != nullptr) {
 				//いる場合は兄がいなくなるまで走査を行う
-				for (; arraychain->prev != nullptr; arraychain = arraychain->prev) {
+				for (; arraychain != nullptr; arraychain = arraychain->prev) {
 					//兄弟の中にキー名が空でないものがあれば配列でないので判定にfalseを代入
 					if (arraychain->key != Constants->EMPTY_STRING) {
 						//配列でないことを返却する
